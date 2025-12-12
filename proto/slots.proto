@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package slots;
+
+option go_package = "vegas-casino/proto/slots";
+
+// Slots Service
+service SlotsService {
+  // Health check
+  rpc Health(HealthRequest) returns (HealthResponse);
+  
+  // Spin slots
+  rpc Spin(SpinRequest) returns (SpinResponse);
+  
+  // Get game assets (HTML/JS/CSS for rendering)
+  rpc GetGameAssets(GameAssetsRequest) returns (GameAssetsResponse);
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;
+  string service = 2;
+  map<string, string> metadata = 3;
+}
+
+message SpinRequest {
+  double bet_amount = 1;
+  bool cheat_active = 2;
+  string cheat_type = 3;
+  map<string, string> player_info = 4;
+}
+
+message SpinResponse {
+  repeated string result = 1;
+  bool win = 2;
+  double win_amount = 3;
+  double bet_amount = 4;
+  double multiplier = 5;
+  string win_type = 6;
+  string description = 7;
+  string timestamp = 8;
+  bool cheat_active = 9;
+  string cheat_type = 10;
+  bool cheat_boosted = 11;
+}
+
+message GameAssetsRequest {
+  string asset_type = 1; // "html", "js", "css", "all"
+}
+
+message GameAssetsResponse {
+  string html = 1;
+  string javascript = 2;
+  string css = 3;
+  map<string, string> config = 4;
+}
+
+
+
+
+

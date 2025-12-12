@@ -1,0 +1,7 @@
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+opentelemetry-exporter-otlp-proto-grpc==1.21.0
+opentelemetry-semantic-conventions==0.42b0
+grpcio==1.60.0
+grpcio-tools==1.60.0
+

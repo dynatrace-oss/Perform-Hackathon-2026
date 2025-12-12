@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vegas-casino
+  labels:
+    name: vegas-casino
+    app: vegas-casino-microservices
+
+
+
+
+

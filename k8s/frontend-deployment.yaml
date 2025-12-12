@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vegas-frontend-service
+  namespace: vegas-casino
+  labels:
+    app: vegas-frontend-service
+    service: frontend
+    tier: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vegas-frontend-service
+  template:
+    metadata:
+      labels:
+        app: vegas-frontend-service
+        service: frontend
+        tier: frontend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/health"
+    spec:
+      containers:
+      - name: frontend-service
+        image: vegas-frontend-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "3000"
+        - name: SERVICE_NAME
+          value: "vegas-frontend-service"
+        - name: SERVICE_NAMESPACE
+          value: "vegas-casino"
+        - name: SERVICE_VERSION
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: SERVICE_VERSION
+        - name: DEPLOYMENT_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: DEPLOYMENT_ENVIRONMENT
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://otel-collector:4318"
+        # gRPC service endpoints
+        - name: SLOTS_SERVICE_GRPC
+          value: "vegas-slots-service:50051"
+        - name: ROULETTE_SERVICE_GRPC
+          value: "vegas-roulette-service:50052"
+        - name: DICE_SERVICE_GRPC
+          value: "vegas-dice-service:50053"
+        - name: BLACKJACK_SERVICE_GRPC
+          value: "vegas-blackjack-service:50054"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vegas-frontend-service
+  namespace: vegas-casino
+  labels:
+    app: vegas-frontend-service
+    service: frontend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  selector:
+    app: vegas-frontend-service
+
+
+
+
+

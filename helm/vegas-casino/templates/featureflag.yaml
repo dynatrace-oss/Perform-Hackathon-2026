@@ -1,0 +1,227 @@
+{{- if .Values.openfeature.enabled }}
+apiVersion: core.openfeature.dev/v1beta1
+kind: FeatureFlag
+metadata:
+  name: {{ include "vegas-casino.fullname" . }}-flags
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vegas-casino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: feature-flags
+spec:
+  flagSpec:
+    flags:
+      # Slots game feature flags
+      "slots.progressive-jackpot":
+        {{- $slots := .Values.flagd.slots | default dict }}
+        {{- $flag := index $slots "progressive-jackpot" | default dict }}
+        {{- $variants := $flag.variants | default dict }}
+        state: {{ $flag.state | default "ENABLED" }}
+        defaultVariant: {{ $flag.defaultVariant | default "true" | quote }}
+        variants:
+          {{- if $variants }}
+          {{- range $key, $value := $variants }}
+          {{ $key | quote }}: {{ $value }}
+          {{- end }}
+          {{- else }}
+          "true": true
+          "false": false
+          {{- end }}
+        targeting: {}
+      "slots.bonus-rounds":
+        {{- $slots := .Values.flagd.slots | default dict }}
+        {{- $flag := index $slots "bonus-rounds" | default dict }}
+        {{- $variants := $flag.variants | default dict }}
+        state: {{ $flag.state | default "ENABLED" }}
+        defaultVariant: {{ $flag.defaultVariant | default "true" | quote }}
+        variants:
+          {{- if $variants }}
+          {{- range $key, $value := $variants }}
+          {{ $key | quote }}: {{ $value }}
+          {{- end }}
+          {{- else }}
+          "true": true
+          "false": false
+          {{- end }}
+        targeting: {}
+      "slots.cheat-detection":
+        {{- $slots := .Values.flagd.slots | default dict }}
+        {{- $flag := index $slots "cheat-detection" | default dict }}
+        {{- $variants := $flag.variants | default dict }}
+        state: {{ $flag.state | default "ENABLED" }}
+        defaultVariant: {{ $flag.defaultVariant | default "true" | quote }}
+        variants:
+          {{- if $variants }}
+          {{- range $key, $value := $variants }}
+          {{ $key | quote }}: {{ $value }}
+          {{- end }}
+          {{- else }}
+          "true": true
+          "false": false
+          {{- end }}
+        targeting: {}
+      "slots.min-bet":
+        {{- $slots := .Values.flagd.slots | default dict }}
+        {{- $flag := index $slots "min-bet" | default dict }}
+        {{- $variants := $flag.variants | default dict }}
+        state: {{ $flag.state | default "ENABLED" }}
+        defaultVariant: {{ $flag.defaultVariant | default "10" | quote }}
+        variants:
+          {{- if $variants }}
+          {{- range $key, $value := $variants }}
+          {{ $key | quote }}: {{ $value }}
+          {{- end }}
+          {{- else }}
+          "10": 10
+          "5": 5
+          "20": 20
+          {{- end }}
+        targeting: {}
+      "slots.max-bet":
+        {{- $slots := .Values.flagd.slots | default dict }}
+        {{- $flag := index $slots "max-bet" | default dict }}
+        {{- $variants := $flag.variants | default dict }}
+        state: {{ $flag.state | default "ENABLED" }}
+        defaultVariant: {{ $flag.defaultVariant | default "1000" | quote }}
+        variants:
+          {{- if $variants }}
+          {{- range $key, $value := $variants }}
+          {{ $key | quote }}: {{ $value }}
+          {{- end }}
+          {{- else }}
+          "1000": 1000
+          "500": 500
+          "2000": 2000
+          {{- end }}
+        targeting: {}
+      # Blackjack game feature flags
+      "blackjack.double-down":
+        {{- $blackjack := .Values.flagd.blackjack | default dict }}
+        {{- $flag := index $blackjack "double-down" | default dict }}
+        {{- $variants := $flag.variants | default dict }}
+        state: {{ $flag.state | default "ENABLED" }}
+        defaultVariant: {{ $flag.defaultVariant | default "true" | quote }}
+        variants:
+          {{- if $variants }}
+          {{- range $key, $value := $variants }}
+          {{ $key | quote }}: {{ $value }}
+          {{- end }}
+          {{- else }}
+          "true": true
+          "false": false
+          {{- end }}
+        targeting: {}
+      "blackjack.insurance":
+        {{- $blackjack := .Values.flagd.blackjack | default dict }}
+        {{- $flag := $blackjack.insurance | default dict }}
+        {{- $variants := $flag.variants | default dict }}
+        state: {{ $flag.state | default "ENABLED" }}
+        defaultVariant: {{ $flag.defaultVariant | default "true" | quote }}
+        variants:
+          {{- if $variants }}
+          {{- range $key, $value := $variants }}
+          {{ $key | quote }}: {{ $value }}
+          {{- end }}
+          {{- else }}
+          "true": true
+          "false": false
+          {{- end }}
+        targeting: {}
+      "blackjack.surrender":
+        {{- $blackjack := .Values.flagd.blackjack | default dict }}
+        {{- $flag := $blackjack.surrender | default dict }}
+        {{- $variants := $flag.variants | default dict }}
+        state: {{ $flag.state | default "ENABLED" }}
+        defaultVariant: {{ $flag.defaultVariant | default "false" | quote }}
+        variants:
+          {{- if $variants }}
+          {{- range $key, $value := $variants }}
+          {{ $key | quote }}: {{ $value }}
+          {{- end }}
+          {{- else }}
+          "true": true
+          "false": false
+          {{- end }}
+        targeting: {}
+      # Roulette game feature flags
+      "roulette.multiple-bets":
+        {{- $roulette := .Values.flagd.roulette | default dict }}
+        {{- $flag := index $roulette "multiple-bets" | default dict }}
+        {{- $variants := $flag.variants | default dict }}
+        state: {{ $flag.state | default "ENABLED" }}
+        defaultVariant: {{ $flag.defaultVariant | default "true" | quote }}
+        variants:
+          {{- if $variants }}
+          {{- range $key, $value := $variants }}
+          {{ $key | quote }}: {{ $value }}
+          {{- end }}
+          {{- else }}
+          "true": true
+          "false": false
+          {{- end }}
+        targeting: {}
+      "roulette.live-wheel":
+        {{- $roulette := .Values.flagd.roulette | default dict }}
+        {{- $flag := index $roulette "live-wheel" | default dict }}
+        {{- $variants := $flag.variants | default dict }}
+        state: {{ $flag.state | default "ENABLED" }}
+        defaultVariant: {{ $flag.defaultVariant | default "true" | quote }}
+        variants:
+          {{- if $variants }}
+          {{- range $key, $value := $variants }}
+          {{ $key | quote }}: {{ $value }}
+          {{- end }}
+          {{- else }}
+          "true": true
+          "false": false
+          {{- end }}
+        targeting: {}
+      "roulette.cheat-detection":
+        {{- $roulette := .Values.flagd.roulette | default dict }}
+        {{- $flag := index $roulette "cheat-detection" | default dict }}
+        {{- $variants := $flag.variants | default dict }}
+        state: {{ $flag.state | default "ENABLED" }}
+        defaultVariant: {{ $flag.defaultVariant | default "true" | quote }}
+        variants:
+          {{- if $variants }}
+          {{- range $key, $value := $variants }}
+          {{ $key | quote }}: {{ $value }}
+          {{- end }}
+          {{- else }}
+          "true": true
+          "false": false
+          {{- end }}
+        targeting: {}
+      # Dice game feature flags
+      "dice.pass-line":
+        {{- $dice := .Values.flagd.dice | default dict }}
+        {{- $flag := index $dice "pass-line" | default dict }}
+        {{- $variants := $flag.variants | default dict }}
+        state: {{ $flag.state | default "ENABLED" }}
+        defaultVariant: {{ $flag.defaultVariant | default "true" | quote }}
+        variants:
+          {{- if $variants }}
+          {{- range $key, $value := $variants }}
+          {{ $key | quote }}: {{ $value }}
+          {{- end }}
+          {{- else }}
+          "true": true
+          "false": false
+          {{- end }}
+        targeting: {}
+      "dice.come-bets":
+        {{- $dice := .Values.flagd.dice | default dict }}
+        {{- $flag := index $dice "come-bets" | default dict }}
+        {{- $variants := $flag.variants | default dict }}
+        state: {{ $flag.state | default "ENABLED" }}
+        defaultVariant: {{ $flag.defaultVariant | default "false" | quote }}
+        variants:
+          {{- if $variants }}
+          {{- range $key, $value := $variants }}
+          {{ $key | quote }}: {{ $value }}
+          {{- end }}
+          {{- else }}
+          "true": true
+          "false": false
+          {{- end }}
+        targeting: {}
+{{- end }}

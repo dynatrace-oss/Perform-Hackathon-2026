@@ -1,0 +1,30 @@
+{{- if .Values.blackjack.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "vegas-casino.fullname" . }}-blackjack
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vegas-casino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: blackjack
+spec:
+  type: {{ .Values.blackjack.service.type }}
+  ports:
+    - port: {{ .Values.blackjack.service.httpPort }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.blackjack.service.grpcPort }}
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+  selector:
+    app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: blackjack
+{{- end }}
+
+
+
+
+

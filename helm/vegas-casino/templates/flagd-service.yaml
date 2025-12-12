@@ -1,0 +1,26 @@
+{{- if and .Values.flagd.enabled (not .Values.openfeature.enabled) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "vegas-casino.fullname" . }}-flagd
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vegas-casino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: flagd
+spec:
+  type: {{ .Values.flagd.service.type }}
+  ports:
+    - port: {{ .Values.flagd.service.httpPort }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.flagd.service.grpcPort }}
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+  selector:
+    app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: flagd
+{{- end }}
+

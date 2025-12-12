@@ -1,0 +1,42 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vegas-casino-ingress
+  namespace: vegas-casino
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"  # Optional: for TLS
+spec:
+  # Uncomment and configure for TLS
+  # tls:
+  # - hosts:
+  #   - vegas-casino.example.com
+  #   secretName: vegas-casino-tls
+  rules:
+  - host: vegas-casino.example.com  # Change to your domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: vegas-casino-gateway
+            port:
+              number: 80
+  # Alternative: use default backend without host requirement
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: vegas-casino-gateway
+            port:
+              number: 80
+
+
+
+
+

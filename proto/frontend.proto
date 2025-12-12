@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package frontend;
+
+option go_package = "vegas-casino/proto/frontend";
+
+// Frontend Service - Aggregates game assets and provides unified interface
+service FrontendService {
+  // Get all available games
+  rpc GetGames(GamesRequest) returns (GamesResponse);
+  
+  // Get game assets for a specific game
+  rpc GetGameAssets(GameAssetsRequest) returns (GameAssetsResponse);
+  
+  // Health check
+  rpc Health(HealthRequest) returns (HealthResponse);
+}
+
+message GamesRequest {}
+
+message GamesResponse {
+  repeated GameInfo games = 1;
+}
+
+message GameInfo {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string icon = 4;
+  string service_endpoint = 5;
+}
+
+message GameAssetsRequest {
+  string game_id = 1;  // "slots", "roulette", "dice", "blackjack"
+  string asset_type = 2; // "html", "js", "css", "all"
+}
+
+message GameAssetsResponse {
+  string html = 1;
+  string javascript = 2;
+  string css = 3;
+  map<string, string> config = 4;
+  string game_id = 5;
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;
+  string service = 2;
+  map<string, string> metadata = 3;
+}
+
+
+
+
+

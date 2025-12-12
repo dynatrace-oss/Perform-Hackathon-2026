@@ -1,0 +1,30 @@
+{{- if .Values.dice.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "vegas-casino.fullname" . }}-dice
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vegas-casino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: dice
+spec:
+  type: {{ .Values.dice.service.type }}
+  ports:
+    - port: {{ .Values.dice.service.httpPort }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.dice.service.grpcPort }}
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+  selector:
+    app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: dice
+{{- end }}
+
+
+
+
+

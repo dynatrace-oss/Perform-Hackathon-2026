@@ -1,0 +1,140 @@
+{{- if .Values.roulette.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vegas-casino.fullname" . }}-roulette
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vegas-casino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: roulette
+spec:
+  replicas: {{ .Values.roulette.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: roulette
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: roulette
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.roulette.service.httpPort }}"
+        prometheus.io/path: "/health"
+        {{- if .Values.openfeature.enabled }}
+        openfeature.dev/enabled: "true"
+        openfeature.dev/featureflagsource: "{{ .Values.global.namespace }}/{{ include "vegas-casino.fullname" . }}-flag-source"
+        {{- end }}
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "vegas-casino.serviceAccountName" . }}
+      containers:
+      - name: roulette-service
+        {{- with .Values.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
+        image: "{{ include "vegas-casino.image" (dict "service" .Values.roulette "Values" .Values) }}"
+        imagePullPolicy: {{ .Values.roulette.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.roulette.service.httpPort }}
+          protocol: TCP
+        - name: grpc
+          containerPort: {{ .Values.roulette.service.grpcPort }}
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "{{ .Values.roulette.service.httpPort }}"
+        - name: GRPC_PORT
+          value: "{{ .Values.roulette.service.grpcPort }}"
+        - name: SERVICE_NAME
+          value: "{{ .Values.roulette.env.SERVICE_NAME }}"
+        - name: OTEL_SERVICE_NAME
+          value: "{{ .Values.roulette.env.OTEL_SERVICE_NAME }}"
+        - name: OTEL_SERVICE_VERSION
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "vegas-casino.fullname" . }}-config
+              key: OTEL_SERVICE_VERSION
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: "service.name={{ .Values.roulette.env.OTEL_SERVICE_NAME }},service.version={{ .Values.roulette.env.OTEL_SERVICE_VERSION }},service.namespace={{ .Values.roulette.env.SERVICE_NAMESPACE }},deployment.environment={{ .Values.roulette.env.DEPLOYMENT_ENVIRONMENT }},application.name=Vegas-Casino-table-games,game.category={{ .Values.roulette.env.GAME_CATEGORY }},game.complexity={{ .Values.roulette.env.GAME_COMPLEXITY }},game.max_payout={{ .Values.roulette.env.GAME_MAX_PAYOUT }},game.type={{ .Values.roulette.env.GAME_TYPE }},game.owner={{ .Values.roulette.env.GAME_OWNER }}"
+        - name: DEPLOYMENT_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "vegas-casino.fullname" . }}-config
+              key: DEPLOYMENT_ENVIRONMENT
+        - name: SERVICE_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "vegas-casino.fullname" . }}-config
+              key: SERVICE_NAMESPACE
+        - name: K8S_CLUSTER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "vegas-casino.fullname" . }}-config
+              key: K8S_CLUSTER_NAME
+        - name: K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: SERVICE_INSTANCE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "{{ .Values.opentelemetry.exporter.endpoint }}"
+        - name: OTEL_EXPORTER_OTLP_PROTOCOL
+          value: "{{ .Values.opentelemetry.exporter.protocol }}"
+        - name: OTEL_EXPORTER_OTLP_INSECURE
+          value: "true"  # Disable TLS for plain gRPC connections
+        # Redis configuration
+        - name: REDIS_HOST
+          value: "{{ include "vegas-casino.fullname" . }}-redis"
+        - name: REDIS_PORT
+          value: "{{ .Values.redis.service.port | toString }}"
+        {{- if .Values.redis.password }}
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "vegas-casino.fullname" . }}-redis
+              key: password
+        {{- end }}
+        # Scoring service configuration
+        - name: SCORING_SERVICE_URL
+          value: "http://{{ include "vegas-casino.fullname" . }}-scoring:{{ .Values.scoring.service.port }}"
+        # Game-specific attributes
+        - name: GAME_CATEGORY
+          value: "{{ .Values.roulette.env.GAME_CATEGORY }}"
+        - name: GAME_COMPLEXITY
+          value: "{{ .Values.roulette.env.GAME_COMPLEXITY }}"
+        - name: GAME_MAX_PAYOUT
+          value: "{{ .Values.roulette.env.GAME_MAX_PAYOUT }}"
+        - name: GAME_TYPE
+          value: "{{ .Values.roulette.env.GAME_TYPE }}"
+        - name: GAME_OWNER
+          value: "{{ .Values.roulette.env.GAME_OWNER }}"
+        # Note: When openfeature.enabled=true, the OpenFeature Operator automatically
+        # injects the flagd sidecar and handles all configuration. No manual env vars needed.
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.roulette.resources | nindent 10 }}
+{{- end }}
+

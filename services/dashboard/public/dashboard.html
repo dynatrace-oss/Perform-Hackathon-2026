@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vegas Casino - Analytics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --dt-purple: #6C2C9C;
+            --dt-blue: #00A1C9;
+            --dt-cyan: #00D4FF;
+            --dt-green: #73BE28;
+            --dt-orange: #FFA86B;
+            --dt-yellow: #FFD23F;
+            --dt-dark: #151515;
+            --dt-darker: #0A0A0A;
+            --dt-gray: #2D2D2D;
+            --dt-light-gray: #4A4A4A;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dt-darker) 0%, var(--dt-dark) 100%);
+            color: #fff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .stat-card {
+            background: rgba(45, 45, 45, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--dt-cyan);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--dt-cyan), var(--dt-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .table-container {
+            background: rgba(45, 45, 45, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: rgba(0, 161, 201, 0.2);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dt-cyan);
+            border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        tr:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+        
+        .rank-1 { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; }
+        .rank-2 { background: linear-gradient(135deg, #C0C0C0, #808080); color: #000; }
+        .rank-3 { background: linear-gradient(135deg, #CD7F32, #8B4513); color: #fff; }
+        .rank-other { background: rgba(0, 212, 255, 0.2); color: var(--dt-cyan); }
+        
+        .game-tab {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .game-tab.active {
+            background: linear-gradient(135deg, var(--dt-purple), var(--dt-blue));
+            border-color: var(--dt-cyan);
+        }
+        
+        .game-tab:hover:not(.active) {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 212, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--dt-cyan);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2" style="background: linear-gradient(135deg, var(--dt-cyan), var(--dt-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                📊 Vegas Casino Analytics Dashboard
+            </h1>
+            <p class="text-gray-400">Real-time game statistics and player leaderboards</p>
+        </div>
+
+        <!-- Game Tabs -->
+        <div class="flex gap-4 mb-6 flex-wrap">
+            <button class="game-tab active" data-game="all" onclick="loadDashboard('all')">
+                All Games
+            </button>
+            <button class="game-tab" data-game="slots" onclick="loadDashboard('slots')">
+                🎰 Slots
+            </button>
+            <button class="game-tab" data-game="roulette" onclick="loadDashboard('roulette')">
+                🎡 Roulette
+            </button>
+            <button class="game-tab" data-game="dice" onclick="loadDashboard('dice')">
+                🎲 Dice
+            </button>
+            <button class="game-tab" data-game="blackjack" onclick="loadDashboard('blackjack')">
+                🃏 Blackjack
+            </button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="hidden text-center py-8">
+            <div class="loading mx-auto"></div>
+            <p class="mt-4 text-gray-400">Loading dashboard data...</p>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboard-content" class="hidden">
+            <!-- Stats Grid -->
+            <div id="stats-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <!-- Stats will be populated here -->
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="stat-card">
+                    <h3 class="text-xl font-semibold mb-4 text-cyan-400">Win Rate Trend</h3>
+                    <canvas id="winRateChart"></canvas>
+                </div>
+                <div class="stat-card">
+                    <h3 class="text-xl font-semibold mb-4 text-cyan-400">Revenue Overview</h3>
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Players Table -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-4" style="color: var(--dt-cyan);">🏆 Top Players</h2>
+                <div class="table-container">
+                    <table id="top-players-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Player</th>
+                                <th>Initial Bet</th>
+                                <th>Winnings</th>
+                                <th>Game</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top-players-body">
+                            <!-- Top players will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-message" class="hidden text-center py-8">
+            <p class="text-red-400 text-lg">Failed to load dashboard data. Please try again.</p>
+        </div>
+    </div>
+
+    <script>
+        let winRateChart = null;
+        let revenueChart = null;
+        let currentGame = 'all';
+
+        // Load dashboard data
+        async function loadDashboard(game) {
+            currentGame = game;
+            
+            // Update active tab
+            document.querySelectorAll('.game-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-game="${game}"]`).classList.add('active');
+            
+            // Show loading
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('dashboard-content').classList.add('hidden');
+            document.getElementById('error-message').classList.add('hidden');
+            
+            try {
+                let url = game === 'all' 
+                    ? '/api/dashboard' 
+                    : `/api/dashboard/${game}`;
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch dashboard data');
+                
+                const data = await response.json();
+                console.log('Dashboard API response:', data);
+                
+                // Handle response format: 
+                // - For 'all': { stats: [...] } (array of stats)
+                // - For specific game: { game: 'slots', stats: {...} } (single stats object)
+                let statsArray;
+                if (game === 'all') {
+                    // All games returns array directly in stats
+                    statsArray = Array.isArray(data.stats) ? data.stats : [];
+                    console.log('All games stats array:', statsArray.length, 'games');
+                } else {
+                    // Single game returns object in stats
+                    statsArray = data.stats ? [data.stats] : [];
+                    console.log('Single game stats:', statsArray.length, 'game');
+                }
+                
+                // Handle empty stats - this is not an error, just no data yet
+                if (statsArray.length === 0 && game === 'all') {
+                    console.warn('No stats returned for all games - this may be normal if no games have been played yet');
+                    // Still render dashboard with empty array - it will show "No game data available"
+                }
+                
+                // Always render dashboard, even with empty array (it will show appropriate message)
+                renderDashboard(statsArray, game);
+                
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('dashboard-content').classList.remove('hidden');
+                document.getElementById('error-message').classList.add('hidden'); // Ensure error is hidden
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error-message').classList.remove('hidden');
+            }
+        }
+
+        // Render dashboard
+        function renderDashboard(statsArray, game) {
+            console.log('Rendering dashboard for game:', game, 'with', statsArray.length, 'stats');
+            
+            if (game === 'all') {
+                // Aggregate stats for all games
+                if (statsArray.length === 0) {
+                    console.warn('No stats available for all games');
+                    document.getElementById('stats-grid').innerHTML = '<div class="col-span-4 text-center text-gray-400 py-8">No game data available</div>';
+                    document.getElementById('top-players-body').innerHTML = '<tr><td colspan="5" class="text-center text-gray-400 py-8">No player data available</td></tr>';
+                    return;
+                }
+                
+                const aggregated = aggregateStats(statsArray);
+                renderStats(aggregated);
+                renderTopPlayersTable(statsArray);
+                renderCharts(statsArray);
+            } else {
+                // Single game stats
+                if (statsArray.length === 0 || !statsArray[0]) {
+                    console.warn('No stats available for game:', game);
+                    document.getElementById('stats-grid').innerHTML = '<div class="col-span-4 text-center text-gray-400 py-8">No game data available</div>';
+                    document.getElementById('top-players-body').innerHTML = '<tr><td colspan="5" class="text-center text-gray-400 py-8">No player data available</td></tr>';
+                    return;
+                }
+                
+                const stats = statsArray[0];
+                renderStats([stats]);
+                renderTopPlayersTable([stats]);
+                renderCharts([stats]);
+            }
+        }
+
+        // Aggregate stats across all games
+        function aggregateStats(statsArray) {
+            return {
+                totalGames: statsArray.reduce((sum, s) => sum + (s.totalGames || 0), 0),
+                totalWins: statsArray.reduce((sum, s) => sum + (s.totalWins || 0), 0),
+                totalLosses: statsArray.reduce((sum, s) => sum + (s.totalLosses || 0), 0),
+                totalBetAmount: statsArray.reduce((sum, s) => sum + (s.totalBetAmount || 0), 0),
+                totalPayout: statsArray.reduce((sum, s) => sum + (s.totalPayout || 0), 0),
+                netRevenue: statsArray.reduce((sum, s) => sum + (s.netRevenue || 0), 0),
+                recentGames: statsArray.reduce((sum, s) => sum + (s.recentGames || 0), 0)
+            };
+        }
+
+        // Render statistics cards
+        function renderStats(statsArray) {
+            const statsGrid = document.getElementById('stats-grid');
+            statsGrid.innerHTML = '';
+            
+            if (currentGame === 'all') {
+                const aggregated = aggregateStats(statsArray);
+                const winRate = aggregated.totalGames > 0 
+                    ? ((aggregated.totalWins / aggregated.totalGames) * 100).toFixed(2) 
+                    : '0.00';
+                
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="text-sm text-gray-400 mb-2">Total Games</div>
+                        <div class="stat-value">${aggregated.totalGames.toLocaleString()}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="text-sm text-gray-400 mb-2">Win Rate</div>
+                        <div class="stat-value">${winRate}%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="text-sm text-gray-400 mb-2">Net Revenue</div>
+                        <div class="stat-value">$${aggregated.netRevenue.toFixed(2)}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="text-sm text-gray-400 mb-2">Recent Games (24h)</div>
+                        <div class="stat-value">${aggregated.recentGames.toLocaleString()}</div>
+                    </div>
+                `;
+            } else {
+                const stats = statsArray[0];
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="text-sm text-gray-400 mb-2">Total Games</div>
+                        <div class="stat-value">${(stats.totalGames || 0).toLocaleString()}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="text-sm text-gray-400 mb-2">Win Rate</div>
+                        <div class="stat-value">${(stats.winRate || 0).toFixed(2)}%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="text-sm text-gray-400 mb-2">Net Revenue</div>
+                        <div class="stat-value">$${(stats.netRevenue || 0).toFixed(2)}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="text-sm text-gray-400 mb-2">Recent Games (24h)</div>
+                        <div class="stat-value">${(stats.recentGames || 0).toLocaleString()}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Render top players table
+        function renderTopPlayersTable(statsArray) {
+            const tbody = document.getElementById('top-players-body');
+            tbody.innerHTML = '';
+            
+            // Collect all top players from all games
+            let allPlayers = [];
+            statsArray.forEach(stats => {
+                if (stats.topPlayers && Array.isArray(stats.topPlayers) && stats.topPlayers.length > 0) {
+                    stats.topPlayers.forEach(player => {
+                        allPlayers.push({
+                            ...player,
+                            gameName: stats.game || 'unknown'
+                        });
+                    });
+                }
+            });
+            
+            // Show message if no players
+            if (allPlayers.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-gray-400 py-8">
+                            <div class="text-lg mb-2">📊 No game data yet</div>
+                            <div class="text-sm">Play some games to see scores and leaderboards!</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Sort by winnings (score) and take top 10
+            allPlayers.sort((a, b) => {
+                const aWinnings = a.winnings || a.score || 0;
+                const bWinnings = b.winnings || b.score || 0;
+                return bWinnings - aWinnings;
+            });
+            allPlayers = allPlayers.slice(0, 10);
+            
+            if (allPlayers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray-400 py-8">No player data available</td></tr>';
+                return;
+            }
+            
+            allPlayers.forEach((player, index) => {
+                const rank = index + 1;
+                const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+                
+                // Get bet and winnings - score is now the winnings, initialBet from metadata or score
+                const winnings = player.winnings || player.score || 0;
+                const initialBet = player.initialBet || 0;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <span class="rank-badge ${rankClass}">${rank}</span>
+                    </td>
+                    <td class="font-semibold">${player.username || 'Unknown'}</td>
+                    <td class="text-gray-300">$${initialBet.toFixed(2)}</td>
+                    <td class="font-bold" style="color: var(--dt-yellow);">$${winnings.toFixed(2)}</td>
+                    <td class="text-gray-400 capitalize">${player.gameName || player.game || 'unknown'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Render charts
+        function renderCharts(statsArray) {
+            const games = statsArray.map(s => s.game || 'unknown');
+            const winRates = statsArray.map(s => s.winRate || 0);
+            const revenues = statsArray.map(s => s.netRevenue || 0);
+            
+            // Win Rate Chart
+            const winRateCtx = document.getElementById('winRateChart').getContext('2d');
+            if (winRateChart) winRateChart.destroy();
+            winRateChart = new Chart(winRateCtx, {
+                type: 'bar',
+                data: {
+                    labels: games,
+                    datasets: [{
+                        label: 'Win Rate (%)',
+                        data: winRates,
+                        backgroundColor: 'rgba(0, 212, 255, 0.6)',
+                        borderColor: '#00D4FF',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+            
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            if (revenueChart) revenueChart.destroy();
+            revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: games,
+                    datasets: [{
+                        label: 'Net Revenue ($)',
+                        data: revenues,
+                        borderColor: '#73BE28',
+                        backgroundColor: 'rgba(115, 190, 40, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            loadDashboard(currentGame);
+        }, 30000);
+
+        // Load dashboard on page load
+        loadDashboard('all');
+    </script>
+</body>
+</html>
+
+

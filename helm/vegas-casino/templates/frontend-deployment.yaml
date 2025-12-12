@@ -1,0 +1,141 @@
+{{- if .Values.frontend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vegas-casino.fullname" . }}-frontend
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vegas-casino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+spec:
+  replicas: {{ .Values.frontend.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: frontend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.frontend.service.port }}"
+        prometheus.io/path: "/health"
+        {{- if .Values.openfeature.enabled }}
+        openfeature.dev/enabled: "true"
+        openfeature.dev/featureflagsource: "{{ .Values.global.namespace }}/{{ include "vegas-casino.fullname" . }}-flag-source"
+        {{- end }}
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "vegas-casino.serviceAccountName" . }}
+      containers:
+      - name: frontend
+        {{- with .Values.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
+        image: "{{ include "vegas-casino.image" (dict "service" .Values.frontend "Values" .Values) }}"
+        imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.frontend.service.port }}
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "{{ .Values.frontend.service.port }}"
+        - name: SERVICE_NAME
+          value: "{{ .Values.frontend.env.SERVICE_NAME }}"
+        - name: OTEL_SERVICE_NAME
+          value: "{{ .Values.frontend.env.OTEL_SERVICE_NAME }}"
+        - name: OTEL_SERVICE_VERSION
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "vegas-casino.fullname" . }}-config
+              key: OTEL_SERVICE_VERSION
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: "service.name={{ .Values.frontend.env.OTEL_SERVICE_NAME }},service.version={{ .Values.frontend.env.OTEL_SERVICE_VERSION }},service.namespace={{ .Values.frontend.env.SERVICE_NAMESPACE }},deployment.environment={{ .Values.frontend.env.DEPLOYMENT_ENVIRONMENT }},application.name=Vegas-Casino-Frontend"
+        - name: DEPLOYMENT_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "vegas-casino.fullname" . }}-config
+              key: DEPLOYMENT_ENVIRONMENT
+        - name: SERVICE_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "vegas-casino.fullname" . }}-config
+              key: SERVICE_NAMESPACE
+        - name: K8S_CLUSTER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "vegas-casino.fullname" . }}-config
+              key: K8S_CLUSTER_NAME
+        - name: K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: SERVICE_INSTANCE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "{{ .Values.opentelemetry.exporter.endpoint }}"
+        - name: OTEL_EXPORTER_OTLP_PROTOCOL
+          value: "{{ .Values.opentelemetry.exporter.protocol }}"
+        - name: OTEL_EXPORTER_OTLP_INSECURE
+          value: "true"  # Disable TLS/SSL for plain gRPC connections
+        # gRPC service endpoints (using Kubernetes service names)
+        - name: SLOTS_SERVICE_GRPC
+          value: "{{ include "vegas-casino.fullname" . }}-slots:{{ .Values.slots.service.grpcPort }}"
+        - name: ROULETTE_SERVICE_GRPC
+          value: "{{ include "vegas-casino.fullname" . }}-roulette:{{ .Values.roulette.service.grpcPort }}"
+        - name: DICE_SERVICE_GRPC
+          value: "{{ include "vegas-casino.fullname" . }}-dice:{{ .Values.dice.service.grpcPort }}"
+        - name: BLACKJACK_SERVICE_GRPC
+          value: "{{ include "vegas-casino.fullname" . }}-blackjack:{{ .Values.blackjack.service.grpcPort }}"
+        # HTTP service endpoints (for fallback when gRPC is not available)
+        - name: SLOTS_SERVICE_URL
+          value: "http://{{ include "vegas-casino.fullname" . }}-slots:{{ .Values.slots.service.httpPort }}"
+        - name: ROULETTE_SERVICE_URL
+          value: "http://{{ include "vegas-casino.fullname" . }}-roulette:{{ .Values.roulette.service.httpPort }}"
+        - name: DICE_SERVICE_URL
+          value: "http://{{ include "vegas-casino.fullname" . }}-dice:{{ .Values.dice.service.httpPort }}"
+        - name: BLACKJACK_SERVICE_URL
+          value: "http://{{ include "vegas-casino.fullname" . }}-blackjack:{{ .Values.blackjack.service.httpPort }}"
+        # Redis configuration
+        - name: REDIS_HOST
+          value: "{{ include "vegas-casino.fullname" . }}-redis"
+        - name: REDIS_PORT
+          value: {{ .Values.redis.service.port | quote }}
+        {{- if .Values.redis.password }}
+        - name: REDIS_PASSWORD
+          value: "{{ .Values.redis.password }}"
+        {{- end }}
+        # Note: When openfeature.enabled=true, the OpenFeature Operator automatically
+        # injects the flagd sidecar and handles all configuration. No manual env vars needed.
+        # Scoring service configuration
+        {{- if .Values.scoring.enabled }}
+        - name: SCORING_SERVICE_URL
+          value: "http://{{ include "vegas-casino.fullname" . }}-scoring:{{ .Values.scoring.service.port }}"
+        {{- end }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.frontend.resources | nindent 10 }}
+{{- end }}
+

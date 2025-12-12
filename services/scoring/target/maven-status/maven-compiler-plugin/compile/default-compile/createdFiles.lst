@@ -1,0 +1,16 @@
+com/vegas/scoring/repository/GameResultRepository.class
+com/vegas/scoring/controller/ScoringController$1.class
+com/vegas/scoring/controller/ScoringController$2.class
+com/vegas/scoring/controller/ScoringController$3.class
+com/vegas/scoring/dto/ScoreRequest.class
+com/vegas/scoring/dto/DashboardStats.class
+com/vegas/scoring/config/OpenTelemetryConfig.class
+com/vegas/scoring/ScoringServiceApplication.class
+com/vegas/scoring/dto/ScoreResponse.class
+com/vegas/scoring/controller/ScoringController.class
+com/vegas/scoring/dto/GameResultRequest.class
+com/vegas/scoring/controller/ScoringController$4.class
+com/vegas/scoring/model/PlayerScore.class
+com/vegas/scoring/model/GameResult.class
+com/vegas/scoring/repository/PlayerScoreRepository.class
+com/vegas/scoring/service/ScoringService.class

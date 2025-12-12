@@ -39,6 +39,10 @@ vegas-*.log
 loadrunner-results/
 loadrunner-scripts/
 test-*.js
-docs/
 scripts/
 *.backup
+
+# MkDocs
+site/
+.mkdocs_cache/
+docs/_build/

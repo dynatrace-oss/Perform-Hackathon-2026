@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microservices Management - Dynatrace Vegas Casino</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dt-purple': '#6C2C9C',
+                        'dt-blue': '#00A1C9',
+                        'dt-cyan': '#00D4FF',
+                        'dt-green': '#73BE28',
+                        'dt-orange': '#FFA86B',
+                        'dt-yellow': '#FFD23F',
+                        'dt-dark': '#151515',
+                        'dt-darker': '#0A0A0A',
+                        'dt-gray': '#2D2D2D',
+                        'dt-light-gray': '#4A4A4A'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Socket.IO for real-time updates -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #0A0A0A 0%, #151515 100%);
+            min-height: 100vh;
+        }
+        
+        .service-card {
+            transition: all 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-running {
+            background-color: #73BE28;
+            box-shadow: 0 0 10px #73BE28;
+        }
+        
+        .status-stopped {
+            background-color: #ff4444;
+            box-shadow: 0 0 10px #ff4444;
+        }
+        
+        .status-starting {
+            background-color: #FFD23F;
+            box-shadow: 0 0 10px #FFD23F;
+        }
+        
+        .status-stopping {
+            background-color: #FFA86B;
+            box-shadow: 0 0 10px #FFA86B;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(0, 212, 255, 0.3);
+            border-top: 3px solid #00D4FF;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="text-white font-sans">
+    <!-- Header -->
+    <div class="bg-dt-darker border-b border-dt-cyan/20 p-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <a href="lobby.html" class="text-dt-cyan hover:text-dt-blue transition-colors">
+                    ← Back to Lobby
+                </a>
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-dt-cyan to-dt-blue bg-clip-text text-transparent">
+                    Microservices Management Dashboard
+                </h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="refreshAll()" class="px-4 py-2 bg-dt-blue hover:bg-dt-cyan rounded-lg transition-colors">
+                    🔄 Refresh
+                </button>
+                <div class="text-sm text-dt-light-gray">
+                    Last updated: <span id="lastUpdate">--</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto p-6">
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-dt-gray rounded-lg p-4 border border-dt-cyan/20">
+                <div class="text-sm text-dt-light-gray">Total Services</div>
+                <div class="text-3xl font-bold text-dt-cyan" id="totalServices">0</div>
+            </div>
+            <div class="bg-dt-gray rounded-lg p-4 border border-dt-green/20">
+                <div class="text-sm text-dt-light-gray">Running</div>
+                <div class="text-3xl font-bold text-dt-green" id="runningServices">0</div>
+            </div>
+            <div class="bg-dt-gray rounded-lg p-4 border border-dt-orange/20">
+                <div class="text-sm text-dt-light-gray">Stopped</div>
+                <div class="text-3xl font-bold text-dt-orange" id="stoppedServices">0</div>
+            </div>
+            <div class="bg-dt-gray rounded-lg p-4 border border-dt-yellow/20">
+                <div class="text-sm text-dt-light-gray">Starting/Stopping</div>
+                <div class="text-3xl font-bold text-dt-yellow" id="transitionServices">0</div>
+            </div>
+        </div>
+
+        <!-- Services Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="servicesGrid">
+            <!-- Services will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <script>
+        let servicesData = {};
+        let refreshInterval;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadServices();
+            // Auto-refresh every 5 seconds
+            refreshInterval = setInterval(loadServices, 5000);
+        });
+
+        // Load services status
+        async function loadServices() {
+            try {
+                const response = await fetch('/api/services/status');
+                const data = await response.json();
+                servicesData = data.services;
+                renderServices();
+                updateSummary();
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+            } catch (error) {
+                console.error('Error loading services:', error);
+            }
+        }
+
+        // Render services
+        function renderServices() {
+            const grid = document.getElementById('servicesGrid');
+            grid.innerHTML = '';
+
+            for (const [serviceName, status] of Object.entries(servicesData)) {
+                const config = status.config || {};
+                const card = createServiceCard(serviceName, status, config);
+                grid.appendChild(card);
+            }
+        }
+
+        // Create service card
+        function createServiceCard(serviceName, status, config) {
+            const card = document.createElement('div');
+            card.className = 'service-card bg-dt-gray rounded-lg p-6 border border-dt-cyan/20';
+            
+            const statusClass = getStatusClass(status.status);
+            const statusText = status.status || 'stopped';
+            
+            card.innerHTML = `
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="text-4xl">${config.icon || '🎮'}</div>
+                        <div>
+                            <h3 class="font-bold text-lg">${config.displayName || serviceName}</h3>
+                            <p class="text-sm text-dt-light-gray">${config.description || ''}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4 space-y-2">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-dt-light-gray">Status:</span>
+                        <span class="flex items-center">
+                            <span class="status-indicator ${statusClass}"></span>
+                            <span class="capitalize">${statusText}</span>
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-dt-light-gray">Port:</span>
+                        <span class="text-dt-cyan">${config.port || 'N/A'}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-dt-light-gray">Category:</span>
+                        <span class="text-dt-light-gray capitalize">${config.category || 'unknown'}</span>
+                    </div>
+                    ${status.pid ? `
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-dt-light-gray">PID:</span>
+                        <span class="text-dt-cyan">${status.pid}</span>
+                    </div>
+                    ` : ''}
+                    ${status.startedAt ? `
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-dt-light-gray">Started:</span>
+                        <span class="text-dt-light-gray text-xs">${new Date(status.startedAt).toLocaleTimeString()}</span>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                <div class="flex space-x-2 mt-4">
+                    ${status.running ? `
+                        <button onclick="stopService('${serviceName}')" 
+                                class="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors text-sm">
+                            Stop
+                        </button>
+                        <button onclick="restartService('${serviceName}')" 
+                                class="flex-1 px-3 py-2 bg-dt-orange hover:bg-dt-yellow rounded-lg transition-colors text-sm">
+                            Restart
+                        </button>
+                    ` : `
+                        <button onclick="startService('${serviceName}')" 
+                                class="flex-1 px-3 py-2 bg-dt-green hover:bg-green-600 rounded-lg transition-colors text-sm">
+                            Start
+                        </button>
+                    `}
+                    <button onclick="checkHealth('${serviceName}')" 
+                            class="px-3 py-2 bg-dt-blue hover:bg-dt-cyan rounded-lg transition-colors text-sm">
+                        Health
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Get status CSS class
+        function getStatusClass(status) {
+            if (!status) return 'status-stopped';
+            const s = status.toLowerCase();
+            if (s === 'running') return 'status-running';
+            if (s === 'stopped') return 'status-stopped';
+            if (s === 'starting') return 'status-starting';
+            if (s === 'stopping') return 'status-stopping';
+            return 'status-stopped';
+        }
+
+        // Update summary
+        function updateSummary() {
+            const services = Object.values(servicesData);
+            const total = services.length;
+            const running = services.filter(s => s.running).length;
+            const stopped = services.filter(s => !s.running && s.status === 'stopped').length;
+            const transition = services.filter(s => 
+                s.status === 'starting' || s.status === 'stopping'
+            ).length;
+
+            document.getElementById('totalServices').textContent = total;
+            document.getElementById('runningServices').textContent = running;
+            document.getElementById('stoppedServices').textContent = stopped;
+            document.getElementById('transitionServices').textContent = transition;
+        }
+
+        // Start service
+        async function startService(serviceName) {
+            try {
+                const response = await fetch(`/api/services/start/${serviceName}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showNotification(`Service ${serviceName} started`, 'success');
+                    setTimeout(loadServices, 1000);
+                } else {
+                    showNotification(result.message || 'Failed to start service', 'error');
+                }
+            } catch (error) {
+                showNotification('Error starting service', 'error');
+                console.error(error);
+            }
+        }
+
+        // Stop service
+        async function stopService(serviceName) {
+            if (!confirm(`Are you sure you want to stop ${serviceName}?`)) {
+                return;
+            }
+            try {
+                const response = await fetch(`/api/services/stop/${serviceName}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showNotification(`Service ${serviceName} stopped`, 'success');
+                    setTimeout(loadServices, 1000);
+                } else {
+                    showNotification(result.message || 'Failed to stop service', 'error');
+                }
+            } catch (error) {
+                showNotification('Error stopping service', 'error');
+                console.error(error);
+            }
+        }
+
+        // Restart service
+        async function restartService(serviceName) {
+            if (!confirm(`Are you sure you want to restart ${serviceName}?`)) {
+                return;
+            }
+            try {
+                const response = await fetch(`/api/services/restart/${serviceName}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showNotification(`Service ${serviceName} restarting`, 'success');
+                    setTimeout(loadServices, 1000);
+                } else {
+                    showNotification(result.message || 'Failed to restart service', 'error');
+                }
+            } catch (error) {
+                showNotification('Error restarting service', 'error');
+                console.error(error);
+            }
+        }
+
+        // Check health
+        async function checkHealth(serviceName) {
+            try {
+                const response = await fetch(`/api/services/health/${serviceName}`);
+                const result = await response.json();
+                const message = result.healthy 
+                    ? `Service ${serviceName} is healthy` 
+                    : `Service ${serviceName} is unhealthy or not responding`;
+                showNotification(message, result.healthy ? 'success' : 'error');
+            } catch (error) {
+                showNotification('Error checking health', 'error');
+                console.error(error);
+            }
+        }
+
+        // Refresh all
+        function refreshAll() {
+            loadServices();
+            showNotification('Refreshing services...', 'info');
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Simple alert for now - can be enhanced with a toast library
+            const colors = {
+                success: '#73BE28',
+                error: '#ff4444',
+                info: '#00D4FF'
+            };
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50';
+            notification.style.backgroundColor = colors[type] || colors.info;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>
+

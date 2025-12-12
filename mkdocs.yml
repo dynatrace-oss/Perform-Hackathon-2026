@@ -1,0 +1,83 @@
+site_name: Vegas Casino - Observability Hackathon
+site_description: A microservices-based casino application designed for observability and feature flag instrumentation
+site_author: Vegas Casino Team
+site_url: https://vegas-casino.example.com
+
+repo_name: vegas-casino
+repo_url: https://github.com/vegas-casino/vegas-app
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: purple
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: purple
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.annotate
+    - content.code.copy
+    - content.tooltips
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - admonition
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - tables
+
+nav:
+  - Home: index.md
+  - Overview:
+    - Project Overview: overview/index.md
+    - Hackathon Context: overview/hackathon.md
+  - Architecture:
+    - Architecture Overview: architecture/index.md
+    - Components: architecture/components.md
+    - Technology Stack: architecture/technology.md
+  - Development:
+    - Building the Project: development/building.md
+    - Docker Images: development/docker.md
+  - Testing:
+    - Testing Overview: testing/index.md
+    - Playwright Tests: testing/playwright.md
+    - k6 Load Tests: testing/k6.md
+  - Deployment:
+    - Deployment Overview: deployment/index.md
+    - Helm Charts: deployment/helm.md
+    - Kubernetes Manifests: deployment/manifests.md
+    - OpenFeature Operator: deployment/openfeature.md
+  - Contributing: contributing.md
+
+plugins:
+  - search
+  - git-revision-date-localized:
+      enable_creation_date: true
+
