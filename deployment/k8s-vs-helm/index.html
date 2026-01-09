@@ -12,13 +12,13 @@
         <meta name="author" content="Vegas Casino Team">
       
       
-        <link rel="canonical" href="https://vegas-casino.example.com/deployment/manifests/">
+        <link rel="canonical" href="https://vegas-casino.example.com/deployment/k8s-vs-helm/">
       
       
-        <link rel="prev" href="../helm/">
+        <link rel="prev" href="../manifests/">
       
       
-        <link rel="next" href="../k8s-vs-helm/">
+        <link rel="next" href="../openfeature/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -26,7 +26,7 @@
     
     
       
-        <title>Kubernetes Manifests - Vegas Casino - Observability Hackathon</title>
+        <title>k8s/ vs Helm Comparison - Vegas Casino - Observability Hackathon</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#kubernetes-manifests" class="md-skip">
+        <a href="#k8s-directory-vs-helm-deployment-comparison" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Kubernetes Manifests
+              k8s/ vs Helm Comparison
             
           </span>
         </div>
@@ -938,6 +938,27 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../manifests/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes Manifests
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -954,7 +975,7 @@
           
   
   <span class="md-ellipsis">
-    Kubernetes Manifests
+    k8s/ vs Helm Comparison
   </span>
   
 
@@ -965,7 +986,7 @@
         
   
   <span class="md-ellipsis">
-    Kubernetes Manifests
+    k8s/ vs Helm Comparison
   </span>
   
 
@@ -996,46 +1017,130 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#key-differences" class="md-nav__link">
     <span class="md-ellipsis">
-      Prerequisites
+      Key Differences
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#deployment-order" class="md-nav__link">
-    <span class="md-ellipsis">
-      Deployment Order
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Deployment Order">
+    <nav class="md-nav" aria-label="Key Differences">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-install-openfeature-operator-required-first" class="md-nav__link">
+  <a href="#1-missing-infrastructure-components" class="md-nav__link">
     <span class="md-ellipsis">
-      1. Install OpenFeature Operator (REQUIRED FIRST!)
+      1. Missing Infrastructure Components
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Missing Infrastructure Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#redis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Redis
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-create-namespace" class="md-nav__link">
+  <a href="#postgresql" class="md-nav__link">
     <span class="md-ellipsis">
-      2. Create Namespace
+      PostgreSQL
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-deploy-resources" class="md-nav__link">
+  <a href="#openfeature-resources" class="md-nav__link">
     <span class="md-ellipsis">
-      3. Deploy Resources
+      OpenFeature Resources
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Tools
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-service-configuration-differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Service Configuration Differences
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Service Configuration Differences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#frontend-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      Frontend Service
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#game-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      Game Services
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-service-naming-convention" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Service Naming Convention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-image-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Image Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-missing-service-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Missing Service Resources
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-opentelemetry-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. OpenTelemetry Configuration
     </span>
   </a>
   
@@ -1047,37 +1152,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#using-helm-template" class="md-nav__link">
+  <a href="#recommendations" class="md-nav__link">
     <span class="md-ellipsis">
-      Using Helm Template
+      Recommendations
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#customizing-manifests" class="md-nav__link">
-    <span class="md-ellipsis">
-      Customizing Manifests
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Customizing Manifests">
+    <nav class="md-nav" aria-label="Recommendations">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#edit-generated-manifests" class="md-nav__link">
+  <a href="#use-helm-chart-recommended" class="md-nav__link">
     <span class="md-ellipsis">
-      Edit Generated Manifests
+      Use Helm Chart (Recommended)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#manual-manifest-creation" class="md-nav__link">
+  <a href="#use-k8s-directory" class="md-nav__link">
     <span class="md-ellipsis">
-      Manual Manifest Creation
+      Use k8s/ Directory
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#migration-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Migration Path
     </span>
   </a>
   
@@ -1089,78 +1194,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verification" class="md-nav__link">
+  <a href="#what-needs-to-be-updated-in-k8s" class="md-nav__link">
     <span class="md-ellipsis">
-      Verification
+      What Needs to be Updated in k8s/
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#updating-manifests" class="md-nav__link">
+  <a href="#current-status" class="md-nav__link">
     <span class="md-ellipsis">
-      Updating Manifests
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Updating Manifests">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#update-image" class="md-nav__link">
-    <span class="md-ellipsis">
-      Update Image
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#scale-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      Scale Services
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#update-environment-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      Update Environment Variables
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cleanup" class="md-nav__link">
-    <span class="md-ellipsis">
-      Cleanup
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#advantages-of-manifests" class="md-nav__link">
-    <span class="md-ellipsis">
-      Advantages of Manifests
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#disadvantages" class="md-nav__link">
-    <span class="md-ellipsis">
-      Disadvantages
+      Current Status
     </span>
   </a>
   
@@ -1170,27 +1215,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../k8s-vs-helm/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    k8s/ vs Helm Comparison
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -1301,46 +1325,130 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#key-differences" class="md-nav__link">
     <span class="md-ellipsis">
-      Prerequisites
+      Key Differences
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#deployment-order" class="md-nav__link">
-    <span class="md-ellipsis">
-      Deployment Order
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Deployment Order">
+    <nav class="md-nav" aria-label="Key Differences">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-install-openfeature-operator-required-first" class="md-nav__link">
+  <a href="#1-missing-infrastructure-components" class="md-nav__link">
     <span class="md-ellipsis">
-      1. Install OpenFeature Operator (REQUIRED FIRST!)
+      1. Missing Infrastructure Components
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Missing Infrastructure Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#redis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Redis
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-create-namespace" class="md-nav__link">
+  <a href="#postgresql" class="md-nav__link">
     <span class="md-ellipsis">
-      2. Create Namespace
+      PostgreSQL
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-deploy-resources" class="md-nav__link">
+  <a href="#openfeature-resources" class="md-nav__link">
     <span class="md-ellipsis">
-      3. Deploy Resources
+      OpenFeature Resources
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Tools
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-service-configuration-differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Service Configuration Differences
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Service Configuration Differences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#frontend-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      Frontend Service
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#game-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      Game Services
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-service-naming-convention" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Service Naming Convention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-image-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Image Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-missing-service-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Missing Service Resources
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-opentelemetry-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. OpenTelemetry Configuration
     </span>
   </a>
   
@@ -1352,37 +1460,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#using-helm-template" class="md-nav__link">
+  <a href="#recommendations" class="md-nav__link">
     <span class="md-ellipsis">
-      Using Helm Template
+      Recommendations
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#customizing-manifests" class="md-nav__link">
-    <span class="md-ellipsis">
-      Customizing Manifests
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Customizing Manifests">
+    <nav class="md-nav" aria-label="Recommendations">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#edit-generated-manifests" class="md-nav__link">
+  <a href="#use-helm-chart-recommended" class="md-nav__link">
     <span class="md-ellipsis">
-      Edit Generated Manifests
+      Use Helm Chart (Recommended)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#manual-manifest-creation" class="md-nav__link">
+  <a href="#use-k8s-directory" class="md-nav__link">
     <span class="md-ellipsis">
-      Manual Manifest Creation
+      Use k8s/ Directory
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#migration-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Migration Path
     </span>
   </a>
   
@@ -1394,78 +1502,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verification" class="md-nav__link">
+  <a href="#what-needs-to-be-updated-in-k8s" class="md-nav__link">
     <span class="md-ellipsis">
-      Verification
+      What Needs to be Updated in k8s/
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#updating-manifests" class="md-nav__link">
+  <a href="#current-status" class="md-nav__link">
     <span class="md-ellipsis">
-      Updating Manifests
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Updating Manifests">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#update-image" class="md-nav__link">
-    <span class="md-ellipsis">
-      Update Image
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#scale-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      Scale Services
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#update-environment-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      Update Environment Variables
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cleanup" class="md-nav__link">
-    <span class="md-ellipsis">
-      Cleanup
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#advantages-of-manifests" class="md-nav__link">
-    <span class="md-ellipsis">
-      Advantages of Manifests
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#disadvantages" class="md-nav__link">
-    <span class="md-ellipsis">
-      Disadvantages
+      Current Status
     </span>
   </a>
   
@@ -1489,161 +1537,272 @@
   
 
 
-<h1 id="kubernetes-manifests">Kubernetes Manifests</h1>
+<h1 id="k8s-directory-vs-helm-deployment-comparison">k8s/ Directory vs Helm Deployment Comparison</h1>
+<p>This document compares the <code>k8s/</code> directory manifests with the Helm chart deployment to help you understand the differences and choose the appropriate deployment method.</p>
 <h2 id="overview">Overview</h2>
-<p>You can deploy the Vegas Casino application using raw Kubernetes manifests instead of Helm. This gives you full control over the resources but requires manual management.</p>
-<h2 id="prerequisites">Prerequisites</h2>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>k8s/ Directory</th>
+<th>Helm Chart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Purpose</strong></td>
+<td>Direct Kubernetes manifests</td>
+<td>Templated Helm charts</td>
+</tr>
+<tr>
+<td><strong>Configuration</strong></td>
+<td>Hardcoded values in YAML</td>
+<td>Configurable via <code>values.yaml</code></td>
+</tr>
+<tr>
+<td><strong>Service Naming</strong></td>
+<td><code>vegas-{service}-service</code></td>
+<td><code>vegas-casino-{service}</code> (configurable)</td>
+</tr>
+<tr>
+<td><strong>Image Tags</strong></td>
+<td><code>latest</code> (hardcoded)</td>
+<td>Configurable via <code>global.imageTag</code></td>
+</tr>
+<tr>
+<td><strong>Infrastructure</strong></td>
+<td>Missing Redis, PostgreSQL</td>
+<td>Includes Redis, PostgreSQL</td>
+</tr>
+<tr>
+<td><strong>Feature Flags</strong></td>
+<td>Not included</td>
+<td>OpenFeature Operator integration</td>
+</tr>
+<tr>
+<td><strong>Testing Tools</strong></td>
+<td>Not included</td>
+<td>k6 and Playwright deployments</td>
+</tr>
+</tbody>
+</table>
+<h2 id="key-differences">Key Differences</h2>
+<h3 id="1-missing-infrastructure-components">1. Missing Infrastructure Components</h3>
+<p>The <code>k8s/</code> directory is <strong>missing</strong> the following components that are present in Helm:</p>
+<h4 id="redis">Redis</h4>
+<ul>
+<li><strong>Helm</strong>: Includes <code>redis-deployment.yaml</code> and <code>redis-service.yaml</code></li>
+<li><strong>k8s/</strong>: ❌ Not present</li>
+<li><strong>Impact</strong>: Frontend service cannot store user balances or profiles</li>
+<li><strong>Required for</strong>: User balance management, profile storage</li>
+</ul>
+<h4 id="postgresql">PostgreSQL</h4>
+<ul>
+<li><strong>Helm</strong>: Includes <code>postgresql-deployment.yaml</code> and <code>postgresql-service.yaml</code></li>
+<li><strong>k8s/</strong>: ❌ Not present</li>
+<li><strong>Impact</strong>: Scoring service cannot persist game results</li>
+<li><strong>Required for</strong>: Game statistics, leaderboards, dashboard data</li>
+</ul>
+<h4 id="openfeature-resources">OpenFeature Resources</h4>
+<ul>
+<li><strong>Helm</strong>: Includes <code>featureflag.yaml</code>, <code>featureflagsource.yaml</code>, <code>flagd-*.yaml</code></li>
+<li><strong>k8s/</strong>: ❌ Not present</li>
+<li><strong>Impact</strong>: Feature flags will not work</li>
+<li><strong>Required for</strong>: Dynamic feature toggling</li>
+</ul>
+<h4 id="testing-tools">Testing Tools</h4>
+<ul>
+<li><strong>Helm</strong>: Includes <code>k6-deployment.yaml</code> and <code>playwright-deployment.yaml</code></li>
+<li><strong>k8s/</strong>: ❌ Not present</li>
+<li><strong>Impact</strong>: Cannot run load tests or E2E tests</li>
+<li><strong>Optional</strong>: Testing infrastructure</li>
+</ul>
+<h3 id="2-service-configuration-differences">2. Service Configuration Differences</h3>
+<h4 id="frontend-service">Frontend Service</h4>
+<p><strong>k8s/ frontend-deployment.yaml</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Missing Redis configuration</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># Missing DASHBOARD_SERVICE_GRPC</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># Uses old service names: vegas-slots-service:50051</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Missing SCORING_SERVICE_URL</span>
+</code></pre></div></p>
+<p><strong>Helm frontend-deployment.yaml</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Includes Redis configuration</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">REDIS_HOST</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;vegas-casino-redis&quot;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">REDIS_PORT</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;6379&quot;</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1"># Includes Dashboard gRPC</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DASHBOARD_SERVICE_GRPC</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;vegas-casino-dashboard:50055&quot;</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># Uses correct service names</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SLOTS_SERVICE_GRPC</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;vegas-casino-slots:50051&quot;</span>
+</code></pre></div></p>
+<h4 id="game-services">Game Services</h4>
+<p><strong>k8s/ slots-deployment.yaml</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Missing gRPC port exposure</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">ports</span><span class="p">:</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8081</span><span class="w">  </span><span class="c1"># HTTP only</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Missing Redis configuration</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1"># Missing OpenFeature annotations</span>
+</code></pre></div></p>
+<p><strong>Helm slots-deployment.yaml</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Includes both HTTP and gRPC ports</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nt">ports</span><span class="p">:</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8081</span><span class="w">  </span><span class="c1"># HTTP</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50051</span><span class="w"> </span><span class="c1"># gRPC</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1"># Includes Redis configuration</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">REDIS_HOST</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;vegas-casino-redis&quot;</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1"># Includes OpenFeature annotations</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="nt">annotations</span><span class="p">:</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="nt">openfeature.dev/enabled</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;true&quot;</span>
+</code></pre></div></p>
+<h3 id="3-service-naming-convention">3. Service Naming Convention</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>k8s/ Directory</th>
+<th>Helm Chart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frontend</td>
+<td><code>vegas-frontend-service</code></td>
+<td><code>vegas-casino-frontend</code></td>
+</tr>
+<tr>
+<td>Slots</td>
+<td><code>vegas-slots-service</code></td>
+<td><code>vegas-casino-slots</code></td>
+</tr>
+<tr>
+<td>Roulette</td>
+<td><code>vegas-roulette-service</code></td>
+<td><code>vegas-casino-roulette</code></td>
+</tr>
+<tr>
+<td>Dice</td>
+<td><code>vegas-dice-service</code></td>
+<td><code>vegas-casino-dice</code></td>
+</tr>
+<tr>
+<td>Blackjack</td>
+<td><code>vegas-blackjack-service</code></td>
+<td><code>vegas-casino-blackjack</code></td>
+</tr>
+<tr>
+<td>Dashboard</td>
+<td><code>vegas-dashboard-service</code></td>
+<td><code>vegas-casino-dashboard</code></td>
+</tr>
+<tr>
+<td>Scoring</td>
+<td><code>vegas-scoring-service</code></td>
+<td><code>vegas-casino-scoring</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Impact</strong>: Services in <code>k8s/</code> use different DNS names, which may cause connectivity issues if services reference each other.</p>
+<h3 id="4-image-configuration">4. Image Configuration</h3>
+<p><strong>k8s/ Directory</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vegas-frontend-service:latest</span><span class="w">  </span><span class="c1"># Hardcoded</span>
+</code></pre></div></p>
+<p><strong>Helm Chart</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">.Values.global.imageRegistry</span><span class="nv"> </span><span class="s">}}-frontend:{{</span><span class="nv"> </span><span class="s">.Values.global.imageTag</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="c1"># Example: hrexed/vegasapp-frontend:0.39</span>
+</code></pre></div></p>
+<p><strong>Impact</strong>: k8s/ directory always uses <code>latest</code> tag, making version management difficult.</p>
+<h3 id="5-missing-service-resources">5. Missing Service Resources</h3>
+<p>The <code>k8s/</code> directory deployments include Service definitions inline, but they may be incomplete:</p>
+<p><strong>k8s/ frontend-deployment.yaml</strong> includes:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nn">---</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Service</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vegas-frontend-service</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="nt">ports</span><span class="p">:</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3000</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3000</span>
+</code></pre></div></p>
+<p><strong>Helm</strong> has separate service files with gRPC ports:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># frontend-service.yaml</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nt">ports</span><span class="p">:</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3000</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50055</span><span class="w">  </span><span class="c1"># gRPC (if needed)</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">grpc</span>
+</code></pre></div></p>
+<h3 id="6-opentelemetry-configuration">6. OpenTelemetry Configuration</h3>
+<p><strong>k8s/ Directory</strong>:
+- Basic OpenTelemetry configuration
+- Hardcoded endpoint: <code>http://otel-collector:4318</code>
+- Missing protocol configuration</p>
+<p><strong>Helm Chart</strong>:
+- Configurable OpenTelemetry endpoint
+- Supports both gRPC and HTTP protocols
+- Configurable via <code>values.yaml</code></p>
+<h2 id="recommendations">Recommendations</h2>
+<h3 id="use-helm-chart-recommended">Use Helm Chart (Recommended)</h3>
+<p>✅ <strong>Use Helm when</strong>:
+- You need a complete, production-ready deployment
+- You want Redis and PostgreSQL included
+- You need feature flags (OpenFeature)
+- You want configurable image tags and registries
+- You need testing tools (k6, Playwright)
+- You want easy upgrades and rollbacks</p>
+<h3 id="use-k8s-directory">Use k8s/ Directory</h3>
+<p>⚠️ <strong>Use k8s/ directory when</strong>:
+- You're doing quick testing or development
+- You have external Redis/PostgreSQL
+- You don't need feature flags
+- You prefer direct kubectl apply
+- You want minimal dependencies</p>
+<h3 id="migration-path">Migration Path</h3>
+<p>If you're currently using <code>k8s/</code> directory and want to migrate to Helm:</p>
 <ol>
-<li><strong>kubectl</strong> configured</li>
-<li><strong>OpenFeature Operator</strong> installed (see <a href="../openfeature/">OpenFeature Operator</a>)</li>
-<li><strong>Gateway API</strong> installed</li>
-<li><strong>Docker images</strong> built and available</li>
+<li>
+<p><strong>Backup current deployment</strong>:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>all<span class="w"> </span>-n<span class="w"> </span>vegas-casino<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span>&gt;<span class="w"> </span>backup.yaml
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Install Helm chart</strong>:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>helm<span class="w"> </span>install<span class="w"> </span>vegas-casino<span class="w"> </span>./helm/vegas-casino
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Update service references</strong> if you have external services pointing to old names</p>
+</li>
+<li>
+<p><strong>Remove old k8s/ resources</strong> (after verifying Helm deployment works)</p>
+</li>
 </ol>
-<h2 id="deployment-order">Deployment Order</h2>
-<h3 id="1-install-openfeature-operator-required-first">1. Install OpenFeature Operator (REQUIRED FIRST!)</h3>
-<p><strong>⚠️ IMPORTANT</strong>: Must be installed before application deployment.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>helm<span class="w"> </span>repo<span class="w"> </span>add<span class="w"> </span>openfeature<span class="w"> </span>https://open-feature.github.io/open-feature-operator
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>helm<span class="w"> </span>install<span class="w"> </span>open-feature-operator<span class="w"> </span>openfeature/open-feature-operator<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span>--namespace<span class="w"> </span>open-feature-system<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span>--create-namespace
-</code></pre></div>
-<h3 id="2-create-namespace">2. Create Namespace</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>vegas-casino
-</code></pre></div>
-<h3 id="3-deploy-resources">3. Deploy Resources</h3>
-<p>Deploy in this order:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># 1. ConfigMaps and Secrets</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>helm/vegas-casino/templates/configmap.yaml
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>helm/vegas-casino/templates/secret.yaml
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1"># 2. Feature Flags (requires OpenFeature Operator)</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>helm/vegas-casino/templates/featureflag.yaml
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>helm/vegas-casino/templates/featureflagsource.yaml
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="c1"># 3. Database (if enabled)</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>helm/vegas-casino/templates/postgresql-deployment.yaml
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>helm/vegas-casino/templates/postgresql-service.yaml
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="c1"># 4. Redis (if enabled)</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>helm/vegas-casino/templates/redis-deployment.yaml
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>helm/vegas-casino/templates/redis-service.yaml
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="c1"># 5. Application Services</span>
-<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>helm/vegas-casino/templates/frontend-deployment.yaml
-<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>helm/vegas-casino/templates/frontend-service.yaml
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>helm/vegas-casino/templates/slots-deployment.yaml
-<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>helm/vegas-casino/templates/slots-service.yaml
-<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="c1"># ... repeat for other services</span>
-<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>
-<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="c1"># 6. Gateway API</span>
-<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>helm/vegas-casino/templates/gateway.yaml
-<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>helm/vegas-casino/templates/httproute.yaml
-</code></pre></div>
-<h2 id="using-helm-template">Using Helm Template</h2>
-<p>Instead of manually applying, you can use Helm to generate manifests:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Generate all manifests</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>helm<span class="w"> </span>template<span class="w"> </span>vegas-casino<span class="w"> </span>./helm/vegas-casino<span class="w"> </span>&gt;<span class="w"> </span>manifests.yaml
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Apply generated manifests</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>manifests.yaml
-</code></pre></div>
-<h2 id="customizing-manifests">Customizing Manifests</h2>
-<h3 id="edit-generated-manifests">Edit Generated Manifests</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Generate manifests</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>helm<span class="w"> </span>template<span class="w"> </span>vegas-casino<span class="w"> </span>./helm/vegas-casino<span class="w"> </span>&gt;<span class="w"> </span>manifests.yaml
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Edit manifests.yaml</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>vim<span class="w"> </span>manifests.yaml
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Apply</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>manifests.yaml
-</code></pre></div>
-<h3 id="manual-manifest-creation">Manual Manifest Creation</h3>
-<p>Create custom manifests based on templates:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/v1</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deployment</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nt">metadata</span><span class="p">:</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vegas-casino-frontend</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vegas-casino</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="nt">spec</span><span class="p">:</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">frontend</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span><span class="nt">template</span><span class="p">:</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">      </span><span class="nt">labels</span><span class="p">:</span>
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">frontend</span>
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">      </span><span class="nt">containers</span><span class="p">:</span>
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">frontend</span>
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hrexed/vegasapp-frontend:0.10</span>
-<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">        </span><span class="nt">ports</span><span class="p">:</span>
-<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3000</span>
-<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="w">        </span><span class="nt">env</span><span class="p">:</span>
-<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CASINO_URL</span>
-<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;http://vegas-casino-frontend:3000&quot;</span>
-</code></pre></div>
-<h2 id="verification">Verification</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Check all resources</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>all<span class="w"> </span>-n<span class="w"> </span>vegas-casino
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Check deployments</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-n<span class="w"> </span>vegas-casino
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># Check services</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>kubectl<span class="w"> </span>get<span class="w"> </span>services<span class="w"> </span>-n<span class="w"> </span>vegas-casino
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="c1"># Check pods</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-n<span class="w"> </span>vegas-casino
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="c1"># Check logs</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>kubectl<span class="w"> </span>logs<span class="w"> </span>-n<span class="w"> </span>vegas-casino<span class="w"> </span>deployment/vegas-casino-frontend
-</code></pre></div>
-<h2 id="updating-manifests">Updating Manifests</h2>
-<h3 id="update-image">Update Image</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Set new image</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>kubectl<span class="w"> </span><span class="nb">set</span><span class="w"> </span>image<span class="w"> </span>deployment/vegas-casino-frontend<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nv">frontend</span><span class="o">=</span>hrexed/vegasapp-frontend:0.11<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span>-n<span class="w"> </span>vegas-casino
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c1"># Or edit deployment</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>kubectl<span class="w"> </span>edit<span class="w"> </span>deployment<span class="w"> </span>vegas-casino-frontend<span class="w"> </span>-n<span class="w"> </span>vegas-casino
-</code></pre></div>
-<h3 id="scale-services">Scale Services</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Scale frontend</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>kubectl<span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>vegas-casino-frontend<span class="w"> </span>--replicas<span class="o">=</span><span class="m">3</span><span class="w"> </span>-n<span class="w"> </span>vegas-casino
-</code></pre></div>
-<h3 id="update-environment-variables">Update Environment Variables</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Set env var</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>kubectl<span class="w"> </span><span class="nb">set</span><span class="w"> </span>env<span class="w"> </span>deployment/vegas-casino-frontend<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nv">OTEL_EXPORTER_OTLP_ENDPOINT</span><span class="o">=</span>otel-collector:4317<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span>-n<span class="w"> </span>vegas-casino
-</code></pre></div>
-<h2 id="cleanup">Cleanup</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Delete all resources</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>namespace<span class="w"> </span>vegas-casino
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Or delete individual resources</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>deployment<span class="w"> </span>vegas-casino-frontend<span class="w"> </span>-n<span class="w"> </span>vegas-casino
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>service<span class="w"> </span>vegas-casino-frontend<span class="w"> </span>-n<span class="w"> </span>vegas-casino
-</code></pre></div>
-<h2 id="advantages-of-manifests">Advantages of Manifests</h2>
-<ul>
-<li>✅ Full control over resources</li>
-<li>✅ No Helm dependency</li>
-<li>✅ Easy to version control</li>
-<li>✅ Direct kubectl operations</li>
-</ul>
-<h2 id="disadvantages">Disadvantages</h2>
-<ul>
-<li>❌ Manual configuration management</li>
-<li>❌ No templating</li>
-<li>❌ Harder to maintain</li>
-<li>❌ No rollback support</li>
-</ul>
+<h2 id="what-needs-to-be-updated-in-k8s">What Needs to be Updated in k8s/</h2>
+<p>If you want to keep using <code>k8s/</code> directory, you should:</p>
+<ol>
+<li><strong>Add Redis deployment and service</strong></li>
+<li><strong>Add PostgreSQL deployment and service</strong></li>
+<li><strong>Update frontend deployment</strong>:</li>
+<li>Add Redis environment variables</li>
+<li>Add DASHBOARD_SERVICE_GRPC</li>
+<li>Update service names to match Helm convention</li>
+<li>Add SCORING_SERVICE_URL</li>
+<li><strong>Update game service deployments</strong>:</li>
+<li>Add gRPC port exposure</li>
+<li>Add Redis environment variables</li>
+<li>Update service names</li>
+<li><strong>Add Service resources</strong> for gRPC ports</li>
+<li><strong>Update image tags</strong> to use versioned tags instead of <code>latest</code></li>
+</ol>
+<h2 id="current-status">Current Status</h2>
+<p><strong>k8s/ Directory</strong>: ⚠️ <strong>Outdated</strong> - Missing critical infrastructure and configuration</p>
+<p><strong>Helm Chart</strong>: ✅ <strong>Current</strong> - Reflects the latest architecture and requirements</p>
 <hr />
-<p><strong>Next</strong>: Learn about <a href="../openfeature/">OpenFeature Operator</a> or return to <a href="../">Deployment Overview</a>.</p>
+<p><strong>Recommendation</strong>: Use the Helm chart for all deployments. The <code>k8s/</code> directory can be kept for reference or removed if no longer needed.</p>
 
 
 

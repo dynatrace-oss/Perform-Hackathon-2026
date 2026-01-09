@@ -12,13 +12,9 @@
         <meta name="author" content="Vegas Casino Team">
       
       
-        <link rel="canonical" href="https://vegas-casino.example.com/development/docker/">
+        <link rel="canonical" href="https://vegas-casino.example.com/snippets/tenant-id/">
       
       
-        <link rel="prev" href="../building/">
-      
-      
-        <link rel="next" href="../../testing/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -26,7 +22,7 @@
     
     
       
-        <title>Docker Images - Vegas Casino - Observability Hackathon</title>
+        <title>Tenant id - Vegas Casino - Observability Hackathon</title>
       
     
     
@@ -78,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#docker-images" class="md-skip">
+        <a href="#gather-details-tenant-id-environment" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Docker Images
+              Tenant id
             
           </span>
         </div>
@@ -289,13 +285,11 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../building/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../development/building/" class="md-tabs__link">
           
   
   Development
@@ -651,8 +645,6 @@
       
   
   
-    
-  
   
   
     
@@ -663,12 +655,14 @@
       
       
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
         
           
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
@@ -682,7 +676,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             Development
@@ -696,7 +690,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../building/" class="md-nav__link">
+      <a href="../../development/building/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -714,30 +708,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Docker Images
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../development/docker/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -746,230 +720,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#image-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Image Overview
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#available-images" class="md-nav__link">
-    <span class="md-ellipsis">
-      Available Images
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Available Images">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#application-images" class="md-nav__link">
-    <span class="md-ellipsis">
-      Application Images
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#testing-images" class="md-nav__link">
-    <span class="md-ellipsis">
-      Testing Images
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#image-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      Image Structure
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Image Structure">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#nodejs-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      Node.js Services
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#python-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      Python Services
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#go-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      Go Services
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#java-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      Java Services
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#environment-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      Environment Variables
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Environment Variables">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#common-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      Common Variables
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#service-specific-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      Service-Specific Variables
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#image-tags" class="md-nav__link">
-    <span class="md-ellipsis">
-      Image Tags
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#building-images" class="md-nav__link">
-    <span class="md-ellipsis">
-      Building Images
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pushing-images" class="md-nav__link">
-    <span class="md-ellipsis">
-      Pushing Images
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Pushing Images">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#to-docker-hub" class="md-nav__link">
-    <span class="md-ellipsis">
-      To Docker Hub
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#to-private-registry" class="md-nav__link">
-    <span class="md-ellipsis">
-      To Private Registry
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#image-sizes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Image Sizes
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#multi-stage-builds" class="md-nav__link">
-    <span class="md-ellipsis">
-      Multi-Stage Builds
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#image-security" class="md-nav__link">
-    <span class="md-ellipsis">
-      Image Security
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1306,8 +1056,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -1316,204 +1064,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#image-overview" class="md-nav__link">
+  <a href="#gather-details-tenant-id-environment" class="md-nav__link">
     <span class="md-ellipsis">
-      Image Overview
+      Gather Details: Tenant ID &amp; Environment
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#available-images" class="md-nav__link">
+  <a href="#gather-details-environment-type" class="md-nav__link">
     <span class="md-ellipsis">
-      Available Images
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Available Images">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#application-images" class="md-nav__link">
-    <span class="md-ellipsis">
-      Application Images
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#testing-images" class="md-nav__link">
-    <span class="md-ellipsis">
-      Testing Images
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#image-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      Image Structure
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Image Structure">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#nodejs-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      Node.js Services
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#python-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      Python Services
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#go-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      Go Services
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#java-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      Java Services
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#environment-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      Environment Variables
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Environment Variables">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#common-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      Common Variables
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#service-specific-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      Service-Specific Variables
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#image-tags" class="md-nav__link">
-    <span class="md-ellipsis">
-      Image Tags
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#building-images" class="md-nav__link">
-    <span class="md-ellipsis">
-      Building Images
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pushing-images" class="md-nav__link">
-    <span class="md-ellipsis">
-      Pushing Images
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Pushing Images">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#to-docker-hub" class="md-nav__link">
-    <span class="md-ellipsis">
-      To Docker Hub
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#to-private-registry" class="md-nav__link">
-    <span class="md-ellipsis">
-      To Private Registry
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#image-sizes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Image Sizes
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#multi-stage-builds" class="md-nav__link">
-    <span class="md-ellipsis">
-      Multi-Stage Builds
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#image-security" class="md-nav__link">
-    <span class="md-ellipsis">
-      Image Security
+      Gather Details: Environment Type
     </span>
   </a>
   
@@ -1537,230 +1099,43 @@
   
 
 
-<h1 id="docker-images">Docker Images</h1>
-<h2 id="image-overview">Image Overview</h2>
-<p>The Vegas Casino project consists of multiple Docker images, each serving a specific purpose in the microservices architecture.</p>
-<h2 id="available-images">Available Images</h2>
-<h3 id="application-images">Application Images</h3>
+  <h1>Tenant id</h1>
+
+<h2 id="gather-details-tenant-id-environment">Gather Details: Tenant ID &amp; Environment</h2>
+<p>You will need access to a Dynatrace tenant. If you do not have access, <a href="https://dt-url.net/trial" target="_blank">sign up for a free 15 day trial</a>.</p>
+<p>Make a note of your Dynatrace tenant ID. It is the first bit of your URL (eg. <code>abc12345</code> in the following examples):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>https://abc12345.live.dynatrace.com
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>https://abc12345.apps.dynatrace.com
+</code></pre></div>
+<h2 id="gather-details-environment-type">Gather Details: Environment Type</h2>
+<p>Make a note of your "environment type" based on your URL.</p>
+<p>If you are unsure, use <code>live</code>.</p>
 <table>
 <thead>
 <tr>
-<th>Service</th>
-<th>Base Image</th>
-<th>Ports</th>
-<th>Purpose</th>
+<th>URL</th>
+<th>Environment Type</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>frontend</code></td>
-<td><code>node:18-alpine</code></td>
-<td>3000</td>
-<td>Web UI and API gateway</td>
+<td>abc12345.apps.dynatrace.com</td>
+<td>live</td>
 </tr>
 <tr>
-<td><code>slots</code></td>
-<td><code>node:18-alpine</code></td>
-<td>8081, 50051</td>
-<td>Slots game service</td>
+<td>abc12345.live.dynatrace.com</td>
+<td>live</td>
 </tr>
 <tr>
-<td><code>roulette</code></td>
-<td><code>python:3.11-slim</code></td>
-<td>8082, 50052</td>
-<td>Roulette game service</td>
+<td>abc12345.sprint.dynatracelabs.com</td>
+<td>sprint</td>
 </tr>
 <tr>
-<td><code>dice</code></td>
-<td><code>golang:1.21-alpine</code></td>
-<td>8083, 50053</td>
-<td>Dice game service</td>
-</tr>
-<tr>
-<td><code>blackjack</code></td>
-<td><code>node:18-alpine</code></td>
-<td>8084, 50054</td>
-<td>Blackjack game service</td>
-</tr>
-<tr>
-<td><code>scoring</code></td>
-<td><code>eclipse-temurin:17-jre-alpine</code></td>
-<td>8085</td>
-<td>Scoring and leaderboard service</td>
-</tr>
-<tr>
-<td><code>dashboard</code></td>
-<td><code>node:18-alpine</code></td>
-<td>3001</td>
-<td>Analytics dashboard</td>
+<td>abc12345.dev.dynatracelabs.com</td>
+<td>dev</td>
 </tr>
 </tbody>
 </table>
-<h3 id="testing-images">Testing Images</h3>
-<table>
-<thead>
-<tr>
-<th>Service</th>
-<th>Base Image</th>
-<th>Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>playwright</code></td>
-<td><code>mcr.microsoft.com/playwright:v1.40.0-focal</code></td>
-<td>Browser automation</td>
-</tr>
-<tr>
-<td><code>k6</code></td>
-<td><code>grafana/k6:latest</code></td>
-<td>Load testing</td>
-</tr>
-</tbody>
-</table>
-<h2 id="image-structure">Image Structure</h2>
-<h3 id="nodejs-services">Node.js Services</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">FROM</span><span class="w"> </span><span class="s">node:18-alpine</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">COPY</span><span class="w"> </span>package*.json<span class="w"> </span>./
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">RUN</span><span class="w"> </span>npm<span class="w"> </span>install
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">COPY</span><span class="w"> </span>services/<span class="o">{</span>service<span class="o">}</span>/<span class="w"> </span>./
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">COPY</span><span class="w"> </span>services/common/<span class="w"> </span>./common/
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;service-file.js&quot;</span><span class="p">]</span>
-</code></pre></div>
-<h3 id="python-services">Python Services</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">FROM</span><span class="w"> </span><span class="s">python:3.11-slim</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">COPY</span><span class="w"> </span>requirements.txt<span class="w"> </span>./
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span>-r<span class="w"> </span>requirements.txt
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">COPY</span><span class="w"> </span>services/<span class="o">{</span>service<span class="o">}</span>/<span class="w"> </span>./
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;service-file.py&quot;</span><span class="p">]</span>
-</code></pre></div>
-<h3 id="go-services">Go Services</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">FROM</span><span class="w"> </span><span class="s">golang:1.21-alpine</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">builder</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">COPY</span><span class="w"> </span>go.mod<span class="w"> </span>go.sum<span class="w"> </span>./
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">RUN</span><span class="w"> </span>go<span class="w"> </span>mod<span class="w"> </span>download
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">COPY</span><span class="w"> </span>.<span class="w"> </span>.
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="k">RUN</span><span class="w"> </span>go<span class="w"> </span>build<span class="w"> </span>-o<span class="w"> </span>service-binary
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="k">FROM</span><span class="w"> </span><span class="s">alpine:latest</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="k">COPY</span><span class="w"> </span>--from<span class="o">=</span>builder<span class="w"> </span>/app/service-binary<span class="w"> </span>/service-binary
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;/service-binary&quot;</span><span class="p">]</span>
-</code></pre></div>
-<h3 id="java-services">Java Services</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">FROM</span><span class="w"> </span><span class="s">maven:3.9-eclipse-temurin-17</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">builder</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">COPY</span><span class="w"> </span>pom.xml<span class="w"> </span>./
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">RUN</span><span class="w"> </span>mvn<span class="w"> </span>dependency:go-offline
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="k">COPY</span><span class="w"> </span>src<span class="w"> </span>./src
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">RUN</span><span class="w"> </span>mvn<span class="w"> </span>clean<span class="w"> </span>package<span class="w"> </span>-DskipTests
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="k">FROM</span><span class="w"> </span><span class="s">eclipse-temurin:17-jre-alpine</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="k">COPY</span><span class="w"> </span>--from<span class="o">=</span>builder<span class="w"> </span>/app/target/*.jar<span class="w"> </span>app.jar
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;java&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-jar&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;app.jar&quot;</span><span class="p">]</span>
-</code></pre></div>
-<h2 id="environment-variables">Environment Variables</h2>
-<p>All images support environment variables for configuration:</p>
-<h3 id="common-variables">Common Variables</h3>
-<ul>
-<li><code>PORT</code>: Service HTTP port</li>
-<li><code>OTEL_EXPORTER_OTLP_ENDPOINT</code>: OpenTelemetry collector endpoint</li>
-<li><code>OTEL_EXPORTER_OTLP_PROTOCOL</code>: Protocol (grpc/http)</li>
-</ul>
-<h3 id="service-specific-variables">Service-Specific Variables</h3>
-<ul>
-<li><code>REDIS_HOST</code>, <code>REDIS_PORT</code>: Redis connection</li>
-<li><code>SCORING_SERVICE_URL</code>: Scoring service endpoint</li>
-<li><code>FLAGD_HOST</code>, <code>FLAGD_PORT</code>: Feature flag service (if not using operator)</li>
-</ul>
-<h2 id="image-tags">Image Tags</h2>
-<p>Images are tagged with:
-- <strong>Version Tag</strong>: From <code>IMAGE_TAG</code> (default: <code>0.10</code>)
-- <strong>Latest Tag</strong>: <code>latest</code> (optional)</p>
-<p>Example:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>hrexed/vegasapp-frontend:0.10
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>hrexed/vegasapp-frontend:latest
-</code></pre></div></p>
-<h2 id="building-images">Building Images</h2>
-<p>See <a href="../building/">Building the Project</a> for detailed build instructions.</p>
-<h2 id="pushing-images">Pushing Images</h2>
-<h3 id="to-docker-hub">To Docker Hub</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Login first</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>docker<span class="w"> </span>login
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Push images</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>make<span class="w"> </span>docker-push-all
-</code></pre></div>
-<h3 id="to-private-registry">To Private Registry</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Set registry</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">REGISTRY</span><span class="o">=</span>your-registry.com/vegasapp
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>make<span class="w"> </span>docker-build-all
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>make<span class="w"> </span>docker-push-all
-</code></pre></div>
-<h2 id="image-sizes">Image Sizes</h2>
-<p>Approximate image sizes:</p>
-<table>
-<thead>
-<tr>
-<th>Image</th>
-<th>Size</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>frontend</code></td>
-<td>~150MB</td>
-</tr>
-<tr>
-<td><code>slots</code></td>
-<td>~150MB</td>
-</tr>
-<tr>
-<td><code>roulette</code></td>
-<td>~200MB</td>
-</tr>
-<tr>
-<td><code>dice</code></td>
-<td>~20MB</td>
-</tr>
-<tr>
-<td><code>blackjack</code></td>
-<td>~150MB</td>
-</tr>
-<tr>
-<td><code>scoring</code></td>
-<td>~200MB</td>
-</tr>
-<tr>
-<td><code>dashboard</code></td>
-<td>~150MB</td>
-</tr>
-<tr>
-<td><code>playwright</code></td>
-<td>~1.5GB</td>
-</tr>
-<tr>
-<td><code>k6</code></td>
-<td>~50MB</td>
-</tr>
-</tbody>
-</table>
-<h2 id="multi-stage-builds">Multi-Stage Builds</h2>
-<p>Several services use multi-stage builds to reduce final image size:</p>
-<ul>
-<li><strong>Go Services</strong>: Build binary in builder stage, copy to minimal runtime</li>
-<li><strong>Java Services</strong>: Build JAR in Maven stage, copy to JRE-only runtime</li>
-</ul>
-<h2 id="image-security">Image Security</h2>
-<ul>
-<li><strong>Base Images</strong>: Use official, regularly updated base images</li>
-<li><strong>Non-Root Users</strong>: Services run as non-root when possible</li>
-<li><strong>Minimal Images</strong>: Alpine-based images for smaller attack surface</li>
-<li><strong>Dependency Scanning</strong>: Regularly update dependencies</li>
-</ul>
-<hr />
-<p><strong>Next</strong>: Learn about <a href="../../testing/">Testing</a> or <a href="../../deployment/">Deployment</a>.</p>
 
 
 
