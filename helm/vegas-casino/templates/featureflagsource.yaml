@@ -1,0 +1,21 @@
+{{- if .Values.openfeature.enabled }}
+apiVersion: core.openfeature.dev/v1beta1
+kind: FeatureFlagSource
+metadata:
+  name: {{ include "vegas-casino.fullname" . }}-flag-source
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vegas-casino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: feature-flag-source
+spec:
+  sources:
+    - source: {{ .Values.global.namespace }}/{{ include "vegas-casino.fullname" . }}-flags
+      provider: kubernetes
+  port: 8014  # gRPC port for flagd sidecar
+  managementPort: 8015  # Management port for health checks and metrics (must be different from gRPC port)
+  probesEnabled: false  # Disable probes since flagd v0.12.4 doesn't expose /readyz endpoint on management port
+  {{- if .Values.opentelemetry.exporter.endpoint }}
+  otelCollectorUri: {{ .Values.opentelemetry.exporter.endpoint }}  # OpenTelemetry collector endpoint for flagd telemetry
+  {{- end }}
+{{- end }}
+

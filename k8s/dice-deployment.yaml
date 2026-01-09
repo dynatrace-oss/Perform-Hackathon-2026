@@ -1,0 +1,125 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vegas-dice-service
+  namespace: vegas-casino
+  labels:
+    app: vegas-dice-service
+    service: dice
+    tier: microservice
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vegas-dice-service
+  template:
+    metadata:
+      labels:
+        app: vegas-dice-service
+        service: dice
+        tier: microservice
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8083"
+        prometheus.io/path: "/health"
+    spec:
+      containers:
+      - name: dice-service
+        image: vegas-dice-service:latest
+        imagePullPolicy: IfNotPresent
+        # Note: This service is now written in Go
+        ports:
+        - containerPort: 8083
+          name: http
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "8083"
+        - name: SERVICE_NAME
+          value: "vegas-dice-service"
+        # OpenTelemetry standard environment variables
+        - name: OTEL_SERVICE_NAME
+          value: "vegas-dice-service"
+        - name: OTEL_SERVICE_VERSION
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: OTEL_SERVICE_VERSION
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: "service.name=vegas-dice-service,service.version=2.1.0,service.namespace=vegas-casino,deployment.environment=production,application.name=Vegas-Casino-dice-games,game.category=dice-games,game.complexity=medium,game.max_payout=2x,game.type=craps-dice,game.owner=Dice-Games-Division"
+        - name: DEPLOYMENT_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: DEPLOYMENT_ENVIRONMENT
+        - name: SERVICE_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: SERVICE_NAMESPACE
+        - name: K8S_CLUSTER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: K8S_CLUSTER_NAME
+        - name: K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: SERVICE_INSTANCE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        # Game-specific attributes
+        - name: GAME_CATEGORY
+          value: "dice-games"
+        - name: GAME_COMPLEXITY
+          value: "medium"
+        - name: GAME_MAX_PAYOUT
+          value: "2x"
+        - name: GAME_TYPE
+          value: "craps-dice"
+        - name: GAME_OWNER
+          value: "Dice-Games-Division"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8083
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8083
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vegas-dice-service
+  namespace: vegas-casino
+  labels:
+    app: vegas-dice-service
+    service: dice
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8083
+    targetPort: 8083
+    protocol: TCP
+    name: http
+  selector:
+    app: vegas-dice-service
+

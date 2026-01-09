@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package roulette;
+
+option go_package = "vegas-casino/proto/roulette";
+
+// Roulette Service
+service RouletteService {
+  // Health check
+  rpc Health(HealthRequest) returns (HealthResponse);
+  
+  // Spin roulette wheel
+  rpc Spin(SpinRequest) returns (SpinResponse);
+  
+  // Get game assets (HTML/JS/CSS for rendering)
+  rpc GetGameAssets(GameAssetsRequest) returns (GameAssetsResponse);
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;
+  string service = 2;
+  map<string, string> metadata = 3;
+}
+
+message Bet {
+  string type = 1;  // "straight", "red", "black", "even", "odd", "low", "high"
+  string value = 2;
+  double amount = 3;
+}
+
+message SpinRequest {
+  string bet_type = 1;  // "multiple" or simple bet type
+  map<string, Bet> bet_value = 2;
+  double bet_amount = 3;
+  bool cheat_active = 4;
+  string cheat_type = 5;
+  map<string, string> player_info = 6;
+}
+
+message SpinResponse {
+  int32 winning_number = 1;
+  string color = 2;
+  bool win = 3;
+  double payout = 4;
+  string timestamp = 5;
+  bool cheat_active = 6;
+  string cheat_type = 7;
+  bool cheat_boosted = 8;
+}
+
+message GameAssetsRequest {
+  string asset_type = 1; // "html", "js", "css", "all"
+}
+
+message GameAssetsResponse {
+  string html = 1;
+  string javascript = 2;
+  string css = 3;
+  map<string, string> config = 4;
+}
+
+
+
+
+
+
+
+

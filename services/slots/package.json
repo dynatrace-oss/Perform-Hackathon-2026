@@ -1,0 +1,38 @@
+{
+  "name": "vegas-slots-service",
+  "version": "2.1.0",
+  "description": "Vegas Casino Slots Service - Node.js microservice with gRPC support",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js",
+    "test": "jest"
+  },
+  "keywords": [
+    "casino",
+    "slots",
+    "microservice",
+    "grpc",
+    "opentelemetry"
+  ],
+  "author": "Dynatrace Vegas Team",
+  "license": "MIT",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.9.0",
+    "@grpc/proto-loader": "^0.7.10",
+    "@opentelemetry/api": "^1.7.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.51.0",
+    "@opentelemetry/exporter-otlp-grpc": "^0.26.0",
+    "@opentelemetry/resources": "^1.21.0",
+    "@opentelemetry/sdk-node": "^0.51.0",
+    "@opentelemetry/semantic-conventions": "^1.21.0",
+    "@openfeature/server-sdk": "^1.6.0",
+    "@openfeature/flagd-provider": "^0.3.0",
+    "express": "^5.1.0",
+    "redis": "^4.6.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
+

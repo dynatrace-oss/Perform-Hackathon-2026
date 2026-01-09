@@ -1,0 +1,120 @@
+{{- if .Values.scoring.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vegas-casino.fullname" . }}-scoring
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vegas-casino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: scoring
+spec:
+  replicas: {{ .Values.scoring.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: scoring
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: scoring
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.scoring.service.port }}"
+        prometheus.io/path: "/api/scoring/health"
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "vegas-casino.serviceAccountName" . }}
+      containers:
+      - name: scoring
+        {{- with .Values.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
+        image: "{{ include "vegas-casino.image" (dict "service" .Values.scoring "Values" .Values) }}"
+        imagePullPolicy: {{ .Values.scoring.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.scoring.service.port }}
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "{{ .Values.scoring.service.port }}"
+        - name: SERVICE_NAME
+          value: "{{ .Values.scoring.env.SERVICE_NAME }}"
+        - name: OTEL_SERVICE_NAME
+          value: "{{ .Values.scoring.env.OTEL_SERVICE_NAME }}"
+        - name: OTEL_SERVICE_VERSION
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "vegas-casino.fullname" . }}-config
+              key: OTEL_SERVICE_VERSION
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: "service.name={{ .Values.scoring.env.OTEL_SERVICE_NAME }},service.version={{ .Values.scoring.env.OTEL_SERVICE_VERSION }},service.namespace={{ .Values.scoring.env.SERVICE_NAMESPACE }},deployment.environment={{ .Values.scoring.env.DEPLOYMENT_ENVIRONMENT }},application.name=Vegas-Casino-Scoring"
+        - name: DEPLOYMENT_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "vegas-casino.fullname" . }}-config
+              key: DEPLOYMENT_ENVIRONMENT
+        - name: SERVICE_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "vegas-casino.fullname" . }}-config
+              key: SERVICE_NAMESPACE
+        - name: K8S_CLUSTER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "vegas-casino.fullname" . }}-config
+              key: K8S_CLUSTER_NAME
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "{{ .Values.opentelemetry.exporter.endpoint }}"
+        - name: OTEL_EXPORTER_OTLP_PROTOCOL
+          value: "{{ .Values.opentelemetry.exporter.protocol }}"
+        - name: OTEL_EXPORTER_OTLP_INSECURE
+          value: "true"  # Disable TLS/SSL for plain gRPC connections
+        # PostgreSQL configuration
+        {{- if .Values.postgresql.enabled }}
+        - name: DB_HOST
+          value: "{{ include "vegas-casino.fullname" . }}-postgresql"
+        - name: DB_PORT
+          value: {{ .Values.postgresql.service.port | quote }}
+        - name: DB_NAME
+          value: "{{ .Values.postgresql.database }}"
+        - name: DB_USER
+          value: "{{ .Values.postgresql.username }}"
+        - name: DB_PASSWORD
+          value: "{{ .Values.postgresql.password }}"
+        {{- else }}
+        - name: DB_HOST
+          value: "{{ .Values.scoring.env.DB_HOST }}"
+        - name: DB_PORT
+          value: "{{ .Values.scoring.env.DB_PORT }}"
+        - name: DB_NAME
+          value: "{{ .Values.scoring.env.DB_NAME }}"
+        - name: DB_USER
+          value: "{{ .Values.scoring.env.DB_USER }}"
+        - name: DB_PASSWORD
+          value: "{{ .Values.scoring.env.DB_PASSWORD }}"
+        {{- end }}
+        livenessProbe:
+          httpGet:
+            path: /api/scoring/health
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/scoring/health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.scoring.resources | nindent 10 }}
+{{- end }}
+
+

@@ -1,0 +1,29 @@
+{
+  "name": "vegas-roulette-service",
+  "version": "2.1.0",
+  "description": "Vegas Casino Roulette Service - Node.js microservice (Python implementation also available)",
+  "main": "roulette-service.js",
+  "scripts": {
+    "start": "node roulette-service.js",
+    "dev": "node roulette-service.js"
+  },
+  "keywords": [
+    "casino",
+    "roulette",
+    "microservice",
+    "opentelemetry"
+  ],
+  "author": "Dynatrace Vegas Team",
+  "license": "MIT",
+  "dependencies": {
+    "@opentelemetry/api": "^1.7.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.51.0",
+    "@opentelemetry/exporter-otlp-grpc": "^0.26.0",
+    "@opentelemetry/resources": "^1.21.0",
+    "@opentelemetry/sdk-node": "^0.51.0",
+    "@opentelemetry/semantic-conventions": "^1.21.0",
+    "express": "^5.1.0",
+    "redis": "^4.6.0"
+  }
+}
+

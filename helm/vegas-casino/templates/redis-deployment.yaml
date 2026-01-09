@@ -1,0 +1,79 @@
+{{- if .Values.redis.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vegas-casino.fullname" . }}-redis
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vegas-casino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: redis
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: redis
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "vegas-casino.serviceAccountName" . }}
+      containers:
+      - name: redis
+        {{- with .Values.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
+        image: "{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
+        imagePullPolicy: {{ .Values.redis.image.pullPolicy }}
+        ports:
+        - name: redis
+          containerPort: {{ .Values.redis.service.port }}
+          protocol: TCP
+        command:
+          - redis-server
+          {{- if .Values.redis.password }}
+          - --requirepass
+          - {{ .Values.redis.password }}
+          {{- end }}
+          {{- if not .Values.redis.persistence.enabled }}
+          - --save
+          - ""
+          - --stop-writes-on-bgsave-error
+          - "no"
+          {{- end }}
+        livenessProbe:
+          exec:
+            command:
+              - redis-cli
+              {{- if .Values.redis.password }}
+              - -a
+              - {{ .Values.redis.password }}
+              {{- end }}
+              - ping
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+              - redis-cli
+              {{- if .Values.redis.password }}
+              - -a
+              - {{ .Values.redis.password }}
+              {{- end }}
+              - ping
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.redis.resources | nindent 10 }}
+{{- end }}
+
+

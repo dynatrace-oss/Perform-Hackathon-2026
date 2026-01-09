@@ -1,0 +1,23 @@
+{
+  "name": "vegas-casino-playwright",
+  "version": "2.1.0",
+  "description": "Playwright automation for Vegas Casino user journey simulation",
+  "main": "simulate-user.js",
+  "scripts": {
+    "start": "node simulate-user.js",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.57.0",
+    "playwright": "^1.57.0"
+  },
+  "keywords": [
+    "playwright",
+    "automation",
+    "testing",
+    "casino"
+  ],
+  "author": "Vegas Casino Team",
+  "license": "MIT"
+}
+

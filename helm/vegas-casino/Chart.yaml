@@ -1,0 +1,25 @@
+apiVersion: v2
+name: vegas-casino
+description: A Helm chart for Vegas Casino microservices application
+type: application
+version: 0.1.0
+appVersion: "2.1.0"
+keywords:
+  - casino
+  - microservices
+  - opentelemetry
+  - gaming
+  - openfeature
+maintainers:
+  - name: Vegas Casino Team
+    email: team@vegas-casino.com
+# OpenFeature Operator is installed separately (not as a dependency)
+# to avoid CRD ownership conflicts. Install it first with:
+# helm install open-feature-operator open-feature/open-feature-operator \
+#   --version 0.8.8 --namespace open-feature --create-namespace
+# dependencies:
+#   - name: open-feature-operator
+#     version: "0.8.8"
+#     repository: "https://open-feature.github.io/open-feature-operator/"
+#     condition: openfeature.enabled
+

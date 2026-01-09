@@ -1,0 +1,33 @@
+{{- if .Values.roulette.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "vegas-casino.fullname" . }}-roulette
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vegas-casino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: roulette
+spec:
+  type: {{ .Values.roulette.service.type }}
+  ports:
+    - port: {{ .Values.roulette.service.httpPort }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.roulette.service.grpcPort }}
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+  selector:
+    app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: roulette
+{{- end }}
+
+
+
+
+
+
+
+

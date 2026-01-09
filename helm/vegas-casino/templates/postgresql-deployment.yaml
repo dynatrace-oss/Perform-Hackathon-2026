@@ -1,0 +1,88 @@
+{{- if .Values.postgresql.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vegas-casino.fullname" . }}-postgresql
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vegas-casino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: postgresql
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: postgresql
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "vegas-casino.serviceAccountName" . }}
+      containers:
+      - name: postgresql
+        {{- with .Values.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
+        image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+        imagePullPolicy: {{ .Values.postgresql.image.pullPolicy }}
+        ports:
+        - name: postgresql
+          containerPort: {{ .Values.postgresql.service.port }}
+          protocol: TCP
+        env:
+        - name: POSTGRES_DB
+          value: {{ .Values.postgresql.database | quote }}
+        - name: POSTGRES_USER
+          value: {{ .Values.postgresql.username | quote }}
+        - name: POSTGRES_PASSWORD
+          value: {{ .Values.postgresql.password | quote }}
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: postgresql-data
+          mountPath: /var/lib/postgresql/data
+        livenessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - pg_isready -U {{ .Values.postgresql.username }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - pg_isready -U {{ .Values.postgresql.username }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.postgresql.resources | nindent 10 }}
+      volumes:
+      {{- if .Values.postgresql.persistence.enabled }}
+      - name: postgresql-data
+        persistentVolumeClaim:
+          claimName: {{ include "vegas-casino.fullname" . }}-postgresql
+      {{- else }}
+      - name: postgresql-data
+        emptyDir: {}
+      {{- end }}
+{{- end }}
+
+
+
+
+
+
+
+

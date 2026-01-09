@@ -1,0 +1,125 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vegas-roulette-service
+  namespace: vegas-casino
+  labels:
+    app: vegas-roulette-service
+    service: roulette
+    tier: microservice
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vegas-roulette-service
+  template:
+    metadata:
+      labels:
+        app: vegas-roulette-service
+        service: roulette
+        tier: microservice
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8082"
+        prometheus.io/path: "/health"
+    spec:
+      containers:
+      - name: roulette-service
+        image: vegas-roulette-service:latest
+        imagePullPolicy: IfNotPresent
+        # Note: This service is now written in Python
+        ports:
+        - containerPort: 8082
+          name: http
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "8082"
+        - name: SERVICE_NAME
+          value: "vegas-roulette-service"
+        # OpenTelemetry standard environment variables
+        - name: OTEL_SERVICE_NAME
+          value: "vegas-roulette-service"
+        - name: OTEL_SERVICE_VERSION
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: OTEL_SERVICE_VERSION
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: "service.name=vegas-roulette-service,service.version=2.1.0,service.namespace=vegas-casino,deployment.environment=production,application.name=Vegas-Casino-table-games,game.category=table-games,game.complexity=high,game.max_payout=36x,game.type=european-roulette,game.owner=Table-Games-Division"
+        - name: DEPLOYMENT_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: DEPLOYMENT_ENVIRONMENT
+        - name: SERVICE_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: SERVICE_NAMESPACE
+        - name: K8S_CLUSTER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: K8S_CLUSTER_NAME
+        - name: K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: SERVICE_INSTANCE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        # Game-specific attributes
+        - name: GAME_CATEGORY
+          value: "table-games"
+        - name: GAME_COMPLEXITY
+          value: "high"
+        - name: GAME_MAX_PAYOUT
+          value: "36x"
+        - name: GAME_TYPE
+          value: "european-roulette"
+        - name: GAME_OWNER
+          value: "Table-Games-Division"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8082
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8082
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vegas-roulette-service
+  namespace: vegas-casino
+  labels:
+    app: vegas-roulette-service
+    service: roulette
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8082
+    targetPort: 8082
+    protocol: TCP
+    name: http
+  selector:
+    app: vegas-roulette-service
+

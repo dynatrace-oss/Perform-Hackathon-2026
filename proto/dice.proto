@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package dice;
+
+option go_package = "vegas-dice-service/proto";
+
+// Dice Service
+service DiceService {
+  // Health check
+  rpc Health(HealthRequest) returns (HealthResponse);
+  
+  // Roll dice
+  rpc Roll(RollRequest) returns (RollResponse);
+  
+  // Get game assets (HTML/JS/CSS for rendering)
+  rpc GetGameAssets(GameAssetsRequest) returns (GameAssetsResponse);
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;
+  string service = 2;
+  map<string, string> metadata = 3;
+}
+
+message RollRequest {
+  double bet_amount = 1;
+  string bet_type = 2;
+  map<string, string> player_info = 3;
+}
+
+message RollResponse {
+  int32 dice1 = 1;
+  int32 dice2 = 2;
+  int32 sum = 3;
+  bool win = 4;
+  double payout = 5;
+  double bet_amount = 6;
+  string bet_type = 7;
+  double payout_multiplier = 8;
+  string timestamp = 9;
+}
+
+message GameAssetsRequest {
+  string asset_type = 1; // "html", "js", "css", "all"
+}
+
+message GameAssetsResponse {
+  string html = 1;
+  string javascript = 2;
+  string css = 3;
+  map<string, string> config = 4;
+}
+

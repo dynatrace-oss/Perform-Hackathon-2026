@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "vegas-casino.fullname" . }}-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vegas-casino.labels" . | nindent 4 }}
+data:
+  # OpenTelemetry standard environment variables
+  OTEL_SERVICE_VERSION: "{{ .Chart.AppVersion }}"
+  DEPLOYMENT_ENVIRONMENT: "{{ .Values.opentelemetry.resourceAttributes.deployment.environment }}"
+  SERVICE_NAMESPACE: "{{ .Values.global.namespace }}"
+  K8S_CLUSTER_NAME: "{{ .Values.opentelemetry.resourceAttributes.k8s.cluster.name }}"
+  # Service ports
+  SLOTS_PORT: "8081"
+  ROULETTE_PORT: "8082"
+  DICE_PORT: "8083"
+  BLACKJACK_PORT: "8084"
+  GATEWAY_PORT: "8080"
+  FRONTEND_PORT: "3000"
+
+
+
+
+
+
+
+

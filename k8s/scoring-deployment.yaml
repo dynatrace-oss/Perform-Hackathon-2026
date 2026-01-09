@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vegas-scoring-service
+  namespace: vegas-casino
+  labels:
+    app: vegas-scoring-service
+    service: scoring
+    tier: microservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vegas-scoring-service
+  template:
+    metadata:
+      labels:
+        app: vegas-scoring-service
+        service: scoring
+        tier: microservice
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8085"
+        prometheus.io/path: "/api/scoring/health"
+    spec:
+      containers:
+      - name: scoring-service
+        image: hrexed/vegasapp-scoring:0.21
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8085
+          name: http
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "8085"
+        - name: SERVICE_NAME
+          value: "vegas-scoring-service"
+        # OpenTelemetry standard environment variables
+        - name: OTEL_SERVICE_NAME
+          value: "vegas-scoring-service"
+        - name: OTEL_SERVICE_VERSION
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: OTEL_SERVICE_VERSION
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: "service.name=vegas-scoring-service,service.version=2.1.0,service.namespace=vegas-casino,deployment.environment=production,application.name=Vegas-Casino-Scoring"
+        - name: DEPLOYMENT_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: DEPLOYMENT_ENVIRONMENT
+        - name: SERVICE_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: SERVICE_NAMESPACE
+        - name: K8S_CLUSTER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: K8S_CLUSTER_NAME
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "otel-collector.default.svc.cluster.local:4317"
+        - name: OTEL_EXPORTER_OTLP_PROTOCOL
+          value: "grpc"
+        - name: OTEL_EXPORTER_OTLP_INSECURE
+          value: "true"
+        # PostgreSQL configuration
+        - name: DB_HOST
+          value: "vegas-casino-postgresql"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "vegas_casino"
+        - name: DB_USER
+          value: "vegas_user"
+        - name: DB_PASSWORD
+          value: "vegas_password"
+        livenessProbe:
+          httpGet:
+            path: /api/scoring/health
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/scoring/health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+
+
+
+
