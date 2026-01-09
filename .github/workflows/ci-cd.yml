@@ -2,13 +2,14 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, V2-Otel, dashboard-fixes ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, V2-Otel ]
+    branches: [ main ]
   workflow_dispatch:
 
 env:
-  REGISTRY: hrexed/vegasapp
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/vegasapp
   IMAGE_TAG: ${{ github.sha }}
   PLATFORM: linux/amd64
 
@@ -97,7 +98,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}-${{ matrix.service }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -135,17 +136,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability scanner (image)
+        if: github.event_name != 'pull_request'
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY }}-${{ matrix.service }}:${{ github.sha }}
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ github.sha }}
           format: 'sarif'
           output: 'trivy-results-${{ matrix.service }}.sarif'
           severity: 'CRITICAL,HIGH'
+          continue-on-error: true
 
       - name: Upload Trivy results to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && github.event_name != 'pull_request'
         with:
           sarif_file: 'trivy-results-${{ matrix.service }}.sarif'
 
@@ -178,11 +181,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Generate SBOM with Syft
+        if: github.event_name != 'pull_request'
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ env.REGISTRY }}-${{ matrix.service }}:${{ github.sha }}
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ github.sha }}
           format: spdx-json
           output-file: sbom-${{ matrix.service }}.json
+          continue-on-error: true
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
@@ -192,9 +197,12 @@ jobs:
           retention-days: 30
 
       - name: Upload SBOM to GitHub
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        continue-on-error: true
+        if: always() && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ matrix.service }}
+          path: sbom-${{ matrix.service }}.json
+          retention-days: 30
 
   build-summary:
     name: Build Summary

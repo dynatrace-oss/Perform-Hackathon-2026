@@ -2,9 +2,9 @@ name: Security Scanning
 
 on:
   push:
-    branches: [ main, V2-Otel ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, V2-Otel ]
+    branches: [ main ]
   schedule:
     - cron: '0 0 * * 0' # Weekly on Sunday
 
