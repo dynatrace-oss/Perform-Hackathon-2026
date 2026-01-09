@@ -1,0 +1,636 @@
+# Default values for vegas-casino
+# This is a YAML-formatted file.
+
+# Global configuration
+global:
+  imageRegistry: hrexed/vegasapp
+  imageTag: "0.39"
+  imagePullPolicy: IfNotPresent
+  namespace: vegas-casino
+  # Set to false if you want to use an existing namespace
+  createNamespace: true
+  # Set to true for codespace deployment (uses NodePort and port-forward)
+  codespace: false
+  
+# OpenTelemetry configuration
+opentelemetry:
+  enabled: true
+  exporter:
+    endpoint: "otel-collector.default.svc.cluster.local:4317"
+    protocol: "grpc"
+  resourceAttributes:
+    deployment:
+      environment: "production"
+    service:
+      namespace: "vegas-casino"
+    k8s:
+      cluster:
+        name: "vegas-casino-k8s-cluster"
+
+# Gateway service configuration
+# NOTE: Gateway service is NOT used when Gateway API is enabled.
+# Gateway API routes directly to frontend/dashboard services.
+# Set to false to disable the gateway service deployment.
+gateway:
+  enabled: false
+  name: gateway
+  image:
+    repository: ""  # If empty, uses global.imageRegistry + "-gateway"
+    tag: ""  # If empty, uses global.imageTag
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+  replicaCount: 1
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env:
+    PORT: "8080"
+    SERVICE_NAME: "vegas-casino-gateway"
+    OTEL_SERVICE_NAME: "vegas-casino-gateway"
+    OTEL_SERVICE_VERSION: "2.1.0"
+    DEPLOYMENT_ENVIRONMENT: "production"
+    SERVICE_NAMESPACE: "vegas-casino"
+
+# Frontend service configuration
+frontend:
+  enabled: true
+  name: frontend
+  image:
+    repository: ""  # If empty, uses global.imageRegistry + "-frontend"
+    tag: ""  # If empty, uses global.imageTag
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  replicaCount: 1
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env:
+    PORT: "3000"
+    SERVICE_NAME: "vegas-frontend-service"
+    OTEL_SERVICE_NAME: "vegas-frontend-service"
+    OTEL_SERVICE_VERSION: "2.1.0"
+    DEPLOYMENT_ENVIRONMENT: "production"
+    SERVICE_NAMESPACE: "vegas-casino"
+    # gRPC service endpoints (will be overridden in deployment template with fullname)
+    SLOTS_SERVICE_GRPC: "vegas-casino-slots:50051"
+    ROULETTE_SERVICE_GRPC: "vegas-casino-roulette:50052"
+    DICE_SERVICE_GRPC: "vegas-casino-dice:50053"
+    BLACKJACK_SERVICE_GRPC: "vegas-casino-blackjack:50054"
+    DASHBOARD_SERVICE_GRPC: "vegas-casino-dashboard:50055"
+    SCORING_SERVICE_URL: "http://vegas-casino-scoring:8085"  # Full URL to scoring service (http://service-name:port)
+
+# Slots service configuration
+slots:
+  enabled: true
+  name: slots
+  image:
+    repository: ""  # If empty, uses global.imageRegistry + "-slots"
+    tag: ""  # If empty, uses global.imageTag
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    httpPort: 8081
+    grpcPort: 50051
+  replicaCount: 1
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env:
+    PORT: "8081"
+    GRPC_PORT: "50051"
+    SERVICE_NAME: "vegas-slots-service"
+    OTEL_SERVICE_NAME: "vegas-slots-service"
+    OTEL_SERVICE_VERSION: "2.1.0"
+    DEPLOYMENT_ENVIRONMENT: "production"
+    SERVICE_NAMESPACE: "vegas-casino"
+    GAME_CATEGORY: "slot-machines"
+    GAME_TYPE: "slots-machine"
+    GAME_COMPLEXITY: "high"
+    GAME_MAX_PAYOUT: "100x"
+    GAME_OWNER: "Slot-Machine-Division"
+    SCORING_SERVICE_URL: "http://vegas-casino-scoring:8085"  # Full URL to scoring service (http://service-name:port)
+
+# Blackjack service configuration
+blackjack:
+  enabled: true
+  name: blackjack
+  image:
+    repository: ""  # If empty, uses global.imageRegistry + "-blackjack"
+    tag: ""  # If empty, uses global.imageTag
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    httpPort: 8084
+    grpcPort: 50054
+  replicaCount: 1
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env:
+    PORT: "8084"
+    GRPC_PORT: "50054"
+    SERVICE_NAME: "vegas-blackjack-service"
+    OTEL_SERVICE_NAME: "vegas-blackjack-service"
+    OTEL_SERVICE_VERSION: "2.1.0"
+    DEPLOYMENT_ENVIRONMENT: "production"
+    SERVICE_NAMESPACE: "vegas-casino"
+    GAME_CATEGORY: "card-games"
+    GAME_TYPE: "blackjack-21"
+    GAME_COMPLEXITY: "high"
+    GAME_MAX_PAYOUT: "2.5x"
+    GAME_OWNER: "Card-Games-Division"
+    SCORING_SERVICE_URL: "http://vegas-casino-scoring:8085"  # Full URL to scoring service (http://service-name:port)
+
+# Roulette service configuration (Python)
+roulette:
+  enabled: true
+  name: roulette
+  image:
+    repository: ""  # If empty, uses global.imageRegistry + "-roulette"
+    tag: ""  # If empty, uses global.imageTag
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    httpPort: 8082
+    grpcPort: 50052
+  replicaCount: 1
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env:
+    PORT: "8082"
+    GRPC_PORT: "50052"
+    SERVICE_NAME: "vegas-roulette-service"
+    OTEL_SERVICE_NAME: "vegas-roulette-service"
+    OTEL_SERVICE_VERSION: "2.1.0"
+    DEPLOYMENT_ENVIRONMENT: "production"
+    SERVICE_NAMESPACE: "vegas-casino"
+    GAME_CATEGORY: "table-games"
+    GAME_TYPE: "european-roulette"
+    GAME_COMPLEXITY: "high"
+    GAME_MAX_PAYOUT: "36x"
+    GAME_OWNER: "Table-Games-Division"
+    SCORING_SERVICE_URL: "http://vegas-casino-scoring:8085"  # Full URL to scoring service (http://service-name:port)
+
+# Dice service configuration (Go)
+dice:
+  enabled: true
+  name: dice
+  image:
+    repository: ""  # If empty, uses global.imageRegistry + "-dice"
+    tag: ""  # If empty, uses global.imageTag
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    httpPort: 8083
+    grpcPort: 50053
+  replicaCount: 1
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "50m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  env:
+    PORT: "8083"
+    GRPC_PORT: "50053"
+    SERVICE_NAME: "vegas-dice-service"
+    OTEL_SERVICE_NAME: "vegas-dice-service"
+    OTEL_SERVICE_VERSION: "2.1.0"
+    DEPLOYMENT_ENVIRONMENT: "production"
+    SERVICE_NAMESPACE: "vegas-casino"
+    GAME_CATEGORY: "dice-games"
+    GAME_TYPE: "craps-dice"
+    GAME_COMPLEXITY: "medium"
+    GAME_MAX_PAYOUT: "2x"
+    GAME_OWNER: "Dice-Games-Division"
+    SCORING_SERVICE_URL: "http://vegas-casino-scoring:8085"  # Full URL to scoring service (http://service-name:port)
+
+# Ingress configuration (traditional Kubernetes Ingress)
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: vegas-casino.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+          port: 3000
+        - path: /api
+          pathType: Prefix
+          service: gateway
+          port: 8080
+  tls: []
+  #  - secretName: vegas-casino-tls
+  #    hosts:
+  #      - vegas-casino.local
+
+# Gateway API configuration (modern Kubernetes Gateway API)
+gatewayAPI:
+  enabled: true
+  gateway:
+    name: vegas-casino-gateway
+    className: "kgateway"
+    listeners:
+      - name: http
+        protocol: HTTP
+        port: 80
+        # No hostname specified - accepts requests from any hostname (including IP access)
+      - name: https
+        protocol: HTTPS
+        port: 443
+        hostname: "vegas-casino.local"
+        tls:
+          mode: Terminate
+          certificateRefs:
+            - name: vegas-casino-tls
+              kind: Secret
+    annotations: {}
+  httpRoutes:
+    - name: dashboard-api-route
+      # No hostnames specified - matches any hostname (allows IP access)
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /api/dashboard
+          backendRefs:
+            - name: dashboard
+              port: 3001
+              weight: 100
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /api/leaderboard
+          backendRefs:
+            - name: dashboard
+              port: 3001
+              weight: 100
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /api/game-results
+          backendRefs:
+            - name: dashboard
+              port: 3001
+              weight: 100
+    - name: dashboard-route
+      # No hostnames specified - matches any hostname (allows IP access)
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /dashboard
+          backendRefs:
+            - name: dashboard
+              port: 3001
+              weight: 100
+    - name: frontend-route
+      # No hostnames specified - matches any hostname (allows IP access)
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /
+          backendRefs:
+            - name: frontend
+              port: 3000
+              weight: 100
+        # Note: Frontend service handles all other /api routes internally
+
+# Redis configuration
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: "7-alpine"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 6379
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  password: ""  # Leave empty for no password, or set a password
+  persistence:
+    enabled: false
+    size: 1Gi
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 5432
+  database: vegas_casino
+  username: vegas_user
+  password: vegas_password  # Change in production!
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  persistence:
+    enabled: false
+    size: 5Gi
+
+# Scoring service configuration
+scoring:
+  enabled: true
+  name: scoring
+  image:
+    repository: ""  # If empty, uses global.imageRegistry + "-scoring"
+    tag: ""  # If empty, uses global.imageTag
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8085
+  replicaCount: 1
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "200m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+  env:
+    PORT: "8085"
+    SERVICE_NAME: "vegas-scoring-service"
+    OTEL_SERVICE_NAME: "vegas-scoring-service"
+    OTEL_SERVICE_VERSION: "2.1.0"
+    DEPLOYMENT_ENVIRONMENT: "production"
+    SERVICE_NAMESPACE: "vegas-casino"
+    DB_HOST: ""  # Will be set to postgresql service name
+    DB_PORT: "5432"
+    DB_NAME: "vegas_casino"
+    DB_USER: "vegas_user"
+    DB_PASSWORD: ""  # Will be set from postgresql.password
+
+# Dashboard service configuration
+dashboard:
+  enabled: true
+  name: dashboard
+  image:
+    repository: ""  # If empty, uses global.imageRegistry + "-dashboard"
+    tag: ""  # If empty, uses global.imageTag
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3001
+    grpcPort: 50055
+  replicaCount: 1
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env:
+    PORT: "3001"
+    SERVICE_NAME: "vegas-dashboard-service"
+    OTEL_SERVICE_NAME: "vegas-dashboard-service"
+    OTEL_SERVICE_VERSION: "2.1.0"
+    DEPLOYMENT_ENVIRONMENT: "production"
+    SERVICE_NAMESPACE: "vegas-casino"
+    APPLICATION_NAME: "Vegas-Casino-Dashboard"
+    SCORING_SERVICE_URL: "http://vegas-casino-scoring:8085"  # Full URL to scoring service (http://service-name:port). Used as fallback if scoring.enabled=false
+
+# OpenFeature Operator configuration
+# IMPORTANT: Before enabling openfeature, you must install the OpenFeature Operator first:
+#   helm repo add open-feature https://open-feature.github.io/open-feature-operator/
+#   helm repo update
+#   helm install open-feature-operator open-feature/open-feature-operator \
+#     --namespace open-feature --create-namespace
+# This installs the required CRDs (FeatureFlag, FeatureFlagSource) that this chart depends on.
+openfeature:
+  enabled: true  # Set to true to use OpenFeature Operator for automatic flagd sidecar injection
+
+# Flagd (OpenFeature) configuration
+# NOTE: When openfeature.enabled=true, the OpenFeature Operator automatically injects flagd sidecars
+# and manages the image. The flagd.image configuration below is ONLY used when openfeature.enabled=false
+# (standalone flagd deployment mode). When using the operator, these values are ignored.
+flagd:
+  enabled: true
+  image:
+    repository: ghcr.io/open-feature/flagd
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    httpPort: 8013
+    grpcPort: 8014
+  logging:
+    level: "info"
+    # Slots game feature flags
+    slots:
+      progressive-jackpot:
+        state: "ENABLED"
+        defaultVariant: "true"
+        variants:
+          "true": true
+          "false": false
+      bonus-rounds:
+        state: "ENABLED"
+        defaultVariant: "true"
+        variants:
+          "true": true
+          "false": false
+      cheat-detection:
+        state: "ENABLED"
+        defaultVariant: "true"
+        variants:
+          "true": true
+          "false": false
+      min-bet:
+        state: "ENABLED"
+        defaultVariant: "10"
+        variants:
+          "10": 10
+          "5": 5
+          "20": 20
+      max-bet:
+        state: "ENABLED"
+        defaultVariant: "1000"
+        variants:
+          "1000": 1000
+          "500": 500
+          "2000": 2000
+    # Blackjack game feature flags
+    blackjack:
+      double-down:
+        state: "ENABLED"
+        defaultVariant: "true"
+        variants:
+          "true": true
+          "false": false
+      insurance:
+        state: "ENABLED"
+        defaultVariant: "true"
+        variants:
+          "true": true
+          "false": false
+      surrender:
+        state: "ENABLED"
+        defaultVariant: "false"
+        variants:
+          "true": true
+          "false": false
+    # Roulette game feature flags
+    roulette:
+      multiple-bets:
+        state: "ENABLED"
+        defaultVariant: "true"
+        variants:
+          "true": true
+          "false": false
+      live-wheel:
+        state: "ENABLED"
+        defaultVariant: "true"
+        variants:
+          "true": true
+          "false": false
+      cheat-detection:
+        state: "ENABLED"
+        defaultVariant: "true"
+        variants:
+          "true": true
+          "false": false
+    # Dice game feature flags
+    dice:
+      pass-line:
+        state: "ENABLED"
+        defaultVariant: "true"
+        variants:
+          "true": true
+          "false": false
+      come-bets:
+        state: "ENABLED"
+        defaultVariant: "true"
+        variants:
+          "true": true
+          "false": false
+    # Casino-wide feature flags (not displayed in UI)
+    casino:
+      house-advantage:
+        state: "ENABLED"
+        defaultVariant: "false"
+        variants:
+          "true": true
+          "false": false
+
+# Playwright automation service configuration
+playwright:
+  enabled: true
+  name: playwright
+  image:
+    repository: ""  # If empty, uses global.imageRegistry + "-playwright"
+    tag: ""  # If empty, uses global.imageTag
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  # Frontend URL - if not specified, defaults to internal service URL
+  # Can be set to external URL (e.g., "http://vegas-casino.example.com") for external access
+  casinoUrl: "http://vegas-casino-frontend.vegas-casino.svc.cluster.local:3000"  # Empty = auto-detect from frontend service
+  userName: "PlaywrightUser"
+  userEmail: "playwright@example.com"
+  userCompany: "Dynatrace"
+  delayBetweenActions: "2000"  # milliseconds
+  delayBetweenGames: "5000"  # milliseconds
+  runContinuously: "true"  # Set to "true" to run continuously
+  iterations: "1"  # Number of iterations when not running continuously
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "200m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+# k6 load testing service configuration
+k6:
+  enabled: true  # Set to false to disable k6 load testing
+  name: k6
+  image:
+    repository: ""  # If empty, uses global.imageRegistry + "-k6"
+    tag: ""  # If empty, uses global.imageTag
+    pullPolicy: IfNotPresent
+  # Frontend URL - if not specified, defaults to internal service URL
+  # Can be set to external URL (e.g., "http://vegas-casino.example.com") for external access
+  casinoUrl: ""  # Empty = auto-detect from frontend service (recommended)
+  vus: "5"  # Virtual Users
+  duration: "35m"  # Test duration (e.g., "5m", "10m", "1h") - shorter default for faster startup
+  rampUp: "30s"  # Ramp-up time (e.g., "30s", "1m")
+  restartPolicy: Never  # Job restart policy
+  backoffLimit: 3  # Number of retries before job is marked as failed (allows retries if services aren't ready)
+  completions: 1  # Number of successful completions required
+  parallelism: 1  # Number of pods to run in parallel
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+# ServiceAccount configuration
+serviceAccount:
+  create: true
+  name: ""  # If empty, uses the chart fullname
+  annotations: {}
+  # Additional labels for the service account
+  labels: {}
+  # Automount API credentials (for accessing Kubernetes API)
+  automountServiceAccountToken: true
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 2000
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Security context
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+

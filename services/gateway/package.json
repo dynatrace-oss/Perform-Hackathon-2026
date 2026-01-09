@@ -1,0 +1,48 @@
+{
+  "name": "vegas-casino-gateway",
+  "version": "2.1.0",
+  "description": "Vegas Casino Gateway - Main API gateway and service orchestrator",
+  "main": "gateway-service.js",
+  "scripts": {
+    "start": "node gateway-service.js",
+    "dev": "node gateway-service.js",
+    "test": "jest",
+    "service:slots": "cd services/slots && npm start",
+    "service:roulette": "cd services/roulette && npm start",
+    "service:blackjack": "cd services/blackjack && npm start",
+    "service:roulette-python": "PORT=8082 GRPC_PORT=50052 python services/roulette/python/roulette_service_grpc.py",
+    "service:dice-go": "PORT=8083 GRPC_PORT=50053 ./services/dice/go/dice-service-grpc",
+    "frontend": "cd services/frontend && npm start",
+    "proto": "make proto",
+    "install:all": "npm install && cd services/slots && npm install && cd ../blackjack && npm install && cd ../frontend && npm install && cd ../roulette && npm install"
+  },
+  "keywords": [
+    "casino",
+    "dynatrace",
+    "smartscape",
+    "websocket",
+    "telemetry",
+    "nodejs",
+    "express",
+    "grpc",
+    "microservices"
+  ],
+  "author": "Dynatrace Vegas Team",
+  "license": "MIT",
+  "dependencies": {
+    "@opentelemetry/api": "^1.7.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.51.0",
+    "@opentelemetry/exporter-otlp-grpc": "^0.26.0",
+    "@opentelemetry/resources": "^1.27.0",
+    "@opentelemetry/sdk-node": "^0.51.0",
+    "@opentelemetry/semantic-conventions": "^1.21.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "axios": "^1.13.2",
+    "grpc-tools": "^1.12.4",
+    "jest": "^29.7.0"
+  }
+}

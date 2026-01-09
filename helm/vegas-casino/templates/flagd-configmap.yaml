@@ -1,0 +1,115 @@
+{{- if and .Values.flagd.enabled (not .Values.openfeature.enabled) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "vegas-casino.fullname" . }}-flagd-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vegas-casino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: flagd
+data:
+  flags.json: |
+    {
+      "flags": {
+        "slots.progressive-jackpot": {
+          "state": "ENABLED",
+          "defaultVariant": "true",
+          "variants": {
+            "true": true,
+            "false": false
+          }
+        },
+        "slots.bonus-rounds": {
+          "state": "ENABLED",
+          "defaultVariant": "true",
+          "variants": {
+            "true": true,
+            "false": false
+          }
+        },
+        "slots.cheat-detection": {
+          "state": "ENABLED",
+          "defaultVariant": "true",
+          "variants": {
+            "true": true,
+            "false": false
+          }
+        },
+        "slots.min-bet": {
+          "state": "ENABLED",
+          "defaultVariant": "10",
+          "variants": {
+            "10": 10,
+            "5": 5,
+            "20": 20
+          }
+        },
+        "slots.max-bet": {
+          "state": "ENABLED",
+          "defaultVariant": "1000",
+          "variants": {
+            "1000": 1000,
+            "500": 500,
+            "2000": 2000
+          }
+        },
+        "blackjack.double-down": {
+          "state": "ENABLED",
+          "defaultVariant": "true",
+          "variants": {
+            "true": true,
+            "false": false
+          }
+        },
+        "blackjack.insurance": {
+          "state": "ENABLED",
+          "defaultVariant": "true",
+          "variants": {
+            "true": true,
+            "false": false
+          }
+        },
+        "blackjack.surrender": {
+          "state": "ENABLED",
+          "defaultVariant": "false",
+          "variants": {
+            "true": true,
+            "false": false
+          }
+        },
+        "roulette.multiple-bets": {
+          "state": "ENABLED",
+          "defaultVariant": "true",
+          "variants": {
+            "true": true,
+            "false": false
+          }
+        },
+        "roulette.live-wheel": {
+          "state": "ENABLED",
+          "defaultVariant": "true",
+          "variants": {
+            "true": true,
+            "false": false
+          }
+        },
+        "dice.pass-line": {
+          "state": "ENABLED",
+          "defaultVariant": "true",
+          "variants": {
+            "true": true,
+            "false": false
+          }
+        },
+        "dice.come-bets": {
+          "state": "ENABLED",
+          "defaultVariant": "true",
+          "variants": {
+            "true": true,
+            "false": false
+          }
+        }
+      }
+    }
+{{- end }}
+

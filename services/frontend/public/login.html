@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vegas Casino - Login</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dt-purple': '#6C2C9C',
+                        'dt-blue': '#00A1C9',
+                        'dt-cyan': '#00D4FF',
+                        'dt-green': '#73BE28',
+                        'dt-orange': '#FFA86B',
+                        'dt-yellow': '#FFD23F',
+                        'dt-dark': '#151515',
+                        'dt-darker': '#0A0A0A',
+                        'dt-gray': '#2D2D2D',
+                        'dt-light-gray': '#4A4A4A'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- OpenTelemetry Browser Instrumentation -->
+    <script src="/js/opentelemetry-browser.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0A0A0A 0%, #151515 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+        
+        .login-container {
+            background: rgba(21, 21, 21, 0.95);
+            border: 1px solid rgba(108, 44, 156, 0.3);
+            border-radius: 16px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(108, 44, 156, 0.2);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #00D4FF;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(45, 45, 45, 0.8);
+            border: 1px solid rgba(108, 44, 156, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #6C2C9C;
+            box-shadow: 0 0 0 3px rgba(108, 44, 156, 0.1);
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #6C2C9C 0%, #00A1C9 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(108, 44, 156, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #6C2C9C 0%, #00D4FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>🎰 Vegas Casino</h1>
+            <p class="text-dt-cyan text-center">Enter your details to start playing</p>
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Player Name *</label>
+                <input type="text" id="username" name="username" required 
+                       placeholder="Enter your name" autocomplete="name">
+                <div class="error-message" id="usernameError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" required 
+                       placeholder="your.email@example.com" autocomplete="email">
+                <div class="error-message" id="emailError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="profileType">Profile Type *</label>
+                <select id="profileType" name="profileType" required>
+                    <option value="">Select profile type...</option>
+                    <option value="partner">Partner</option>
+                    <option value="customer">Customer</option>
+                    <option value="dynatracer">Dynatracer</option>
+                    <option value="other">Other</option>
+                </select>
+                <div class="error-message" id="profileTypeError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="balance">Starting Balance *</label>
+                <input type="number" id="balance" name="balance" required 
+                       min="10" step="10" value="1000" placeholder="1000">
+                <div class="error-message" id="balanceError"></div>
+                <small class="text-dt-light-gray">Minimum: $10</small>
+            </div>
+            
+            <button type="submit" class="btn-primary">Enter Casino</button>
+        </form>
+    </div>
+    
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.classList.remove('show');
+                el.textContent = '';
+            });
+            
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const profileType = document.getElementById('profileType').value;
+            const balance = parseFloat(document.getElementById('balance').value);
+            
+            // Validation
+            let hasError = false;
+            
+            if (!username || username.length < 2) {
+                document.getElementById('usernameError').textContent = 'Name must be at least 2 characters';
+                document.getElementById('usernameError').classList.add('show');
+                hasError = true;
+            }
+            
+            if (!email || !email.includes('@')) {
+                document.getElementById('emailError').textContent = 'Please enter a valid email address';
+                document.getElementById('emailError').classList.add('show');
+                hasError = true;
+            }
+            
+            if (!profileType) {
+                document.getElementById('profileTypeError').textContent = 'Please select a profile type';
+                document.getElementById('profileTypeError').classList.add('show');
+                hasError = true;
+            }
+            
+            if (!balance || balance < 10 || isNaN(balance)) {
+                document.getElementById('balanceError').textContent = 'Balance must be at least $10';
+                document.getElementById('balanceError').classList.add('show');
+                hasError = true;
+            }
+            
+            if (hasError) {
+                return;
+            }
+            
+            // Disable form during submission
+            loginForm.querySelector('button').disabled = true;
+            loginForm.querySelector('button').textContent = 'Entering Casino...';
+            
+            try {
+                // Initialize user with backend
+                const response = await fetch('/api/user/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        Username: username,
+                        Email: email,
+                        ProfileType: profileType,
+                        Balance: balance
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to initialize user');
+                }
+                
+                // Store user info in localStorage
+                localStorage.setItem('vegas.username', username);
+                localStorage.setItem('vegas.email', email);
+                localStorage.setItem('vegas.profileType', profileType);
+                localStorage.setItem('vegasBalance', String(data.balance || balance));
+                
+                // Remove old keys if they exist
+                localStorage.removeItem('vegasUser');
+                
+                console.log(`[Login] User initialized: ${username}, email: ${email}, profile: ${profileType}, balance: ${data.balance || balance}`);
+                
+                // Redirect to lobby
+                window.location.href = '/lobby.html';
+                
+            } catch (error) {
+                console.error('[Login] Error:', error);
+                alert('Failed to initialize user: ' + error.message);
+                loginForm.querySelector('button').disabled = false;
+                loginForm.querySelector('button').textContent = 'Enter Casino';
+            }
+        });
+        
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const existingUsername = localStorage.getItem('vegas.username') || localStorage.getItem('vegasUser');
+            if (existingUsername && existingUsername !== 'Anonymous' && existingUsername !== 'Agent') {
+                // User is already logged in, redirect to lobby
+                console.log('[Login] User already logged in, redirecting to lobby');
+                window.location.href = '/lobby.html';
+            }
+        });
+    </script>
+</body>
+</html>

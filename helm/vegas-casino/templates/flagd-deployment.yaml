@@ -1,0 +1,79 @@
+{{- if and .Values.flagd.enabled (not .Values.openfeature.enabled) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vegas-casino.fullname" . }}-flagd
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vegas-casino.labels" . | nindent 4 }}
+    app.kubernetes.io/component: flagd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: flagd
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: flagd
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "vegas-casino.serviceAccountName" . }}
+      containers:
+      - name: flagd
+        {{- with .Values.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
+        image: "{{ .Values.flagd.image.repository }}:{{ .Values.flagd.image.tag }}"
+        imagePullPolicy: {{ .Values.flagd.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.flagd.service.httpPort }}
+          protocol: TCP
+        - name: grpc
+          containerPort: {{ .Values.flagd.service.grpcPort }}
+          protocol: TCP
+        command:
+          - /flagd
+          - start
+          - --uri
+          - file:/etc/flagd/flags.json
+          - --port
+          - "{{ .Values.flagd.service.httpPort }}"
+          - --grpc-port
+          - "{{ .Values.flagd.service.grpcPort }}"
+        env:
+        - name: FLAGD_LOGGING_LEVEL
+          value: {{ .Values.flagd.logging.level | quote }}
+        volumeMounts:
+        - name: flagd-config
+          mountPath: /etc/flagd
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.flagd.resources | nindent 10 }}
+      volumes:
+      - name: flagd-config
+        configMap:
+          name: {{ include "vegas-casino.fullname" . }}-flagd-config
+{{- end }}
+

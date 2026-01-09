@@ -1,0 +1,102 @@
+name: Docker Build and Push
+
+on:
+  push:
+    branches: [ main, V2-Otel ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to build (leave empty for all)'
+        required: false
+        type: choice
+        options:
+          - all
+          - gateway
+          - slots
+          - blackjack
+          - frontend
+          - roulette
+          - dice
+          - scoring
+          - dashboard
+          - playwright
+          - k6
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/vegasapp
+  PLATFORM: linux/amd64
+
+jobs:
+  build:
+    name: Build ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: gateway
+            dockerfile: services/gateway/Dockerfile
+          - service: slots
+            dockerfile: services/slots/Dockerfile
+          - service: blackjack
+            dockerfile: services/blackjack/Dockerfile
+          - service: frontend
+            dockerfile: services/frontend/Dockerfile
+          - service: roulette
+            dockerfile: services/roulette/Dockerfile
+          - service: dice
+            dockerfile: services/dice/Dockerfile
+          - service: scoring
+            dockerfile: services/scoring/Dockerfile
+          - service: dashboard
+            dockerfile: services/dashboard/Dockerfile
+          - service: playwright
+            dockerfile: services/playwright/Dockerfile
+          - service: k6
+            dockerfile: services/k6/Dockerfile
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: ${{ env.PLATFORM }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+
+
+

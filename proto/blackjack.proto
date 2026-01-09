@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package blackjack;
+
+option go_package = "vegas-casino/proto/blackjack";
+
+// Blackjack Service
+service BlackjackService {
+  // Health check
+  rpc Health(HealthRequest) returns (HealthResponse);
+  
+  // Deal initial cards
+  rpc Deal(DealRequest) returns (DealResponse);
+  
+  // Player hits
+  rpc Hit(HitRequest) returns (HitResponse);
+  
+  // Player stands
+  rpc Stand(StandRequest) returns (StandResponse);
+  
+  // Player doubles down
+  rpc Double(DoubleRequest) returns (DoubleResponse);
+  
+  // Get game assets (HTML/JS/CSS for rendering)
+  rpc GetGameAssets(GameAssetsRequest) returns (GameAssetsResponse);
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;
+  string service = 2;
+  map<string, string> metadata = 3;
+}
+
+message Card {
+  int32 rank = 1;  // 1-13 (Ace-King)
+  string suit = 2; // "♥", "♦", "♣", "♠"
+}
+
+message DealRequest {
+  double bet_amount = 1;
+  string username = 2;
+  map<string, string> player_info = 3;
+}
+
+message DealResponse {
+  repeated Card player_hand = 1;
+  repeated Card dealer_hand = 2;
+  int32 player_score = 3;
+  int32 dealer_score = 4;
+  double bet_amount = 5;
+  string timestamp = 6;
+}
+
+message HitRequest {
+  string username = 1;
+  map<string, string> player_info = 2;
+}
+
+message HitResponse {
+  Card new_card = 1;
+  int32 player_score = 2;
+  int32 dealer_score = 3;
+  string timestamp = 4;
+}
+
+message StandRequest {
+  string username = 1;
+  map<string, string> player_info = 2;
+}
+
+message StandResponse {
+  repeated Card dealer_final_hand = 1;
+  int32 dealer_score = 2;
+  string result = 3;  // "win", "lose", "push"
+  double payout = 4;
+  string timestamp = 5;
+}
+
+message DoubleRequest {
+  string username = 1;
+  map<string, string> player_info = 2;
+}
+
+message DoubleResponse {
+  Card new_card = 1;
+  int32 player_score = 2;
+  int32 dealer_score = 3;
+  double additional_bet = 4;
+  string timestamp = 5;
+}
+
+message GameAssetsRequest {
+  string asset_type = 1; // "html", "js", "css", "all"
+}
+
+message GameAssetsResponse {
+  string html = 1;
+  string javascript = 2;
+  string css = 3;
+  map<string, string> config = 4;
+}
+
+
+
+
+
+
+
+

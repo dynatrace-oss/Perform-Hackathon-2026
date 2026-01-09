@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vegas-casino-gateway
+  namespace: vegas-casino
+  labels:
+    app: vegas-casino-gateway
+    tier: gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vegas-casino-gateway
+  template:
+    metadata:
+      labels:
+        app: vegas-casino-gateway
+        tier: gateway
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/api/health"
+    spec:
+      containers:
+      - name: gateway
+        image: vegas-casino-gateway:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "8080"
+        - name: SERVICE_NAME
+          value: "vegas-casino-gateway"
+        # OpenTelemetry standard environment variables
+        - name: OTEL_SERVICE_NAME
+          value: "vegas-casino-gateway"
+        - name: OTEL_SERVICE_VERSION
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: OTEL_SERVICE_VERSION
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: "service.name=vegas-casino-gateway,service.version=2.1.0,service.namespace=vegas-casino,deployment.environment=production,application.name=Vegas-Casino-Microservices"
+        - name: DEPLOYMENT_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: DEPLOYMENT_ENVIRONMENT
+        - name: SERVICE_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: SERVICE_NAMESPACE
+        - name: K8S_CLUSTER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: K8S_CLUSTER_NAME
+        - name: K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: SERVICE_INSTANCE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        # Service discovery - use K8s service names
+        - name: SLOTS_SERVICE_URL
+          value: "http://vegas-slots-service:8081"
+        - name: ROULETTE_SERVICE_URL
+          value: "http://vegas-roulette-service:8082"
+        - name: DICE_SERVICE_URL
+          value: "http://vegas-dice-service:8083"
+        - name: BLACKJACK_SERVICE_URL
+          value: "http://vegas-blackjack-service:8084"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vegas-casino-gateway
+  namespace: vegas-casino
+  labels:
+    app: vegas-casino-gateway
+    tier: gateway
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: vegas-casino-gateway
+

@@ -1,0 +1,12 @@
+/Users/henrik.rexed/Library/CloudStorage/OneDrive-Dynatrace/Documents/conference/perform/2026/VegasAPP/services/scoring/src/main/java/com/vegas/scoring/dto/ScoreResponse.java
+/Users/henrik.rexed/Library/CloudStorage/OneDrive-Dynatrace/Documents/conference/perform/2026/VegasAPP/services/scoring/src/main/java/com/vegas/scoring/dto/GameResultRequest.java
+/Users/henrik.rexed/Library/CloudStorage/OneDrive-Dynatrace/Documents/conference/perform/2026/VegasAPP/services/scoring/src/main/java/com/vegas/scoring/repository/GameResultRepository.java
+/Users/henrik.rexed/Library/CloudStorage/OneDrive-Dynatrace/Documents/conference/perform/2026/VegasAPP/services/scoring/src/main/java/com/vegas/scoring/repository/PlayerScoreRepository.java
+/Users/henrik.rexed/Library/CloudStorage/OneDrive-Dynatrace/Documents/conference/perform/2026/VegasAPP/services/scoring/src/main/java/com/vegas/scoring/config/OpenTelemetryConfig.java
+/Users/henrik.rexed/Library/CloudStorage/OneDrive-Dynatrace/Documents/conference/perform/2026/VegasAPP/services/scoring/src/main/java/com/vegas/scoring/controller/ScoringController.java
+/Users/henrik.rexed/Library/CloudStorage/OneDrive-Dynatrace/Documents/conference/perform/2026/VegasAPP/services/scoring/src/main/java/com/vegas/scoring/dto/DashboardStats.java
+/Users/henrik.rexed/Library/CloudStorage/OneDrive-Dynatrace/Documents/conference/perform/2026/VegasAPP/services/scoring/src/main/java/com/vegas/scoring/model/PlayerScore.java
+/Users/henrik.rexed/Library/CloudStorage/OneDrive-Dynatrace/Documents/conference/perform/2026/VegasAPP/services/scoring/src/main/java/com/vegas/scoring/model/GameResult.java
+/Users/henrik.rexed/Library/CloudStorage/OneDrive-Dynatrace/Documents/conference/perform/2026/VegasAPP/services/scoring/src/main/java/com/vegas/scoring/dto/ScoreRequest.java
+/Users/henrik.rexed/Library/CloudStorage/OneDrive-Dynatrace/Documents/conference/perform/2026/VegasAPP/services/scoring/src/main/java/com/vegas/scoring/ScoringServiceApplication.java
+/Users/henrik.rexed/Library/CloudStorage/OneDrive-Dynatrace/Documents/conference/perform/2026/VegasAPP/services/scoring/src/main/java/com/vegas/scoring/service/ScoringService.java

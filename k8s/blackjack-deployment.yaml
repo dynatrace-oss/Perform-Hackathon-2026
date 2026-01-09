@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vegas-blackjack-service
+  namespace: vegas-casino
+  labels:
+    app: vegas-blackjack-service
+    service: blackjack
+    tier: microservice
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vegas-blackjack-service
+  template:
+    metadata:
+      labels:
+        app: vegas-blackjack-service
+        service: blackjack
+        tier: microservice
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8084"
+        prometheus.io/path: "/health"
+    spec:
+      containers:
+      - name: blackjack-service
+        image: vegas-blackjack-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8084
+          name: http
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "8084"
+        - name: SERVICE_NAME
+          value: "vegas-blackjack-service"
+        # OpenTelemetry standard environment variables
+        - name: OTEL_SERVICE_NAME
+          value: "vegas-blackjack-service"
+        - name: OTEL_SERVICE_VERSION
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: OTEL_SERVICE_VERSION
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: "service.name=vegas-blackjack-service,service.version=2.1.0,service.namespace=vegas-casino,deployment.environment=production,application.name=Vegas-Casino-card-games,game.category=card-games,game.complexity=high,game.max_payout=2.5x,game.type=blackjack-21,game.owner=Card-Games-Division"
+        - name: DEPLOYMENT_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: DEPLOYMENT_ENVIRONMENT
+        - name: SERVICE_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: SERVICE_NAMESPACE
+        - name: K8S_CLUSTER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: vegas-casino-config
+              key: K8S_CLUSTER_NAME
+        - name: K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: SERVICE_INSTANCE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        # Game-specific attributes
+        - name: GAME_CATEGORY
+          value: "card-games"
+        - name: GAME_COMPLEXITY
+          value: "high"
+        - name: GAME_MAX_PAYOUT
+          value: "2.5x"
+        - name: GAME_TYPE
+          value: "blackjack-21"
+        - name: GAME_OWNER
+          value: "Card-Games-Division"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8084
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8084
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vegas-blackjack-service
+  namespace: vegas-casino
+  labels:
+    app: vegas-blackjack-service
+    service: blackjack
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8084
+    targetPort: 8084
+    protocol: TCP
+    name: http
+  selector:
+    app: vegas-blackjack-service
+

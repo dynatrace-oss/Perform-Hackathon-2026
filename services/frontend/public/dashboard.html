@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vegas Casino - Analytics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- OpenTelemetry Browser Instrumentation -->
+    <script src="/js/opentelemetry-browser.js"></script>
+    
+    <style>
+        :root {
+            --dt-purple: #6C2C9C;
+            --dt-blue: #00A1C9;
+            --dt-cyan: #00D4FF;
+            --dt-green: #73BE28;
+            --dt-orange: #FFA86B;
+            --dt-yellow: #FFD23F;
+            --dt-dark: #151515;
+            --dt-darker: #0A0A0A;
+            --dt-gray: #2D2D2D;
+            --dt-light-gray: #4A4A4A;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dt-darker) 0%, var(--dt-dark) 100%);
+            color: #fff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .stat-card {
+            background: rgba(45, 45, 45, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--dt-cyan);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--dt-cyan), var(--dt-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .table-container {
+            background: rgba(45, 45, 45, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: rgba(0, 161, 201, 0.2);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dt-cyan);
+            border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        tr:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+        
+        .rank-1 { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; }
+        .rank-2 { background: linear-gradient(135deg, #C0C0C0, #808080); color: #000; }
+        .rank-3 { background: linear-gradient(135deg, #CD7F32, #8B4513); color: #fff; }
+        .rank-other { background: rgba(0, 212, 255, 0.2); color: var(--dt-cyan); }
+        
+        .game-tab {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .game-tab.active {
+            background: linear-gradient(135deg, var(--dt-purple), var(--dt-blue));
+            border-color: var(--dt-cyan);
+        }
+        
+        .game-tab:hover:not(.active) {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 212, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--dt-cyan);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .nav-button {
+            background: linear-gradient(135deg, var(--dt-purple), var(--dt-blue));
+            border: 1px solid var(--dt-cyan);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header with Navigation -->
+        <div class="mb-8 flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-bold mb-2" style="background: linear-gradient(135deg, var(--dt-cyan), var(--dt-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    📊 Vegas Casino Analytics Dashboard
+                </h1>
+                <p class="text-gray-400">Real-time game statistics and player leaderboards</p>
+            </div>
+            <a href="/lobby.html" target="_self" class="nav-button inline-flex items-center gap-2">
+                ← Back to Lobby
+            </a>
+        </div>
+
+        <!-- Game Tabs -->
+        <div class="flex gap-4 mb-6 flex-wrap">
+            <button class="game-tab active" data-game="all" onclick="loadDashboard('all')">
+                All Games
+            </button>
+            <button class="game-tab" data-game="slots" onclick="loadDashboard('slots')">
+                🎰 Slots
+            </button>
+            <button class="game-tab" data-game="roulette" onclick="loadDashboard('roulette')">
+                🎡 Roulette
+            </button>
+            <button class="game-tab" data-game="dice" onclick="loadDashboard('dice')">
+                🎲 Dice
+            </button>
+            <button class="game-tab" data-game="blackjack" onclick="loadDashboard('blackjack')">
+                🃏 Blackjack
+            </button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="hidden text-center py-8">
+            <div class="loading mx-auto"></div>
+            <p class="mt-4 text-gray-400">Loading dashboard data...</p>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboard-content" class="hidden">
+            <!-- Stats Grid -->
+            <div id="stats-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <!-- Stats will be populated here -->
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="stat-card">
+                    <h3 class="text-xl font-semibold mb-4 text-cyan-400">Top Win Amounts by Game</h3>
+                    <canvas id="winRateChart"></canvas>
+                </div>
+                <div class="stat-card">
+                    <h3 class="text-xl font-semibold mb-4 text-cyan-400">Total Wins by Game</h3>
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Players Table -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-4" style="color: var(--dt-cyan);">🏆 Top Wins</h2>
+                <div class="table-container">
+                    <table id="top-players-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Player</th>
+                                <th>Top Win Amount</th>
+                                <th>Bet Amount</th>
+                                <th>Game</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top-players-body">
+                            <!-- Top players will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-message" class="hidden text-center py-8">
+            <p class="text-red-400 text-lg">Failed to load dashboard data. Please try again.</p>
+        </div>
+    </div>
+
+    <script>
+        let winRateChart = null;
+        let revenueChart = null;
+        let currentGame = 'all';
+
+        // Load dashboard data - calls frontend-service HTTP endpoint which uses gRPC
+        async function loadDashboard(game) {
+            currentGame = game;
+            
+            // Update active tab
+            document.querySelectorAll('.game-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            const activeTab = document.querySelector(`[data-game="${game}"]`);
+            if (activeTab) activeTab.classList.add('active');
+            
+            // Show loading
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('dashboard-content').classList.add('hidden');
+            document.getElementById('error-message').classList.add('hidden');
+            
+            try {
+                // Call frontend-service HTTP endpoint - it uses gRPC internally to call dashboard service
+                // Architecture: Browser → HTTP → Frontend Service → gRPC → Dashboard Service → Scoring Service
+                // User always interacts with frontend, frontend calls backend services via gRPC
+                let url = game === 'all' 
+                    ? '/api/dashboard' 
+                    : `/api/dashboard/${game}`;
+                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Dashboard API error:', response.status, errorText);
+                    throw new Error(`Failed to fetch dashboard data: ${response.status} ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('📊 Dashboard API response:', data);
+                console.log('📊 Dashboard API response (stringified):', JSON.stringify(data, null, 2));
+                
+                // DEBUG: Check if topWin exists in the raw response
+                if (data.stats) {
+                    if (Array.isArray(data.stats)) {
+                        console.log('📊 DEBUG: Response has stats array with', data.stats.length, 'games');
+                        data.stats.forEach((s, idx) => {
+                            console.log(`📊 DEBUG: Game ${idx} (${s.game}):`, {
+                                hasTopWin: !!(s.top_win || s.topWin),
+                                topWinValue: s.top_win || s.topWin,
+                                topWinType: typeof (s.top_win || s.topWin),
+                                allKeys: Object.keys(s),
+                                topPlayersCount: (s.topPlayers || s.top_players || []).length
+                            });
+                        });
+                    } else {
+                        console.log('📊 DEBUG: Response has single stats object:', {
+                            hasTopWin: !!(data.stats.top_win || data.stats.topWin),
+                            topWinValue: data.stats.top_win || data.stats.topWin,
+                            topWinType: typeof (data.stats.top_win || data.stats.topWin),
+                            allKeys: Object.keys(data.stats)
+                        });
+                    }
+                }
+                
+                // Handle response format: 
+                // - For 'all': { stats: [...] } (array of stats)
+                // - For specific game: { game: 'slots', stats: {...} } (single stats object)
+                let statsArray;
+                if (game === 'all') {
+                    // All games returns array directly in stats
+                    statsArray = Array.isArray(data.stats) ? data.stats : [];
+                    console.log('📊 All games stats array:', statsArray.length, 'games');
+                    
+                    // Log detailed info for each game
+                    statsArray.forEach(s => {
+                        const topWin = s.top_win || s.topWin;
+                        console.log(`📊 Game ${s.game || 'unknown'}:`, {
+                            total_games: s.total_games || s.totalGames || 0,
+                            total_wins: s.total_wins || s.totalWins || 0,
+                            total_bet_amount: s.total_bet_amount || s.totalBetAmount || 0,
+                            top_win: topWin ? {
+                                username: topWin.username,
+                                payout: topWin.payout,
+                                bet_amount: topWin.bet_amount || topWin.betAmount
+                            } : null,
+                            has_top_win: topWin !== null && topWin !== undefined,
+                            // DEBUG: Check raw properties
+                            rawTopWin: s.top_win,
+                            rawTopWinCamel: s.topWin,
+                            hasTopPlayers: !!(s.topPlayers || s.top_players),
+                            topPlayersCount: (s.topPlayers || s.top_players || []).length
+                        });
+                        
+                        // If topWin is missing but we have topPlayers, try to derive it client-side
+                        if (!topWin && (s.topPlayers || s.top_players) && (s.topPlayers || s.top_players).length > 0) {
+                            console.warn(`⚠️ [Dashboard] Game ${s.game} has topPlayers but no topWin - attempting client-side derivation`);
+                            const topPlayer = (s.topPlayers || s.top_players)[0];
+                            if (topPlayer && topPlayer.winnings > 0) {
+                                const derivedTopWin = {
+                                    username: topPlayer.username || 'Unknown',
+                                    game: topPlayer.game || s.game,
+                                    payout: -Math.abs(topPlayer.winnings || topPlayer.score || 0),
+                                    bet_amount: topPlayer.initialBet || topPlayer.initial_bet || 0,
+                                    timestamp: new Date().toISOString()
+                                };
+                                console.log(`✅ [Dashboard] Client-side derived topWin for ${s.game}:`, derivedTopWin);
+                                // Set it on the object so it can be used
+                                s.top_win = derivedTopWin;
+                                s.topWin = derivedTopWin;
+                            }
+                        }
+                    });
+                } else {
+                    // Single game returns object in stats
+                    statsArray = data.stats ? [data.stats] : [];
+                    console.log('📊 Single game stats:', statsArray.length, 'game');
+                    if (statsArray[0]) {
+                        const s = statsArray[0];
+                        let topWin = s.top_win || s.topWin;
+                        
+                        // If topWin is missing but we have topPlayers, try to derive it client-side
+                        if (!topWin && (s.topPlayers || s.top_players) && (s.topPlayers || s.top_players).length > 0) {
+                            console.warn(`⚠️ [Dashboard] Single game ${game} has topPlayers but no topWin - attempting client-side derivation`);
+                            const topPlayer = (s.topPlayers || s.top_players)[0];
+                            if (topPlayer && topPlayer.winnings > 0) {
+                                const derivedTopWin = {
+                                    username: topPlayer.username || 'Unknown',
+                                    game: topPlayer.game || game,
+                                    payout: -Math.abs(topPlayer.winnings || topPlayer.score || 0),
+                                    bet_amount: topPlayer.initialBet || topPlayer.initial_bet || 0,
+                                    timestamp: new Date().toISOString()
+                                };
+                                console.log(`✅ [Dashboard] Client-side derived topWin for ${game}:`, derivedTopWin);
+                                // Set it on the object so it can be used
+                                s.top_win = derivedTopWin;
+                                s.topWin = derivedTopWin;
+                                topWin = derivedTopWin;
+                            }
+                        }
+                        
+                        console.log(`📊 Single game ${game} stats:`, {
+                            total_games: s.total_games || s.totalGames || 0,
+                            total_wins: s.total_wins || s.totalWins || 0,
+                            total_bet_amount: s.total_bet_amount || s.totalBetAmount || 0,
+                            top_win: topWin ? {
+                                username: topWin.username,
+                                payout: topWin.payout,
+                                bet_amount: topWin.bet_amount || topWin.betAmount
+                            } : null,
+                            has_top_win: topWin !== null && topWin !== undefined,
+                            // DEBUG: Check raw properties
+                            rawTopWin: s.top_win,
+                            rawTopWinCamel: s.topWin,
+                            hasTopPlayers: !!(s.topPlayers || s.top_players),
+                            topPlayersCount: (s.topPlayers || s.top_players || []).length
+                        });
+                    }
+                }
+                
+                // Handle empty stats - this is not an error, just no data yet
+                if (statsArray.length === 0 && game === 'all') {
+                    console.warn('No stats returned for all games - this may be normal if no games have been played yet');
+                    // Still render dashboard with empty array - it will show "No game data available"
+                }
+                
+                // Always render dashboard, even with empty array (it will show appropriate message)
+                renderDashboard(statsArray, game);
+                
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('dashboard-content').classList.remove('hidden');
+                document.getElementById('error-message').classList.add('hidden'); // Ensure error is hidden
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error-message').classList.remove('hidden');
+            }
+        }
+
+        // Render dashboard
+        function renderDashboard(statsArray, game) {
+            console.log('Rendering dashboard for game:', game, 'with', statsArray.length, 'stats');
+            
+            if (game === 'all') {
+                // Show stats for all games
+                if (statsArray.length === 0) {
+                    console.warn('No stats available for all games');
+                    document.getElementById('stats-grid').innerHTML = '<div class="col-span-4 text-center text-gray-400 py-8">No game data available</div>';
+                    document.getElementById('top-players-body').innerHTML = '<tr><td colspan="5" class="text-center text-gray-400 py-8">No player data available</td></tr>';
+                    return;
+                }
+                
+                // renderStats expects an array and will show top win per game
+                renderStats(statsArray);
+                renderTopPlayersTable(statsArray);
+                renderCharts(statsArray);
+            } else {
+                // Single game stats
+                if (statsArray.length === 0 || !statsArray[0]) {
+                    console.warn('No stats available for game:', game);
+                    document.getElementById('stats-grid').innerHTML = '<div class="col-span-4 text-center text-gray-400 py-8">No game data available</div>';
+                    document.getElementById('top-players-body').innerHTML = '<tr><td colspan="5" class="text-center text-gray-400 py-8">No player data available</td></tr>';
+                    return;
+                }
+                
+                const stats = statsArray[0];
+                renderStats([stats]);
+                renderTopPlayersTable([stats]);
+                renderCharts([stats]);
+            }
+        }
+
+        // Aggregate stats across all games
+        function aggregateStats(statsArray) {
+            return {
+                totalGames: statsArray.reduce((sum, s) => sum + (s.totalGames || s.total_games || 0), 0),
+                totalWins: statsArray.reduce((sum, s) => sum + (s.totalWins || s.total_wins || 0), 0),
+                totalLosses: statsArray.reduce((sum, s) => sum + (s.totalLosses || s.total_losses || 0), 0),
+                totalBetAmount: statsArray.reduce((sum, s) => sum + (s.totalBetAmount || s.total_bet_amount || 0), 0),
+                totalPayout: statsArray.reduce((sum, s) => sum + (s.totalPayout || s.total_payout || 0), 0),
+                netRevenue: statsArray.reduce((sum, s) => sum + ((s.totalBetAmount || s.total_bet_amount || 0) - (s.totalPayout || s.total_payout || 0)), 0),
+                recentGames: statsArray.reduce((sum, s) => sum + (s.recentGames || 0), 0)
+            };
+        }
+
+        // Render statistics cards - showing only top win per game as negative amount
+        function renderStats(statsArray) {
+            const statsGrid = document.getElementById('stats-grid');
+            statsGrid.innerHTML = '';
+            
+            if (currentGame === 'all') {
+                // Show top win per game for all games
+                const topWinsByGame = statsArray
+                    .map(s => s.top_win || s.topWin)
+                    .filter(win => win !== null && win !== undefined);
+                
+                console.log(`[Dashboard Frontend] Rendering all games: ${statsArray.length} games, ${topWinsByGame.length} with top wins`);
+                
+                if (topWinsByGame.length === 0) {
+                    // Show aggregate stats even if no wins
+                    const totalGames = statsArray.reduce((sum, s) => sum + (s.total_games || s.totalGames || 0), 0);
+                    const totalBets = statsArray.reduce((sum, s) => sum + (s.total_bet_amount || s.totalBetAmount || 0), 0);
+                    
+                    if (totalGames > 0) {
+                        statsGrid.innerHTML = `
+                            <div class="stat-card">
+                                <div class="text-sm text-gray-400 mb-2">Total Games Played</div>
+                                <div class="stat-value">${totalGames.toLocaleString()}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="text-sm text-gray-400 mb-2">Total Bet Amount</div>
+                                <div class="stat-value">$${totalBets.toFixed(2)}</div>
+                            </div>
+                            <div class="col-span-2 text-center text-gray-400 py-8">
+                                <div class="text-lg mb-2">📊 No wins recorded yet</div>
+                                <div class="text-sm">Play games to see top wins!</div>
+                            </div>
+                        `;
+                    } else {
+                        statsGrid.innerHTML = `
+                            <div class="col-span-4 text-center text-gray-400 py-8">
+                                <div class="text-lg mb-2">📊 No game data available</div>
+                                <div class="text-sm">Play games to see statistics!</div>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+                
+                // Display top win for each game
+                let cardsHTML = '';
+                statsArray.forEach(stats => {
+                    const topWin = stats.top_win || stats.topWin;
+                    const gameName = stats.game || 'unknown';
+                    const totalGames = stats.total_games || stats.totalGames || 0;
+                    const totalWins = stats.total_wins || stats.totalWins || 0;
+                    const totalBets = stats.total_bet_amount || stats.totalBetAmount || 0;
+                    
+                    console.log(`📊 Rendering stats for ${gameName}:`, {
+                        totalGames,
+                        totalWins,
+                        totalBets,
+                        topWin: topWin ? {
+                            username: topWin.username,
+                            payout: topWin.payout,
+                            bet_amount: topWin.bet_amount || topWin.betAmount
+                        } : null,
+                        hasTopWin: topWin !== null && topWin !== undefined
+                    });
+                    
+                    if (topWin && topWin !== null && topWin !== undefined) {
+                        const payout = parseFloat(topWin.payout || 0); // Negative from backend (casino loss = player win)
+                        const username = topWin.username || 'Unknown';
+                        const betAmount = parseFloat(topWin.bet_amount || topWin.betAmount || 0);
+                        // Convert negative payout to positive for display (casino loss = player win)
+                        const displayPayout = Math.abs(payout);
+                        
+                        console.log(`✅ Adding top win card for ${gameName}: username=${username}, payout=${payout}, displayPayout=${displayPayout}, betAmount=${betAmount}`);
+                        
+                        // Only show if payout is valid
+                        if (!isNaN(payout) && payout !== 0) {
+                            cardsHTML += `
+                                <div class="stat-card">
+                                    <div class="text-sm text-gray-400 mb-2">Top Win - ${gameName.charAt(0).toUpperCase() + gameName.slice(1)}</div>
+                                    <div class="stat-value" style="color: var(--dt-red);">$${displayPayout.toFixed(2)}</div>
+                                    <div class="text-xs text-gray-500 mt-1">${username}</div>
+                                    <div class="text-xs text-gray-600 mt-1">Bet: $${betAmount.toFixed(2)}</div>
+                                </div>
+                            `;
+                        } else {
+                            console.warn(`⚠️ Invalid payout for ${gameName}: ${payout}, showing game stats instead`);
+                            // Fall through to show game stats
+                            cardsHTML += `
+                                <div class="stat-card">
+                                    <div class="text-sm text-gray-400 mb-2">${gameName.charAt(0).toUpperCase() + gameName.slice(1)}</div>
+                                    <div class="stat-value">${totalGames}</div>
+                                    <div class="text-xs text-gray-500 mt-1">Games Played</div>
+                                    <div class="text-xs text-gray-600 mt-1">Bets: $${totalBets.toFixed(2)}</div>
+                                </div>
+                            `;
+                        }
+                    } else {
+                        console.log(`ℹ️ No topWin for game ${gameName} - showing game stats instead`);
+                        // Show game stats even if no top win
+                        cardsHTML += `
+                            <div class="stat-card">
+                                <div class="text-sm text-gray-400 mb-2">${gameName.charAt(0).toUpperCase() + gameName.slice(1)}</div>
+                                <div class="stat-value">${totalGames}</div>
+                                <div class="text-xs text-gray-500 mt-1">Games Played</div>
+                                <div class="text-xs text-gray-600 mt-1">Bets: $${totalBets.toFixed(2)}</div>
+                                ${totalWins > 0 ? `<div class="text-xs text-gray-500 mt-1">Wins: ${totalWins}</div>` : ''}
+                            </div>
+                        `;
+                    }
+                });
+                
+                statsGrid.innerHTML = cardsHTML || '<div class="col-span-4 text-center text-gray-400 py-8">No game data available</div>';
+            } else {
+                // Single game - show top win
+                const stats = statsArray[0];
+                const topWin = stats.top_win || stats.topWin;
+                const totalGames = stats.total_games || stats.totalGames || 0;
+                const totalWins = stats.total_wins || stats.totalWins || 0;
+                const totalBetAmount = stats.total_bet_amount || stats.totalBetAmount || 0;
+                
+                console.log(`📊 [Dashboard Frontend] Single game ${currentGame}: totalGames=${totalGames}, totalWins=${totalWins}, topWin=`, topWin);
+                
+                if (topWin && topWin !== null && topWin !== undefined) {
+                    const payout = parseFloat(topWin.payout || 0); // Negative from backend (casino loss = player win)
+                    const username = topWin.username || 'Unknown';
+                    const timestamp = topWin.timestamp ? new Date(topWin.timestamp).toLocaleDateString() : 'N/A';
+                    const betAmount = parseFloat(topWin.bet_amount || topWin.betAmount || 0);
+                    // Convert negative payout to positive for display (casino loss = player win)
+                    const displayPayout = Math.abs(payout);
+                    
+                    console.log(`📊 Single game top win details: username=${username}, payout=${payout}, displayPayout=${displayPayout}, betAmount=${betAmount}, isValid=${!isNaN(payout) && payout !== 0}`);
+                    
+                    if (!isNaN(payout) && payout !== 0) {
+                        statsGrid.innerHTML = `
+                            <div class="stat-card">
+                                <div class="text-sm text-gray-400 mb-2">Top Win Amount</div>
+                                <div class="stat-value" style="color: var(--dt-red); font-size: 2.5rem;">$${displayPayout.toFixed(2)}</div>
+                                <div class="text-xs text-gray-500 mt-1">Bet: $${betAmount.toFixed(2)}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="text-sm text-gray-400 mb-2">Winner</div>
+                                <div class="stat-value">${username}</div>
+                                <div class="text-xs text-gray-500 mt-1">${timestamp}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="text-sm text-gray-400 mb-2">Total Bet Amount</div>
+                                <div class="stat-value">$${totalBetAmount.toFixed(2)}</div>
+                                <div class="text-xs text-gray-500 mt-1">All games</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="text-sm text-gray-400 mb-2">Total Wins</div>
+                                <div class="stat-value">${totalWins.toLocaleString()}</div>
+                                <div class="text-xs text-gray-500 mt-1">Out of ${totalGames.toLocaleString()} games</div>
+                            </div>
+                        `;
+                    } else {
+                        console.warn(`⚠️ Invalid payout for single game ${currentGame}: ${payout}, showing aggregate stats instead`);
+                        // Fall through to show aggregate stats
+                        statsGrid.innerHTML = `
+                            <div class="stat-card">
+                                <div class="text-sm text-gray-400 mb-2">Total Games</div>
+                                <div class="stat-value">${totalGames.toLocaleString()}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="text-sm text-gray-400 mb-2">Total Wins</div>
+                                <div class="stat-value">${totalWins.toLocaleString()}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="text-sm text-gray-400 mb-2">Total Bet Amount</div>
+                                <div class="stat-value">$${totalBetAmount.toFixed(2)}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="text-sm text-gray-400 mb-2">Win Rate</div>
+                                <div class="stat-value">${totalGames > 0 ? ((totalWins / totalGames) * 100).toFixed(1) : 0}%</div>
+                                <div class="text-xs text-gray-500 mt-1">No top win recorded</div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // Show stats even if no top win
+                    statsGrid.innerHTML = `
+                        <div class="stat-card">
+                            <div class="text-sm text-gray-400 mb-2">Total Games</div>
+                            <div class="stat-value">${totalGames.toLocaleString()}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="text-sm text-gray-400 mb-2">Total Wins</div>
+                            <div class="stat-value">${totalWins.toLocaleString()}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="text-sm text-gray-400 mb-2">Total Bet Amount</div>
+                            <div class="stat-value">$${totalBetAmount.toFixed(2)}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="text-sm text-gray-400 mb-2">Win Rate</div>
+                            <div class="stat-value">${totalGames > 0 ? ((totalWins / totalGames) * 100).toFixed(1) : 0}%</div>
+                            <div class="text-xs text-gray-500 mt-1">${totalWins > 0 ? 'No top win recorded' : 'No wins yet'}</div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Render top players table - showing top win per game
+        function renderTopPlayersTable(statsArray) {
+            const tbody = document.getElementById('top-players-body');
+            tbody.innerHTML = '';
+            
+            // Collect all top wins from all games
+            let topWins = [];
+            statsArray.forEach(stats => {
+                const topWin = stats.top_win || stats.topWin;
+                console.log(`📊 Collecting top wins: game=${stats.game || 'unknown'}, topWin=`, topWin);
+                if (topWin && topWin !== null && topWin !== undefined) {
+                    const payout = parseFloat(topWin.payout || 0);
+                    const betAmount = parseFloat(topWin.bet_amount || topWin.betAmount || 0);
+                    const username = topWin.username || 'Unknown';
+                    
+                    console.log(`📊 Top win details: username=${username}, payout=${payout}, betAmount=${betAmount}, type=${typeof payout}`);
+                    
+                    // Only add if payout is valid (should be negative from backend)
+                    if (!isNaN(payout) && payout !== 0) {
+                        const winData = {
+                            username: username,
+                            payout: payout, // Already negative from backend
+                            bet_amount: betAmount,
+                            game: topWin.game || stats.game || 'unknown',
+                            timestamp: topWin.timestamp || new Date().toISOString()
+                        };
+                        console.log(`✅ Adding top win to table:`, winData);
+                        topWins.push(winData);
+                    } else {
+                        console.warn(`⚠️ Skipping invalid topWin for game ${stats.game}: payout=${payout}`);
+                    }
+                } else {
+                    console.log(`ℹ️ No topWin for game ${stats.game || 'unknown'} - skipping`);
+                }
+            });
+            
+            console.log(`📊 Total top wins collected: ${topWins.length} out of ${statsArray.length} games`);
+            
+            // Show message if no wins
+            if (topWins.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-gray-400 py-8">
+                            <div class="text-lg mb-2">📊 No wins recorded yet</div>
+                            <div class="text-sm">Play games to see top wins!</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Sort by payout (most negative = highest win) and take top 10
+            topWins.sort((a, b) => a.payout - b.payout); // Negative amounts, so lower = bigger win
+            topWins = topWins.slice(0, 10);
+            
+            topWins.forEach((win, index) => {
+                const rank = index + 1;
+                const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+                const date = new Date(win.timestamp).toLocaleDateString();
+                // Convert negative payout to positive for display (casino loss = player win)
+                const displayPayout = Math.abs(win.payout);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <span class="rank-badge ${rankClass}">${rank}</span>
+                    </td>
+                    <td class="font-semibold">${win.username || 'Unknown'}</td>
+                    <td class="font-bold" style="color: var(--dt-red);">$${displayPayout.toFixed(2)}</td>
+                    <td class="text-gray-300">$${(win.bet_amount || 0).toFixed(2)}</td>
+                    <td class="text-gray-400 capitalize">${win.game}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Render charts - showing top win amounts per game
+        function renderCharts(statsArray) {
+            console.log('📊 [Charts] Rendering charts with', statsArray.length, 'games');
+            
+            // Filter to only games with actual top wins (non-zero, non-null)
+            const gamesWithWins = statsArray.filter(s => {
+                const topWin = s.top_win || s.topWin;
+                if (!topWin || topWin === null || topWin === undefined) {
+                    return false;
+                }
+                const payout = parseFloat(topWin.payout || 0);
+                const isValid = !isNaN(payout) && payout !== 0;
+                console.log(`📊 [Charts] Game ${s.game || 'unknown'}: topWin exists=${!!topWin}, payout=${payout}, isValid=${isValid}`);
+                return isValid;
+            });
+            
+            console.log(`📊 [Charts] Found ${gamesWithWins.length} games with valid top wins out of ${statsArray.length} total games`);
+            
+            // Extract data only for games with wins
+            const games = gamesWithWins.map(s => {
+                const gameName = s.game || 'unknown';
+                return gameName.charAt(0).toUpperCase() + gameName.slice(1);
+            });
+            const topWinAmounts = gamesWithWins.map(s => {
+                const topWin = s.top_win || s.topWin;
+                const payout = parseFloat(topWin.payout || 0);
+                // Convert negative payout to positive for display (casino loss = player win)
+                const displayPayout = Math.abs(payout);
+                console.log(`📊 [Charts] Extracting payout for ${s.game}: ${payout} -> display: ${displayPayout}`);
+                return displayPayout; // Convert to positive for display
+            });
+            const totalWins = gamesWithWins.map(s => s.totalWins || s.total_wins || 0);
+            
+            // If no games with wins, show message instead of empty chart
+            if (games.length === 0 || topWinAmounts.every(amt => amt === 0)) {
+                console.warn('📊 [Charts] No valid top wins found - showing empty state');
+                const winRateCtx = document.getElementById('winRateChart').getContext('2d');
+                if (winRateChart) winRateChart.destroy();
+                
+                // Clear canvas and show message
+                winRateCtx.clearRect(0, 0, winRateCtx.canvas.width, winRateCtx.canvas.height);
+                winRateCtx.fillStyle = '#9CA3AF';
+                winRateCtx.font = '16px Arial';
+                winRateCtx.textAlign = 'center';
+                winRateCtx.fillText('No wins recorded yet', winRateCtx.canvas.width / 2, winRateCtx.canvas.height / 2);
+                
+                // Also handle revenue chart
+                const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+                if (revenueChart) revenueChart.destroy();
+                revenueCtx.clearRect(0, 0, revenueCtx.canvas.width, revenueCtx.canvas.height);
+                revenueCtx.fillStyle = '#9CA3AF';
+                revenueCtx.font = '16px Arial';
+                revenueCtx.textAlign = 'center';
+                revenueCtx.fillText('No wins recorded yet', revenueCtx.canvas.width / 2, revenueCtx.canvas.height / 2);
+                return;
+            }
+            
+            console.log(`📊 [Charts] Creating chart with ${games.length} games:`, games);
+            console.log(`📊 [Charts] Top win amounts:`, topWinAmounts);
+            
+            // Top Win Amounts Chart
+            const winRateCtx = document.getElementById('winRateChart').getContext('2d');
+            if (winRateChart) winRateChart.destroy();
+            winRateChart = new Chart(winRateCtx, {
+                type: 'bar',
+                data: {
+                    labels: games,
+                    datasets: [{
+                        label: 'Top Win Amount ($)',
+                        data: topWinAmounts,
+                        backgroundColor: topWinAmounts.map(amt => amt < 0 ? 'rgba(239, 68, 68, 0.6)' : 'rgba(0, 212, 255, 0.6)'), // Red for negative (losses)
+                        borderColor: topWinAmounts.map(amt => amt < 0 ? '#EF4444' : '#00D4FF'),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { 
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    return `Top Win: $${Math.abs(value).toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false, // Allow negative values
+                            ticks: { 
+                                color: '#fff',
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+            
+            // Revenue Chart - Total Wins by Game
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            if (revenueChart) revenueChart.destroy();
+            
+            // For revenue chart, use all games (not just those with top wins) to show total wins
+            const allGames = statsArray.map(s => {
+                const gameName = s.game || 'unknown';
+                return gameName.charAt(0).toUpperCase() + gameName.slice(1);
+            });
+            const allTotalWins = statsArray.map(s => s.totalWins || s.total_wins || 0);
+            
+            console.log(`📊 [Charts] Revenue chart: ${allGames.length} games, total wins:`, allTotalWins);
+            
+            revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: allGames,
+                    datasets: [{
+                        label: 'Total Wins',
+                        data: allTotalWins,
+                        borderColor: '#73BE28',
+                        backgroundColor: 'rgba(115, 190, 40, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { 
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    return `Total Wins: ${value}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { 
+                                color: '#fff',
+                                stepSize: 1
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            loadDashboard(currentGame);
+        }, 30000);
+
+        // Load dashboard on page load
+        loadDashboard('all');
+    </script>
+</body>
+</html>
