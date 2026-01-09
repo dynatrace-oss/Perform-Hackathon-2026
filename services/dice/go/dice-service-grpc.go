@@ -15,11 +15,41 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/grpc"
+<<<<<<< HEAD
+=======
+	"google.golang.org/grpc/metadata"
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 	"google.golang.org/grpc/reflection"
 
 	pb "vegas-dice-service/proto"
 )
 
+<<<<<<< HEAD
+=======
+// metadataTextMapCarrier adapts gRPC metadata to OpenTelemetry text map carrier
+type metadataTextMapCarrier metadata.MD
+
+func (m metadataTextMapCarrier) Get(key string) string {
+	values := metadata.MD(m).Get(key)
+	if len(values) > 0 {
+		return values[0]
+	}
+	return ""
+}
+
+func (m metadataTextMapCarrier) Set(key, value string) {
+	metadata.MD(m).Set(key, value)
+}
+
+func (m metadataTextMapCarrier) Keys() []string {
+	keys := make([]string, 0, len(metadata.MD(m)))
+	for k := range metadata.MD(m) {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 type diceServer struct {
 	pb.UnimplementedDiceServiceServer
 }
@@ -64,10 +94,18 @@ func (s *diceServer) Roll(ctx context.Context, req *pb.RollRequest) (*pb.RollRes
 	// Get feature flags
 	passLineEnabled := getFeatureFlag(ctx, "dice.pass-line", true)
 	comeBetsEnabled := getFeatureFlag(ctx, "dice.come-bets", true)
+<<<<<<< HEAD
+=======
+	houseAdvantageEnabled := getFeatureFlag(ctx, "casino.house-advantage", false)
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 
 	span.SetAttributes(
 		attribute.Bool("feature_flag.pass_line", passLineEnabled),
 		attribute.Bool("feature_flag.come_bets", comeBetsEnabled),
+<<<<<<< HEAD
+=======
+		attribute.Bool("feature_flag.house_advantage", houseAdvantageEnabled),
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 	)
 
 	// Validate bet type against feature flags
@@ -86,9 +124,16 @@ func (s *diceServer) Roll(ctx context.Context, req *pb.RollRequest) (*pb.RollRes
 		return nil, fmt.Errorf("come bets are disabled")
 	}
 
+<<<<<<< HEAD
 	// Roll dice - TEMPORARY: Force winning dice for testing
 	d1 := 4 // rand.Intn(6) + 1
 	d2 := 3 // rand.Intn(6) + 1
+=======
+	// Roll dice - generate random values (1-6 for each die)
+	// Note: rand.Seed should be called in main() for proper randomization
+	d1 := rand.Intn(6) + 1
+	d2 := rand.Intn(6) + 1
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 	sum := d1 + d2
 
 	// Determine win condition
@@ -122,6 +167,20 @@ func (s *diceServer) Roll(ctx context.Context, req *pb.RollRequest) (*pb.RollRes
 	payout := 0.0
 	if win {
 		payout = betAmount * payoutMultiplier
+<<<<<<< HEAD
+=======
+
+		// Apply house advantage feature flag if enabled
+		// This reduces win probability by 25% when the casino is losing too much money
+		if houseAdvantageEnabled {
+			// 25% chance to convert a win into a loss (house advantage)
+			if rand.Float64() < 0.25 {
+				win = false
+				payout = 0.0
+				log.Printf("[Dice] 🏠 House advantage applied: win converted to loss")
+			}
+		}
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 	}
 
 	// Get username from request (if available in player_info)
@@ -132,11 +191,41 @@ func (s *diceServer) Roll(ctx context.Context, req *pb.RollRequest) (*pb.RollRes
 		}
 	}
 
+<<<<<<< HEAD
 	// Prepare game data for scoring
 	gameData := map[string]interface{}{
 		"dice1": d1,
 		"dice2": d2,
 		"sum":   sum,
+=======
+	// Store game state in Redis
+	gameState := &GameState{
+		LastRoll:         time.Now(),
+		Dice1:            d1,
+		Dice2:            d2,
+		Sum:              sum,
+		Win:              win,
+		Payout:           payout,
+		BetAmount:        betAmount,
+		BetType:          betType,
+		PayoutMultiplier: payoutMultiplier,
+	}
+	if err := SaveGameState(ctx, username, gameState); err != nil {
+		log.Printf("Warning: Failed to save game state to Redis: %v", err)
+	}
+
+	// Record game result in scoring service for ALL games (wins and losses) to track total bets
+	result := "lose"
+	if win && payout > 0 {
+		result = "win"
+	}
+
+	// Prepare game data for scoring
+	gameData := map[string]interface{}{
+		"dice1":   d1,
+		"dice2":   d2,
+		"sum":     sum,
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 		"betType": betType,
 	}
 	gameDataJSON, _ := json.Marshal(gameData)
@@ -146,6 +235,7 @@ func (s *diceServer) Roll(ctx context.Context, req *pb.RollRequest) (*pb.RollRes
 	}
 	metadataJSON, _ := json.Marshal(metadata)
 
+<<<<<<< HEAD
 	// Record game result in scoring service (async, non-blocking)
 	recordGameResultAsync(ctx, GameResultRequest{
 		Username: username,
@@ -162,6 +252,18 @@ func (s *diceServer) Roll(ctx context.Context, req *pb.RollRequest) (*pb.RollRes
 		}(),
 		GameData: string(gameDataJSON),
 		Metadata: string(metadataJSON),
+=======
+	recordGameResultAsync(ctx, GameResultRequest{
+		Username:  username,
+		Game:      "dice",
+		Action:    "roll",
+		BetAmount: betAmount,
+		Payout:    payout,
+		Win:       win && payout > 0,
+		Result:    result,
+		GameData:  string(gameDataJSON),
+		Metadata:  string(metadataJSON),
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 	})
 
 	// Add game attributes to span
@@ -170,6 +272,10 @@ func (s *diceServer) Roll(ctx context.Context, req *pb.RollRequest) (*pb.RollRes
 		attribute.Float64("game.bet_amount", betAmount),
 		attribute.String("game.bet_type", betType),
 		attribute.Int("game.dice1", d1),
+<<<<<<< HEAD
+=======
+		attribute.Bool("feature_flag.house_advantage", houseAdvantageEnabled),
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 		attribute.Int("game.dice2", d2),
 		attribute.Int("game.sum", sum),
 		attribute.Bool("game.win", win),
@@ -317,6 +423,7 @@ async function initDiceGame() {
             
             document.getElementById('dice1').textContent = response.dice1;
             document.getElementById('dice2').textContent = response.dice2;
+<<<<<<< HEAD
             document.getElementById('sum').textContent = ` + "`Sum: ${response.sum}`" + `;
             
             if (response.win) {
@@ -325,6 +432,16 @@ async function initDiceGame() {
             } else {
                 document.getElementById('result').innerHTML = 
                     ` + "`<div class=\"text-red-500 text-xl\">😢 No win this time</div>`" + `;
+=======
+            document.getElementById('sum').textContent = `+"`Sum: ${response.sum}`"+`;
+            
+            if (response.win) {
+                document.getElementById('result').innerHTML = 
+                    `+"`<div class=\"text-green-500 text-xl\">🎉 Win! Payout: $${response.payout.toFixed(2)}</div>`"+`;
+            } else {
+                document.getElementById('result').innerHTML = 
+                    `+"`<div class=\"text-red-500 text-xl\">😢 No win this time</div>`"+`;
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
             }
         } catch (error) {
             console.error('Error rolling dice:', error);
@@ -335,7 +452,11 @@ async function initDiceGame() {
 }
 
 async function callDiceService(method, data) {
+<<<<<<< HEAD
     const response = await fetch(` + "`/api/dice/${method.toLowerCase()}`" + `, {
+=======
+    const response = await fetch(`+"`/api/dice/${method.toLowerCase()}`"+`, {
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -405,6 +526,12 @@ func main() {
 		log.Printf("Warning: Failed to initialize flagd client: %v. Feature flags will use defaults.", err)
 	}
 
+<<<<<<< HEAD
+=======
+	// Initialize Redis
+	InitializeRedis()
+
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 	// Initialize OpenTelemetry
 	serviceMetadata := map[string]string{
 		"version":      "2.1.0",
@@ -435,7 +562,24 @@ func main() {
 		log.Fatalf("Failed to listen: %v", err)
 	}
 
+<<<<<<< HEAD
 	s := grpc.NewServer()
+=======
+	// Create gRPC server with OpenTelemetry interceptor for trace context propagation
+	// The interceptor extracts trace context from gRPC metadata
+	s := grpc.NewServer(
+		grpc.UnaryInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+			// Extract trace context from gRPC metadata
+			md, ok := metadata.FromIncomingContext(ctx)
+			if ok {
+				// Extract trace context using OpenTelemetry propagator
+				prop := otel.GetTextMapPropagator()
+				ctx = prop.Extract(ctx, metadataTextMapCarrier(md))
+			}
+			return handler(ctx, req)
+		}),
+	)
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 	pb.RegisterDiceServiceServer(s, &diceServer{})
 	reflection.Register(s)
 

@@ -5,6 +5,14 @@ The Vegas Casino application can be deployed to Kubernetes using either:
 1. **Helm Charts** (Recommended) - Declarative, configurable deployment
 2. **Kubernetes Manifests** - Direct YAML files
 
+## Deployment Options
+
+- **[Helm Charts](helm.md)** - Recommended way to deploy using Helm (✅ **Current & Complete**)
+- **[Kubernetes Manifests](manifests.md)** - Direct Kubernetes manifest deployment (⚠️ **See k8s/ vs Helm comparison**)
+- **[k8s/ vs Helm Comparison](k8s-vs-helm.md)** - Differences between k8s/ directory and Helm chart
+- **[OpenFeature Operator](openfeature.md)** - Feature flag management setup
+- **[CI/CD and Releases](ci-cd.md)** - GitHub Actions workflows, creating releases, and updating environments
+
 ## Prerequisites
 
 Before deploying, ensure you have:

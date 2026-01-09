@@ -30,6 +30,12 @@
         }
     </script>
     
+<<<<<<< HEAD
+=======
+    <!-- OpenTelemetry Browser Instrumentation -->
+    <script src="/js/opentelemetry-browser.js"></script>
+    
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     <style>
         .roulette-bg {
             background: 
@@ -464,6 +470,7 @@
         let cheatsEnabled = false;
         const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
         
+<<<<<<< HEAD
         // Check if cheats are enabled via feature flag (from game assets)
         // Note: Cheat controls are now always visible, but this function can still be used
         // to check feature flag status for other purposes
@@ -496,6 +503,11 @@
                 console.warn('Could not check cheat feature flag:', error);
             }
         }
+=======
+        // Deprecated: checkCheatFeatureFlag removed
+        // Cheat controls are always visible in the UI
+        // Feature flags are now handled by backend services via OpenFeature
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
         
         function toggleCheat() {
             const toggle = document.getElementById('cheatToggle');
@@ -551,12 +563,28 @@
                 updateBalanceDisplay();
             }
             
+<<<<<<< HEAD
             // Check cheat feature flag
             checkCheatFeatureFlag();
             
             // Initialize cheat UI
             updateCheatUI();
             updateSidePanelStatus();
+=======
+            // Initialize cheat UI (cheat controls are always visible)
+            updateCheatUI();
+            updateSidePanelStatus();
+
+            // Ensure that changing the bet type via the dropdown also clears any previously selected number.
+            // This prevents unintended combined bets (number + color/type) when the user only wants a simple bet.
+            const betTypeSelect = document.getElementById('betType');
+            if (betTypeSelect) {
+                betTypeSelect.addEventListener('change', (e) => {
+                    const newType = e.target.value;
+                    selectBetType(newType);
+                });
+            }
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
         });
         
         async function addFunds() {
@@ -829,23 +857,66 @@
             
             // Prepare request - roulette service expects specific format
             let requestBody;
+<<<<<<< HEAD
             if (selectedNumber !== null) {
                 // Straight bet on a specific number
                 requestBody = {
                     Username: username,
+=======
+            
+            // Check if both a number and a bet type are selected
+            const hasNumberBet = selectedNumber !== null;
+            const hasColorBet = betType && betType !== 'none' && ['red', 'black', 'even', 'odd', 'low', 'high'].includes(betType);
+            
+            if (hasNumberBet && hasColorBet) {
+                // Multiple bets: both number and color/type bet
+                // Each bet is independent, so total bet is sum of both
+                const totalBetAmount = betAmount * 2;
+                requestBody = {
+                    Username: username,
+                    BetAmount: totalBetAmount, // Total bet amount for balance deduction
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                     BetType: 'multiple',
                     BetValue: {
                         [`bet_${selectedNumber}`]: {
                             type: 'straight',
                             value: selectedNumber.toString(),
                             amount: betAmount
+<<<<<<< HEAD
+=======
+                        },
+                        [`bet_${betType}`]: {
+                            type: betType,
+                            amount: betAmount
+                        }
+                    },
+                    CheatActive: (cheatState.active !== null) || (cheatActive && cheatsEnabled),
+                    CheatType: cheatState.active || (cheatActive && cheatsEnabled ? cheatType : null)
+                };
+            } else if (hasNumberBet) {
+                // Only straight bet on a specific number (no additional color/type bet)
+                // Send as a simple 'straight' bet so the backend uses the dedicated straight-bet logic.
+                requestBody = {
+                    Username: username,
+                    BetAmount: betAmount,
+                    BetType: 'straight',
+                    BetValue: {
+                        [`bet_${selectedNumber}`]: {
+                            type: 'straight',
+                            value: selectedNumber.toString(),
+                            amount: betAmount
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                         }
                     },
                     CheatActive: (cheatState.active !== null) || (cheatActive && cheatsEnabled),
                     CheatType: cheatState.active || (cheatActive && cheatsEnabled ? cheatType : null)
                 };
             } else {
+<<<<<<< HEAD
                 // Simple color/type bet
+=======
+                // Simple color/type bet only
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                 requestBody = {
                     Username: username,
                     BetAmount: betAmount,
@@ -882,14 +953,24 @@
                     document.getElementById('winningColor').textContent = color.toUpperCase();
                     document.getElementById('winningColor').className = `text-lg font-bold ${color === 'red' ? 'text-red-500' : color === 'black' ? 'text-gray-300' : 'text-green-500'}`;
                     
+<<<<<<< HEAD
                     // Update balance from server response or calculate locally
+=======
+                    // Always use server balance - server is the source of truth
+                    // Backend handles all game logic including balance calculation
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                     let newBalance;
                     if (result.newBalance !== undefined) {
                         newBalance = result.newBalance;
                     } else if (result.balance !== undefined) {
                         newBalance = result.balance;
                     } else {
+<<<<<<< HEAD
                         // Calculate locally: subtract bet, add payout
+=======
+                        // Fallback: if server doesn't provide balance, log warning
+                        console.warn('⚠️ Server did not provide balance, using local calculation as fallback');
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                         const currentBalance = parseFloat(localStorage.getItem('vegasBalance') || '1000');
                         newBalance = currentBalance - betAmount + payout;
                     }

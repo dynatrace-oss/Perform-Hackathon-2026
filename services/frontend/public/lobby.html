@@ -32,9 +32,19 @@
     
     <!-- External libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<<<<<<< HEAD
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+=======
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- OpenTelemetry Browser Instrumentation -->
+    <!-- Note: Browser tracing relies on auto-instrumentation from fetch/XMLHttpRequest -->
+    <!-- The trace context will be propagated via HTTP headers automatically -->
+    <script src="/js/opentelemetry-browser.js"></script>
+    
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     <style>
         /* Responsive Layout System */
         .responsive-layout {
@@ -369,6 +379,12 @@
                             <div class="w-2 h-2 bg-dt-green rounded-full animate-pulse"></div>
                             <span class="text-dt-cyan">Agent:</span>
                             <span id="agentName" class="font-mono text-white text-xs">Loading...</span>
+<<<<<<< HEAD
+=======
+                            <button onclick="changeUser()" class="bg-dt-purple hover:bg-dt-purple/80 text-white px-2 py-1 rounded text-xs font-semibold transition-colors" title="Change Player">
+                                🔄
+                            </button>
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                         </div>
                         <div class="flex items-center space-x-2">
                             <span class="text-dt-cyan">Balance:</span>
@@ -377,7 +393,11 @@
                         <button onclick="addFunds()" class="bg-dt-green hover:bg-dt-green/80 text-white px-3 py-1 rounded text-xs font-semibold transition-colors">
                             Deposit
                         </button>
+<<<<<<< HEAD
                         <a href="/dashboard" target="_blank" class="bg-dt-blue hover:bg-dt-blue/80 text-white px-3 py-1 rounded text-xs font-semibold transition-colors inline-flex items-center gap-1">
+=======
+                        <a href="/dashboard.html" target="_self" class="bg-dt-blue hover:bg-dt-blue/80 text-white px-3 py-1 rounded text-xs font-semibold transition-colors inline-flex items-center gap-1">
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                             📊 Dashboard
                         </a>
                     </div>
@@ -423,7 +443,11 @@
                         <div class="bg-gradient-to-br from-dt-blue/20 to-dt-cyan/20 rounded-2xl p-6 border border-dt-blue/30 backdrop-blur-sm">
                             <div class="text-center">
                                 <div class="w-20 h-20 mx-auto bg-gradient-to-br from-dt-blue to-dt-cyan rounded-lg flex items-center justify-center mb-4 shadow-lg overflow-hidden">
+<<<<<<< HEAD
                                     <img src="/assets/blackjack/blackjack.png" alt="Blackjack" class="w-12 h-12 object-contain" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'text-3xl\'>🃏</div>'">
+=======
+                                    <div class="text-3xl">🃏</div>
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                                 </div>
                                 <h3 class="text-xl font-bold text-dt-blue mb-2">♠️ Service Blackjack</h3>
                                 <p class="text-dt-light-gray text-sm mb-4">AI-enhanced card analysis</p>
@@ -446,7 +470,11 @@
                         <div class="bg-gradient-to-br from-dt-green/20 to-dt-yellow/20 rounded-2xl p-6 border border-dt-green/30 backdrop-blur-sm">
                             <div class="text-center">
                                 <div class="w-20 h-20 mx-auto bg-gradient-to-br from-dt-green to-dt-yellow rounded-lg flex items-center justify-center mb-4 shadow-lg overflow-hidden">
+<<<<<<< HEAD
                                     <img src="/assets/roulette/roulette.png" alt="Roulette" class="w-12 h-12 object-contain" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'text-3xl\'>🎡</div>'">
+=======
+                                    <div class="text-3xl">🎡</div>
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                                 </div>
                                 <h3 class="text-xl font-bold text-dt-green mb-2">🎡 European Roulette</h3>
                                 <p class="text-dt-light-gray text-sm mb-4">37-number wheel with live betting</p>
@@ -470,7 +498,11 @@
                         <div class="bg-gradient-to-br from-dt-orange/20 to-dt-yellow/20 rounded-2xl p-6 border border-dt-orange/30 backdrop-blur-sm">
                             <div class="text-center">
                                 <div class="w-20 h-20 mx-auto bg-gradient-to-br from-dt-orange to-dt-yellow rounded-lg flex items-center justify-center mb-4 shadow-lg overflow-hidden">
+<<<<<<< HEAD
                                     <img src="/assets/dice/dice.png" alt="Dice" class="w-12 h-12 object-contain" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'text-3xl\'>🎲</div>'">
+=======
+                                    <div class="text-3xl">🎲</div>
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                                 </div>
                                 <h3 class="text-xl font-bold text-dt-orange mb-2">🎲 Process Dice</h3>
                                 <p class="text-dt-light-gray text-sm mb-4">Probability prediction engine</p>
@@ -801,6 +833,7 @@
             document.body.appendChild(modal);
         }
         
+<<<<<<< HEAD
         // Socket.io initialization
         const socket = io();
         
@@ -829,6 +862,26 @@
         document.addEventListener('DOMContentLoaded', async function() {
             // Track lobby entry
             const username = localStorage.getItem('vegas.username') || localStorage.getItem('vegasUser') || 'Agent';
+=======
+        // Socket.IO removed - using HTTP/gRPC architecture instead
+        // Real-time metrics can be fetched via HTTP polling if needed
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check if user is logged in
+            const username = localStorage.getItem('vegas.username') || localStorage.getItem('vegasUser');
+            const email = localStorage.getItem('vegas.email');
+            const profileType = localStorage.getItem('vegas.profileType');
+            
+            // If no username or username is Anonymous/Agent, redirect to login
+            if (!username || username === 'Anonymous' || username === 'Agent') {
+                console.log('[Lobby] User not logged in, redirecting to login');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            // Track lobby entry
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
             const traceId = 'lobby-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
             
             // Send lobby entry event to backend for tracing
@@ -851,7 +904,19 @@
             console.log('Setting agent name to:', username);
             const agentNameElement = document.getElementById('agentName');
             if (agentNameElement) {
+<<<<<<< HEAD
                 agentNameElement.textContent = username;
+=======
+                // Display username with profile type if available
+                const profileType = localStorage.getItem('vegas.profileType');
+                const email = localStorage.getItem('vegas.email');
+                let displayName = username;
+                if (profileType) {
+                    displayName += ` (${profileType})`;
+                }
+                agentNameElement.textContent = displayName;
+                agentNameElement.title = email ? `Email: ${email}` : username;
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                 console.log('Agent name element updated:', agentNameElement.textContent);
             } else {
                 console.log('Agent name element not found!');
@@ -890,6 +955,7 @@
                     ensureGameNodesVisible();
                 }
                 
+<<<<<<< HEAD
                 gsap.from('.metrics-overlay', {
                     duration: 0.6,
                     x: 30,
@@ -897,6 +963,19 @@
                     ease: "power3.out",
                     delay: 0.3
                 });
+=======
+                // Only animate metrics overlay if it exists
+                const metricsOverlay = document.querySelector('.metrics-overlay');
+                if (metricsOverlay) {
+                    gsap.from('.metrics-overlay', {
+                        duration: 0.6,
+                        x: 30,
+                        opacity: 0,
+                        ease: "power3.out",
+                        delay: 0.3
+                    });
+                }
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
             }, 100);
 
             // Extra safety: force visibility shortly after initial animations
@@ -914,6 +993,7 @@
             });
         }
 
+<<<<<<< HEAD
         // Listen for real-time metrics updates
         socket.on('metricsUpdate', (data) => {
             if (data.activeUsers !== undefined) {
@@ -927,11 +1007,32 @@
             }
         });
 
+=======
+        // Real-time metrics updates removed - Socket.IO no longer used
+        // Metrics can be updated via HTTP polling if needed
+        
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
         // Quick spin function for lobby
         function quickSpin() {
             // Navigate to slots game for a quick spin
             navigateToGame('slots');
         }
+<<<<<<< HEAD
+=======
+        
+        // Change user/player identity - redirects to login page
+        function changeUser() {
+            // Clear all user data and redirect to login
+            localStorage.removeItem('vegas.username');
+            localStorage.removeItem('vegasUser');
+            localStorage.removeItem('vegas.email');
+            localStorage.removeItem('vegas.profileType');
+            localStorage.removeItem('vegasBalance');
+            
+            // Redirect to login page
+            window.location.href = '/login.html';
+        }
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     </script>
 </body>
 </html>

@@ -14,7 +14,7 @@ The project uses a `Makefile` for build automation. Key configuration variables:
 
 ```makefile
 REGISTRY ?= hrexed/vegasapp
-IMAGE_TAG ?= 0.10
+IMAGE_TAG ?= 0.39
 BUILDER ?= podman  # or docker
 PLATFORM ?= linux/amd64
 ```
@@ -69,9 +69,9 @@ Images follow the pattern:
 ```
 
 Example:
-- `hrexed/vegasapp-frontend:0.10`
-- `hrexed/vegasapp-slots:0.10`
-- `hrexed/vegasapp-scoring:0.10`
+- `hrexed/vegasapp-frontend:0.39`
+- `hrexed/vegasapp-slots:0.39`
+- `hrexed/vegasapp-scoring:0.39`
 
 ## Pushing Images
 

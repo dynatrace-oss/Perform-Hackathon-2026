@@ -37,7 +37,7 @@ Edit `helm/vegas-casino/values.yaml` or use `--set` flags:
 ```yaml
 global:
   imageRegistry: hrexed/vegasapp
-  imageTag: "0.10"
+  imageTag: "0.39"
   namespace: vegas-casino
 
 frontend:
@@ -124,7 +124,7 @@ kubectl get pods -n vegas-casino
 ```bash
 # Upgrade with new image tag
 helm upgrade vegas-casino ./helm/vegas-casino \
-  --set global.imageTag=0.11
+  --set global.imageTag=0.39
 
 # Upgrade with values file
 helm upgrade vegas-casino ./helm/vegas-casino -f my-values.yaml
@@ -248,7 +248,7 @@ helm install vegas-casino ./helm/vegas-casino --dry-run --debug
 
 ```bash
 # Verify image exists
-docker pull hrexed/vegasapp-frontend:0.10
+docker pull hrexed/vegasapp-frontend:0.39
 
 # Check image pull secrets
 kubectl get secrets -n vegas-casino
@@ -257,6 +257,8 @@ kubectl get secrets -n vegas-casino
 ---
 
 **Next**: Learn about [Kubernetes Manifests](manifests.md) or [OpenFeature Operator](openfeature.md).
+
+
 
 
 

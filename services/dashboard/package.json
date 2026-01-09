@@ -18,6 +18,11 @@
   "author": "Dynatrace Vegas Team",
   "license": "MIT",
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "@grpc/grpc-js": "^1.9.0",
+    "@grpc/proto-loader": "^0.7.10",
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     "@opentelemetry/api": "^1.7.0",
     "@opentelemetry/auto-instrumentations-node": "^0.51.0",
     "@opentelemetry/exporter-otlp-grpc": "^0.26.0",

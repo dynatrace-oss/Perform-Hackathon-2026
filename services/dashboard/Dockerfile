@@ -17,6 +17,12 @@ COPY services/common/opentelemetry.js ./common/opentelemetry.js
 COPY services/common/logger.js ./common/logger.js
 RUN chmod 644 ./common/*.js
 
+<<<<<<< HEAD
+=======
+# Copy proto files
+COPY proto/ ./proto/
+
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 # Expose port
 EXPOSE 3001
 

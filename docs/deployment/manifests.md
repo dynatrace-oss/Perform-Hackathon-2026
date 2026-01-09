@@ -201,3 +201,6 @@ kubectl delete service vegas-casino-frontend -n vegas-casino
 
 
 
+
+
+

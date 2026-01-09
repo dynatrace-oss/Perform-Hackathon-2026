@@ -8,10 +8,14 @@ Playwright automation simulates complete user journeys through the Vegas Casino 
 
 The Playwright test script (`simulate-user.js`) performs the following actions:
 
-1. **Enter Casino**
-   - Navigate to frontend
-   - Fill in user information (name, email, company)
-   - Submit entry form
+1. **Login/Profile Setup**
+   - Navigate to frontend (redirects to login if not authenticated)
+   - Fill in user profile information:
+     - Player Name
+     - Email
+     - Profile Type (Partner, Customer, Dynatracer, Other)
+     - Starting Balance (minimum $10, default $1000)
+   - Submit login form
 
 2. **Play Each Game**
    - Navigate to slots, roulette, dice, and blackjack
@@ -36,8 +40,9 @@ The Playwright test script (`simulate-user.js`) performs the following actions:
 |----------|---------|-------------|
 | `CASINO_URL` | `http://localhost:3000` | Frontend service URL |
 | `USER_NAME` | `PlaywrightUser_{timestamp}` | Test user name |
-| `USER_EMAIL` | `{username}@example.com` | Test user email |
-| `USER_COMPANY` | `Dynatrace` | Test user company |
+| `USER_EMAIL` | `playwright@example.com` | Test user email |
+| `PROFILE_TYPE` | `Customer` | Profile type (Partner, Customer, Dynatracer, Other) |
+| `STARTING_BALANCE` | `1000` | Initial balance (minimum $10) |
 | `DELAY_BETWEEN_ACTIONS` | `2000` | Milliseconds between actions |
 | `DELAY_BETWEEN_GAMES` | `5000` | Milliseconds between games |
 | `RUN_CONTINUOUSLY` | `false` | Run in continuous loop |
@@ -51,7 +56,8 @@ playwright:
   casinoUrl: ""  # Auto-detect if empty
   userName: "PlaywrightUser"
   userEmail: "playwright@example.com"
-  userCompany: "Dynatrace"
+  profileType: "Customer"  # Options: Partner, Customer, Dynatracer, Other
+  startingBalance: "1000"  # Minimum: 10
   delayBetweenActions: "2000"
   delayBetweenGames: "5000"
   runContinuously: "false"
@@ -96,9 +102,11 @@ docker run --rm \
 ## Test Flow
 
 ```
-1. Enter Casino
+1. Login/Profile Setup
    ↓
-2. Deposit Funds
+2. Navigate to Lobby
+   ↓
+3. Deposit Funds (if needed)
    ↓
 3. Play Slots (with cheats enabled)
    ↓

@@ -42,9 +42,14 @@ spec:
         - name: http
           containerPort: {{ .Values.dashboard.service.port }}
           protocol: TCP
+        - name: grpc
+          containerPort: {{ .Values.dashboard.service.grpcPort }}
+          protocol: TCP
         env:
         - name: PORT
           value: "{{ .Values.dashboard.service.port }}"
+        - name: GRPC_PORT
+          value: "{{ .Values.dashboard.service.grpcPort }}"
         - name: SERVICE_NAME
           value: "{{ .Values.dashboard.env.SERVICE_NAME }}"
         - name: OTEL_SERVICE_NAME

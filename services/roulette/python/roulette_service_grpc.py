@@ -28,6 +28,56 @@ except ImportError:
     except ImportError:
         logger = None
 
+<<<<<<< HEAD
+=======
+# Import Redis helper
+try:
+    from redis_helper import initialize_redis, save_game_state, get_game_state, delete_game_state
+except ImportError:
+    # Fallback: try relative import
+    try:
+        sys.path.insert(0, os.path.dirname(__file__))
+        from redis_helper import initialize_redis, save_game_state, get_game_state, delete_game_state
+    except ImportError:
+        print("Warning: Redis helper not found. Game state will not be persisted.")
+        def initialize_redis():
+            pass
+        def save_game_state(*args, **kwargs):
+            return False
+        def get_game_state(*args, **kwargs):
+            return None
+        def delete_game_state(*args, **kwargs):
+            return False
+
+# Import scoring helper
+try:
+    from scoring_helper import record_game_result_async
+except ImportError:
+    # Fallback: try relative import
+    try:
+        sys.path.insert(0, os.path.dirname(__file__))
+        from scoring_helper import record_game_result_async
+    except ImportError:
+        print("Warning: Scoring helper not found. Game results will not be recorded.")
+        def record_game_result_async(*args, **kwargs):
+            pass
+
+# Import feature flag helper
+try:
+    from featureflags import get_feature_flag
+except ImportError:
+    # Fallback: try relative import
+    try:
+        sys.path.insert(0, os.path.dirname(__file__))
+        from featureflags import get_feature_flag
+    except ImportError:
+        print("Warning: Feature flag helper not found. Using environment variable fallback.")
+        def get_feature_flag(flag_key, default_value=False):
+            env_key = f"FLAG_{flag_key.replace('.', '_').upper()}"
+            env_value = os.getenv(env_key, str(default_value))
+            return env_value.lower() in ("true", "1", "yes")
+
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 # Import generated gRPC code
 # Proto files are generated in the same directory during Docker build
 try:
@@ -41,6 +91,10 @@ except ImportError:
 # Import OpenTelemetry setup
 try:
     from opentelemetry import trace
+<<<<<<< HEAD
+=======
+    from opentelemetry.propagate import extract
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     from opentelemetry_setup import initialize_telemetry, add_game_attributes, add_http_attributes
     tracer = initialize_telemetry("vegas-roulette-service", {
         "version": "2.1.0",
@@ -54,6 +108,10 @@ try:
 except (ImportError, NameError):
     print("Warning: OpenTelemetry not available, running without instrumentation")
     tracer = None
+<<<<<<< HEAD
+=======
+    extract = None
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 
 # Service metadata
 METADATA = {
@@ -114,6 +172,7 @@ class RouletteServiceServicer(roulette_pb2_grpc.RouletteServiceServicer):
         )
 
     def Spin(self, request, context):
+<<<<<<< HEAD
         if tracer:
             span = tracer.start_span("roulette_spin")
             add_http_attributes(span, "POST", "/spin")
@@ -122,6 +181,40 @@ class RouletteServiceServicer(roulette_pb2_grpc.RouletteServiceServicer):
 
         bet_type = request.bet_type or "red"
         bet_amount = request.bet_amount or 10
+=======
+        # Extract trace context from gRPC metadata
+        extracted_context = None
+        if tracer and extract and context:
+            try:
+                # Extract trace context from gRPC metadata
+                metadata_dict = {}
+                # Python gRPC uses invocation_metadata() method
+                if hasattr(context, 'invocation_metadata'):
+                    for key, value in context.invocation_metadata():
+                        metadata_dict[key.lower()] = value
+                
+                if metadata_dict:
+                    extracted_context = extract(metadata_dict)
+            except Exception as e:
+                print(f"Warning: Failed to extract trace context: {e}")
+        
+        # Start span in extracted context (or active context if extraction failed)
+        span = None
+        if tracer:
+            try:
+                if extracted_context:
+                    span = tracer.start_span("roulette_spin", context=extracted_context)
+                else:
+                    span = tracer.start_span("roulette_spin")
+                add_http_attributes(span, "POST", "/spin")
+            except Exception as e:
+                print(f"Warning: Failed to start span with trace context: {e}")
+                span = tracer.start_span("roulette_spin") if tracer else None
+
+        bet_type = request.bet_type or "red"
+        bet_amount = request.bet_amount or 10
+        bet_value = request.bet_value or {}  # For multiple bets
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
         cheat_active = request.cheat_active
         cheat_type = request.cheat_type or ""
         
@@ -130,6 +223,16 @@ class RouletteServiceServicer(roulette_pb2_grpc.RouletteServiceServicer):
         if request.player_info:
             username = request.player_info.get("username", "Anonymous")
 
+<<<<<<< HEAD
+=======
+        # Check house advantage feature flag
+        house_advantage_enabled = get_feature_flag("casino.house-advantage", False)
+        if span:
+            span.set_attribute("feature_flag.house_advantage", house_advantage_enabled)
+        if house_advantage_enabled:
+            print(f"[Roulette] 🏠 House advantage mode enabled - reducing win probability")
+
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
         # Log game start
         if logger:
             logger.log_game_start("roulette", username, bet_amount, {
@@ -158,6 +261,7 @@ class RouletteServiceServicer(roulette_pb2_grpc.RouletteServiceServicer):
             boost_chance = get_cheat_boost_chance(cheat_type)
             if random.random() < boost_chance:
                 cheat_boosted = True
+<<<<<<< HEAD
                 # Try to favor player bets
                 if bet_type == "red" and color != "red":
                     winning_number = random.choice(RED_NUMBERS)
@@ -165,6 +269,92 @@ class RouletteServiceServicer(roulette_pb2_grpc.RouletteServiceServicer):
                 elif bet_type == "black" and color != "black":
                     winning_number = random.choice([n for n in range(1, 37) if n not in RED_NUMBERS])
                     color = "black"
+=======
+                print(f"[Roulette] ?? Cheat boosted! bet_type={bet_type}, boost_chance={boost_chance}")
+                
+                # Handle multiple bets with cheat
+                if bet_type == "multiple" and bet_value:
+                    # Try to make at least one bet win
+                    potential_winning_numbers = []
+                    for bet_key, bet in bet_value.items():
+                        if isinstance(bet, dict):
+                            bet_type_inner = bet.get('type') or bet.get('Type') or ''
+                            bet_value_inner = bet.get('value') or bet.get('Value')
+                        else:
+                            bet_type_inner = getattr(bet, 'type', getattr(bet, 'Type', ''))
+                            bet_value_inner = getattr(bet, 'value', getattr(bet, 'Value', None))
+                        
+                        # For straight bets, add the specific number
+                        if bet_type_inner == "straight" and bet_value_inner is not None:
+                            try:
+                                straight_number = int(bet_value_inner)
+                                if 0 <= straight_number <= 36:
+                                    potential_winning_numbers.append(straight_number)
+                                    print(f"[Roulette] ?? Cheat: Found straight bet on {straight_number}")
+                            except (ValueError, TypeError):
+                                pass
+                        
+                        # For color bets, add numbers of that color
+                        elif bet_type_inner == "red":
+                            potential_winning_numbers.extend(RED_NUMBERS)
+                            print(f"[Roulette] ?? Cheat: Found red bet, adding red numbers")
+                        elif bet_type_inner == "black":
+                            black_numbers = [n for n in range(1, 37) if n not in RED_NUMBERS]
+                            potential_winning_numbers.extend(black_numbers)
+                            print(f"[Roulette] ?? Cheat: Found black bet, adding black numbers")
+                        elif bet_type_inner == "even":
+                            even_numbers = [n for n in range(2, 37, 2)]  # 2, 4, 6, ..., 36
+                            potential_winning_numbers.extend(even_numbers)
+                            print(f"[Roulette] ?? Cheat: Found even bet, adding even numbers")
+                        elif bet_type_inner == "odd":
+                            odd_numbers = [n for n in range(1, 37, 2)]  # 1, 3, 5, ..., 35
+                            potential_winning_numbers.extend(odd_numbers)
+                            print(f"[Roulette] ?? Cheat: Found odd bet, adding odd numbers")
+                        elif bet_type_inner == "low":
+                            low_numbers = list(range(1, 19))  # 1-18
+                            potential_winning_numbers.extend(low_numbers)
+                            print(f"[Roulette] ?? Cheat: Found low bet, adding low numbers")
+                        elif bet_type_inner == "high":
+                            high_numbers = list(range(19, 37))  # 19-36
+                            potential_winning_numbers.extend(high_numbers)
+                            print(f"[Roulette] ?? Cheat: Found high bet, adding high numbers")
+                    
+                    # If we have potential winning numbers, pick one
+                    if potential_winning_numbers:
+                        winning_number = random.choice(potential_winning_numbers)
+                        color = get_color(winning_number)
+                        print(f"[Roulette] ?? Cheat: Selected winning_number={winning_number}, color={color} from {len(potential_winning_numbers)} options")
+                    else:
+                        print(f"[Roulette] ?? Cheat: No potential winning numbers found, using random")
+                
+                # Handle simple bet types
+                elif bet_type == "red" and color != "red":
+                    winning_number = random.choice(RED_NUMBERS)
+                    color = "red"
+                    print(f"[Roulette] ?? Cheat: Set winning_number={winning_number} (red)")
+                elif bet_type == "black" and color != "black":
+                    winning_number = random.choice([n for n in range(1, 37) if n not in RED_NUMBERS])
+                    color = "black"
+                    print(f"[Roulette] ?? Cheat: Set winning_number={winning_number} (black)")
+                elif bet_type == "straight" and bet_value:
+                    # Try to extract the number from bet_value
+                    for bet_key, bet in bet_value.items():
+                        if isinstance(bet, dict):
+                            bet_number_value = bet.get('value') or bet.get('Value')
+                        else:
+                            bet_number_value = getattr(bet, 'value', getattr(bet, 'Value', None))
+                        
+                        if bet_number_value is not None:
+                            try:
+                                straight_number = int(bet_number_value)
+                                if 0 <= straight_number <= 36:
+                                    winning_number = straight_number
+                                    color = get_color(winning_number)
+                                    print(f"[Roulette] ?? Cheat: Set winning_number={winning_number} (straight bet)")
+                                    break
+                            except (ValueError, TypeError):
+                                pass
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                 
                 # Log cheat activation
                 if logger:
@@ -172,20 +362,139 @@ class RouletteServiceServicer(roulette_pb2_grpc.RouletteServiceServicer):
                         "game": "roulette",
                         "username": username,
                         "cheat_type": cheat_type,
+<<<<<<< HEAD
                         "cheat_boosted": cheat_boosted
+=======
+                        "cheat_boosted": cheat_boosted,
+                        "winning_number": winning_number,
+                        "color": color
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                     })
 
         # Calculate win and payout
         win = False
         payout = 0.0
 
+<<<<<<< HEAD
         if bet_type == "red":
+=======
+        # Handle multiple bets (bet_type == "multiple" with bet_value dict)
+        if bet_type == "multiple" and bet_value:
+            # ALL multiple bets are evaluated independently:
+            # each leg is evaluated separately; any winning leg makes the spin a win
+            # Payout is the sum of all winning legs
+            total_payout = 0.0
+            win = False  # Initialize win to False for multiple bets
+            print(
+                f"[Roulette] Processing multiple bets. bet_value: {bet_value}, "
+                f"winning_number: {winning_number}, color: {color}"
+            )
+            for bet_key, bet in bet_value.items():
+                # Handle both dict and object formats
+                if isinstance(bet, dict):
+                    bet_type_inner = bet.get("type") or bet.get("Type") or ""
+                    bet_amount_inner = float(
+                        bet.get("amount") or bet.get("Amount") or bet.get("betAmount") or 0
+                    )
+                else:
+                    bet_type_inner = getattr(bet, "type", getattr(bet, "Type", ""))
+                    bet_amount_inner = float(
+                        getattr(
+                            bet,
+                            "amount",
+                            getattr(bet, "Amount", getattr(bet, "betAmount", 0)),
+                        )
+                    )
+
+                print(
+                    f"[Roulette] Processing bet: key={bet_key}, type={bet_type_inner}, "
+                    f"amount={bet_amount_inner}, winning_number={winning_number}, color={color}"
+                )
+                bet_win = False
+                if bet_type_inner == "red":
+                    bet_win = color == "red"
+                    print(f"[Roulette] Red bet check: color={color}, bet_win={bet_win}")
+                elif bet_type_inner == "black":
+                    bet_win = color == "black"
+                    print(f"[Roulette] Black bet check: color={color}, bet_win={bet_win}")
+                elif bet_type_inner == "even":
+                    # Even numbers: 2, 4, 6, ..., 36 (0 is NOT even for betting purposes)
+                    bet_win = winning_number > 0 and winning_number % 2 == 0
+                elif bet_type_inner == "odd":
+                    # Odd numbers: 1, 3, 5, ..., 35 (0 is NOT odd)
+                    bet_win = winning_number > 0 and winning_number % 2 == 1
+                elif bet_type_inner == "low":
+                    # Low numbers: 1-18 (0 is NOT low)
+                    bet_win = 1 <= winning_number <= 18
+                elif bet_type_inner == "high":
+                    # High numbers: 19-36 (0 and 1-18 are NOT high)
+                    bet_win = 19 <= winning_number <= 36
+                elif bet_type_inner == "straight":
+                    # Straight bet on specific number
+                    bet_number_value = None
+                    if isinstance(bet, dict):
+                        bet_number_value = bet.get("value") or bet.get("Value")
+                    elif hasattr(bet, "value"):
+                        bet_number_value = bet.value
+                    elif hasattr(bet, "Value"):
+                        bet_number_value = bet.Value
+
+                    if bet_number_value is not None:
+                        try:
+                            bet_number = int(bet_number_value)
+                            bet_win = winning_number == bet_number
+                            print(
+                                f"[Roulette] Straight bet check: bet_number={bet_number}, "
+                                f"winning_number={winning_number}, bet_win={bet_win}"
+                            )
+                        except (ValueError, TypeError) as e:
+                            print(
+                                f"[Roulette] Error parsing bet_number_value "
+                                f"'{bet_number_value}': {e}"
+                            )
+                            bet_win = False
+                    else:
+                        print(
+                            "[Roulette] No bet_number_value found for straight bet"
+                        )
+                        bet_win = False
+
+                if bet_win:
+                    # Calculate payout based on bet type
+                    if bet_type_inner == "straight":
+                        payout_amount = bet_amount_inner * 36  # 36x for straight
+                        total_payout += payout_amount
+                        print(f"[Roulette] ✅ Straight bet WON! Payout: {payout_amount}")
+                    else:
+                        payout_amount = bet_amount_inner * 2  # 2x for other bets
+                        total_payout += payout_amount
+                        print(
+                            f"[Roulette] ✅ {bet_type_inner} bet WON! "
+                            f"Payout: {payout_amount}"
+                        )
+                    win = True  # Set win to True if ANY bet wins
+                    print(
+                        "[Roulette] Win flag set to True (at least one bet won)"
+                    )
+                else:
+                    print(f"[Roulette] ❌ {bet_type_inner} bet LOST")
+
+            payout = total_payout
+            print("[Roulette] ========== FINAL RESULT ==========")
+            print(
+                f"[Roulette] win={win}, total_payout={total_payout}, "
+                f"winning_number={winning_number}, color={color}"
+            )
+            print("[Roulette] ===================================")
+        elif bet_type == "red":
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
             win = color == "red"
             payout = bet_amount * 2 if win else 0
         elif bet_type == "black":
             win = color == "black"
             payout = bet_amount * 2 if win else 0
         elif bet_type == "even":
+<<<<<<< HEAD
             win = winning_number > 0 and winning_number % 2 == 0
             payout = bet_amount * 2 if win else 0
         elif bet_type == "odd":
@@ -202,6 +511,107 @@ class RouletteServiceServicer(roulette_pb2_grpc.RouletteServiceServicer):
             win = False
             payout = 0
 
+=======
+            # Even numbers: 2, 4, 6, ..., 36 (0 is NOT even for betting purposes)
+            win = winning_number > 0 and winning_number % 2 == 0
+            payout = bet_amount * 2 if win else 0
+        elif bet_type == "odd":
+            # Odd numbers: 1, 3, 5, ..., 35 (0 is NOT odd)
+            win = winning_number > 0 and winning_number % 2 == 1
+            payout = bet_amount * 2 if win else 0
+        elif bet_type == "low":
+            # Low numbers: 1-18 (0 is NOT low)
+            win = 1 <= winning_number <= 18
+            payout = bet_amount * 2 if win else 0
+        elif bet_type == "high":
+            # High numbers: 19-36 (0 and 1-18 are NOT high)
+            # Bug fix: Ensure 0 and numbers 1-18 are correctly identified as losses
+            win = winning_number >= 19 and winning_number <= 36
+            payout = bet_amount * 2 if win else 0
+        elif bet_type == "straight":
+            # Straight bet on a specific number
+            # If bet_value is provided, check if winning number matches
+            if bet_value:
+                # Extract the number from bet_value (could be in various formats)
+                for bet_key, bet in bet_value.items():
+                    try:
+                        bet_number = int(bet.value) if hasattr(bet, 'value') else int(bet_key.replace('bet_', ''))
+                        if winning_number == bet_number:
+                            win = True
+                            payout = bet_amount * 36  # 36x payout for straight bet
+                            break
+                    except (ValueError, AttributeError):
+                        continue
+            # If no bet_value or no match, it's a loss
+            if not win:
+                win = False
+                payout = 0
+        else:
+            # Unknown bet type - default to loss
+            win = False
+            payout = 0
+
+        # Apply house advantage feature flag if enabled
+        # This reduces win probability by 25% when the casino is losing too much money
+        if win and payout > 0 and house_advantage_enabled:
+            # 25% chance to convert a win into a loss (house advantage)
+            if random.random() < 0.25:
+                win = False
+                payout = 0.0
+                print(f"[Roulette] 🏠 House advantage applied: win converted to loss")
+                if span:
+                    span.set_attribute("feature_flag.house_advantage_applied", True)
+
+        # Store game state in Redis
+        game_state = {
+            "last_spin": datetime.utcnow().isoformat() + "Z",
+            "winning_number": winning_number,
+            "color": color,
+            "win": win,
+            "payout": payout,
+            "bet_amount": bet_amount,
+            "bet_type": bet_type,
+            "cheat_active": cheat_active,
+            "cheat_type": cheat_type,
+            "cheat_boosted": cheat_boosted
+        }
+        save_game_state(username, game_state)
+
+        # Calculate total bet amount (sum of all individual bets if multiple bets)
+        total_bet_amount = bet_amount
+        if bet_type == "multiple" and bet_value:
+            # Sum all individual bet amounts
+            total_bet_amount = 0.0
+            for bet_key, bet in bet_value.items():
+                if isinstance(bet, dict):
+                    bet_amount_inner = float(bet.get('amount') or bet.get('Amount') or bet.get('betAmount') or 0)
+                else:
+                    bet_amount_inner = float(getattr(bet, 'amount', getattr(bet, 'Amount', getattr(bet, 'betAmount', 0))))
+                total_bet_amount += bet_amount_inner
+        
+        # Record game result in scoring service for ALL games (wins and losses) to track total bets
+        record_game_result_async({
+            "username": username,
+            "game": "roulette",
+            "action": "spin",
+            "betAmount": total_bet_amount,
+            "payout": payout,
+            "win": win and payout > 0,
+            "result": "win" if (win and payout > 0) else "lose",
+                "gameData": {
+                    "winning_number": winning_number,
+                    "color": color,
+                    "bet_type": bet_type,
+                },
+                "metadata": {
+                    "cheat_active": cheat_active,
+                    "cheat_type": cheat_type,
+                    "cheat_boosted": cheat_boosted,
+                    "timestamp": datetime.utcnow().isoformat() + "Z",
+                },
+            })
+
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
         # Log game result
         if logger:
             logger.log_game_end("roulette", username, f"Number {winning_number} ({color})", payout, win, {
@@ -265,7 +675,11 @@ def generate_roulette_html():
 </head>
 <body class="bg-green-900 text-white p-4">
     <div id="roulette-game-container" class="max-w-2xl mx-auto">
+<<<<<<< HEAD
         <h1 class="text-3xl font-bold mb-4 text-center">🎲 Roulette</h1>
+=======
+        <h1 class="text-3xl font-bold mb-4 text-center">?? Roulette</h1>
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
         <div id="roulette-result" class="text-center mb-4">
             <div id="winning-number" class="text-6xl font-bold mb-2">?</div>
             <div id="color" class="text-2xl"></div>
@@ -317,10 +731,17 @@ async function initRouletteGame() {
             
             if (response.win) {
                 document.getElementById('result').innerHTML = 
+<<<<<<< HEAD
                     `<div class="text-green-500 text-xl">🎉 Win! Payout: $${response.payout.toFixed(2)}</div>`;
             } else {
                 document.getElementById('result').innerHTML = 
                     `<div class="text-red-500 text-xl">😢 No win this time</div>`;
+=======
+                    `<div class="text-green-500 text-xl">?? Win! Payout: $${response.payout.toFixed(2)}</div>`;
+            } else {
+                document.getElementById('result').innerHTML = 
+                    `<div class="text-red-500 text-xl">?? No win this time</div>`;
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
             }
         } catch (error) {
             console.error('Error spinning roulette:', error);
@@ -422,7 +843,11 @@ def serve_http():
     server = HTTPServer(('0.0.0.0', http_port), RouletteHTTPHandler)
     if logger:
         logger.log_info("Roulette HTTP server started", {"port": http_port})
+<<<<<<< HEAD
     print(f"🎲 Roulette HTTP server listening on port {http_port}")
+=======
+    print(f"?? Roulette HTTP server listening on port {http_port}")
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     server.serve_forever()
 
 
@@ -444,11 +869,20 @@ def serve_grpc():
     server.start()
     if logger:
         logger.log_info("Roulette gRPC server started", {"port": grpc_port})
+<<<<<<< HEAD
     print(f"🎲 Roulette gRPC server listening on port {grpc_port}")
+=======
+    print(f"?? Roulette gRPC server listening on port {grpc_port}")
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     server.wait_for_termination()
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
+=======
+    # Initialize Redis
+    initialize_redis()
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     import threading
     
     service_name = os.getenv("SERVICE_NAME", "vegas-roulette-service")
@@ -470,7 +904,11 @@ if __name__ == '__main__':
     # Keep main thread alive
     if logger:
         logger.log_info("Roulette service running (HTTP + gRPC)")
+<<<<<<< HEAD
     print("🎲 Roulette service running (HTTP + gRPC)")
+=======
+    print("?? Roulette service running (HTTP + gRPC)")
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     print("Press Ctrl+C to stop")
     
     try:

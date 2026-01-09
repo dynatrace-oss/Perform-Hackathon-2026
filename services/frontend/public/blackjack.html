@@ -32,9 +32,18 @@
     
     <!-- External libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<<<<<<< HEAD
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     
+=======
+    <!-- Socket.IO removed - using HTTP/gRPC architecture instead -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- OpenTelemetry Browser Instrumentation -->
+    <script src="/js/opentelemetry-browser.js"></script>
+    
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     <style>
         /* Blackjack specific styles */
         .blackjack-bg {
@@ -681,11 +690,19 @@
                             <div class="betting-area">
                                 <h3 class="text-dt-green font-semibold mb-4">Betting Chips</h3>
                                 <div class="flex justify-center space-x-4 mb-4">
+<<<<<<< HEAD
                                     <div class="chip chip-5" onclick="setBet(5)">$5</div>
                                     <div class="chip chip-10" onclick="setBet(10)">$10</div>
                                     <div class="chip chip-25" onclick="setBet(25)">$25</div>
                                     <div class="chip chip-50" onclick="setBet(50)">$50</div>
                                     <div class="chip chip-100" onclick="setBet(100)">$100</div>
+=======
+                                    <div class="chip chip-5" onclick="setBet(5, event)">$5</div>
+                                    <div class="chip chip-10" onclick="setBet(10, event)">$10</div>
+                                    <div class="chip chip-25" onclick="setBet(25, event)">$25</div>
+                                    <div class="chip chip-50" onclick="setBet(50, event)">$50</div>
+                                    <div class="chip chip-100" onclick="setBet(100, event)">$100</div>
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                                 </div>
                                 <div class="text-center">
                                     <div class="text-dt-light-gray mb-2">Current Bet:</div>
@@ -697,7 +714,11 @@
                             <div class="betting-area">
                                 <h3 class="text-dt-green font-semibold mb-4">Game Actions</h3>
                                 <div class="grid grid-cols-2 gap-3">
+<<<<<<< HEAD
                                     <button class="action-button" id="dealButton" onclick="startNewHand()">
+=======
+                                    <button class="action-button" id="dealButton" onclick="startNewHand()" style="cursor: pointer; pointer-events: auto;">
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                                         Deal Cards
                                     </button>
                                     <button class="action-button" id="hitButton" onclick="playerHit()" disabled>
@@ -726,8 +747,13 @@
     </main>
 
     <script>
+<<<<<<< HEAD
         // Initialize Socket.IO
         const socket = io();
+=======
+        // Socket.IO removed - using HTTP/gRPC architecture instead
+        // Backend handles all game logic, frontend only renders UI
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
         
         // Check if user has the new required fields, if not populate with defaults
         function ensureUserProfileComplete() {
@@ -851,7 +877,11 @@
             cheatState.active = null;
             cheatState.winBoost = 0;
             updateCheatUI();
+<<<<<<< HEAD
             showMessage('🔄 Configuration reset to baseline', 'info');
+=======
+            showNotification('🔄 Configuration reset to baseline', 'info');
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
         }
         
         function updateCheatUI() {
@@ -922,6 +952,11 @@
 
         // Game state
         let gameState = 'waiting'; // waiting, playing, dealer_turn, finished
+<<<<<<< HEAD
+=======
+        // Game state is now managed by backend via Redis
+        // These are kept for compatibility but should not be used for game logic
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
         let playerHand = [];
         let dealerHand = [];
         let currentBet = 0;
@@ -940,9 +975,15 @@
             runningCount: 0
         };
         
+<<<<<<< HEAD
         function setBet(amount) {
             if (gameState !== 'waiting') return;
             
+=======
+        function setBet(amount, event) {
+            if (gameState !== 'waiting') return;
+
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
             const currentBalance = parseInt((document.getElementById('balanceDisplay').textContent || '0').replace(/[^0-9]/g, '')) || 0;
             const newTotalBet = currentBet + amount;
             
@@ -955,6 +996,7 @@
             currentBet = newTotalBet;
             document.getElementById('currentBet').textContent = `$${currentBet}`;
             
+<<<<<<< HEAD
             // Animate the clicked chip
             event.target.style.transform = 'scale(1.2)';
             event.target.style.boxShadow = '0 0 20px rgba(115, 190, 40, 0.8)';
@@ -964,6 +1006,20 @@
                 event.target.style.transform = 'scale(1)';
                 event.target.style.boxShadow = '';
             }, 300);
+=======
+            // Animate the clicked chip - get element from event or find by amount
+            const clickedChip = event?.target || document.querySelector(`.chip-${amount}`);
+            if (clickedChip) {
+                clickedChip.style.transform = 'scale(1.2)';
+                clickedChip.style.boxShadow = '0 0 20px rgba(115, 190, 40, 0.8)';
+                
+                // Reset animation after a moment
+                setTimeout(() => {
+                    clickedChip.style.transform = 'scale(1)';
+                    clickedChip.style.boxShadow = '';
+                }, 300);
+            }
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
             
             // Show feedback
             showNotification(`Added $${amount} chip! Total bet: $${currentBet}`, 'success');
@@ -987,6 +1043,7 @@
             updateStrategyHint();
         }
         
+<<<<<<< HEAD
         // Local deck management
         let deck = [];
         
@@ -1013,6 +1070,67 @@
                 createDeck(); // Reshuffle when low
             }
             return deck.pop();
+=======
+        // Game state - managed by backend via Redis
+        let currentGameState = null;
+        
+        // HTTP client helper - calls frontend service HTTP endpoints
+        // Frontend service then uses gRPC to communicate with blackjack service
+        async function callBlackjackService(method, request) {
+            const username = localStorage.getItem('vegas.username') || localStorage.getItem('vegasUser') || 'Anonymous';
+            
+            // Map gRPC method names to HTTP endpoint paths
+            const endpointMap = {
+                'Deal': '/api/games/blackjack/deal',
+                'Hit': '/api/games/blackjack/hit',
+                'Stand': '/api/games/blackjack/stand',
+                'Double': '/api/games/blackjack/double'
+            };
+            
+            const endpoint = endpointMap[method];
+            if (!endpoint) {
+                throw new Error(`Unknown method: ${method}`);
+            }
+            
+            // Prepare HTTP request (frontend service will convert to gRPC)
+            const httpRequest = {
+                Username: username,
+                ...request
+            };
+            
+            // Convert bet_amount to BetAmount for HTTP endpoint
+            if (httpRequest.bet_amount !== undefined) {
+                httpRequest.BetAmount = httpRequest.bet_amount;
+            }
+            
+            // Call frontend service HTTP endpoint (which uses gRPC internally)
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(httpRequest)
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || `HTTP call failed: ${method}`);
+            }
+            
+            const result = await response.json();
+            
+            // Convert response format (handle both snake_case from gRPC and camelCase)
+            const converted = {};
+            for (const [key, value] of Object.entries(result)) {
+                // Convert snake_case to camelCase
+                const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+                converted[camelKey] = value;
+                // Also keep original key for compatibility
+                converted[key] = value;
+            }
+            
+            return converted;
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
         }
         
         async function startNewHand() {
@@ -1029,6 +1147,7 @@
                 return;
             }
             
+<<<<<<< HEAD
             // Deduct bet from balance
             const newBalance = currentBalance - currentBet;
             localStorage.setItem('vegasBalance', String(newBalance));
@@ -1112,6 +1231,73 @@
                 updateGameStatus('Your turn. Hit or stand?');
                 updateActionButtons();
                 updateStrategyHint();
+=======
+            // Get username
+            const username = localStorage.getItem('vegas.username') || localStorage.getItem('vegasUser') || 'Anonymous';
+            console.log(`[Blackjack] 🎲 Deal called by user "${username}" with bet=${currentBet}`);
+            
+            // Clear previous game display
+            document.getElementById('playerCards').innerHTML = '';
+            document.getElementById('dealerCards').innerHTML = '';
+            document.getElementById('playerScore').textContent = '0';
+            document.getElementById('dealerScore').textContent = '0';
+            
+            updateGameStatus('Dealing cards...');
+            updateActionButtons();
+            
+            try {
+                // Call backend via gRPC-Web
+                const result = await callBlackjackService('Deal', {
+                    bet_amount: currentBet
+                });
+                
+                currentGameState = result;
+                
+                // Update balance from response
+                if (result.newBalance !== undefined) {
+                    document.getElementById('balanceDisplay').textContent = `$${result.newBalance}`;
+                    localStorage.setItem('vegasBalance', String(result.newBalance));
+                }
+                
+                // Render cards from backend response (use snake_case or camelCase)
+                // Update outer variables (not const - these are the tracked state)
+                playerHand = result.playerHand || result.player_hand || [];
+                dealerHand = result.dealerHand || result.dealer_hand || [];
+                await dealInitialCards(playerHand, dealerHand);
+                
+                // Update scores (use snake_case or camelCase)
+                const playerScore = result.playerScore !== undefined ? result.playerScore : (result.player_score || 0);
+                const dealerScore = result.dealerScore !== undefined ? result.dealerScore : (result.dealer_score || 0);
+                updateScores(playerScore, dealerScore);
+                
+                // Check if game is already finished (natural blackjack)
+                const gameStatus = result.gameStatus || result.game_status || 'playing';
+                if (gameStatus === 'finished') {
+                    gameState = 'finished';
+                    const gameResult = result.result || 'unknown';
+                    const payout = result.payout || 0;
+                    if (gameResult === 'blackjack') {
+                        handleGameEnd('blackjack', 'Blackjack! You win!', payout);
+                    } else if (gameResult === 'push') {
+                        handleGameEnd('push', 'Both blackjack! Push.', payout);
+                    }
+                } else {
+                    gameState = 'playing';
+                    // Ensure playerHand is updated before enabling buttons
+                    // Double down requires exactly 2 cards, so verify before enabling
+                    console.log(`[Blackjack] Game started: playerHand.length=${playerHand.length}, gameState=${gameState}`);
+                    updateGameStatus('Your turn. Hit or stand?');
+                    // Small delay to ensure state is fully synced before enabling buttons
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    updateActionButtons();
+                    updateStrategyHint();
+                }
+            } catch (error) {
+                console.error('Error dealing cards:', error);
+                showNotification(`Error: ${error.message}`, 'error');
+                gameState = 'waiting';
+                updateActionButtons();
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
             }
         }
         
@@ -1122,10 +1308,18 @@
                 addCardToHand('player', playerCards[i]);
             }
             
+<<<<<<< HEAD
             // Deal dealer cards (second card face down)
             for (let i = 0; i < dealerCards.length; i++) {
                 await new Promise(resolve => setTimeout(resolve, 500));
                 if (i === 1) {
+=======
+            // Deal dealer cards (second card face down if game is still playing)
+            for (let i = 0; i < dealerCards.length; i++) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                // Hide second dealer card if game is still in progress
+                if (i === 1 && currentGameState && currentGameState.gameStatus === 'playing') {
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                     addCardToHand('dealer', { suit: 'hidden', rank: 'hidden' }, true);
                 } else {
                     addCardToHand('dealer', dealerCards[i]);
@@ -1194,10 +1388,23 @@
             return cardDiv;
         }
         
+<<<<<<< HEAD
         function calculateScore(hand) {
             let score = 0;
             let aces = 0;
             
+=======
+        // Score calculation removed - backend handles all scoring
+        // This function is kept for compatibility but should not be used for game logic
+        function calculateScore(hand) {
+            // This is a fallback - backend should always provide scores
+            // Only use if backend doesn't provide score
+            let score = 0;
+            let aces = 0;
+            
+            if (!hand || hand.length === 0) return 0;
+            
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
             for (let card of hand) {
                 if (card.rank === 1) {
                     aces++;
@@ -1219,6 +1426,7 @@
         }
         
         async function playerHit() {
+<<<<<<< HEAD
             if (gameState !== 'playing') return;
             
             // Draw new card
@@ -1355,18 +1563,282 @@
             } else {
                 console.log('   Calling LOSE scenario');
                 handleGameEnd('lose', 'Dealer wins.', finalPayout);
+=======
+            if (gameState !== 'playing') {
+                console.log('Cannot hit: game not in playing state');
+                showNotification('No active hand. Please deal cards first.', 'error');
+                return;
+            }
+            
+            // Check if we have an active hand by verifying player cards exist
+            const playerCardsEl = document.getElementById('playerCards');
+            if (!playerCardsEl || playerCardsEl.children.length === 0) {
+                console.log('Cannot hit: no player cards found');
+                showNotification('No active hand. Please deal cards first.', 'error');
+                gameState = 'waiting';
+                updateActionButtons();
+                return;
+            }
+            
+            const username = localStorage.getItem('vegas.username') || localStorage.getItem('vegasUser') || 'Anonymous';
+            
+            updateGameStatus('Drawing card...');
+            updateActionButtons();
+            
+            try {
+                // Call backend via gRPC-Web
+                const result = await callBlackjackService('Hit', {});
+                currentGameState = result;
+                
+                // Add new card with animation
+                await new Promise(resolve => setTimeout(resolve, 300));
+                const newCard = result.newCard || result.new_card;
+                if (newCard) {
+                    addCardToHand('player', newCard);
+                }
+                // Update playerHand array from backend response to keep it in sync
+                playerHand = result.playerHand || result.player_hand || playerHand;
+                
+                // Update scores from backend (handle both formats)
+                const playerScore = result.playerScore !== undefined ? result.playerScore : (result.player_score || 0);
+                const dealerScore = result.dealerScore !== undefined ? result.dealerScore : (result.dealer_score || 0);
+                updateScores(playerScore, dealerScore);
+                
+                // Check game status from backend
+                const gameStatus = result.gameStatus || result.game_status || 'playing';
+                if (gameStatus === 'finished') {
+                    gameState = 'finished';
+                    const gameResult = result.result || 'unknown';
+                    const payout = result.payout || 0;
+                    if (gameResult === 'bust') {
+                        updateGameStatus('💥 BUST! You went over 21!');
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        handleGameEnd('bust', 'You lose! Bust over 21.', payout);
+                    }
+                } else if (playerScore === 21) {
+                    // Auto-stand on 21
+                    updateGameStatus('Perfect 21! Standing automatically...');
+                    setTimeout(() => playerStand(), 1000);
+                } else {
+                    updateGameStatus('Hit or stand?');
+                    updateStrategyHint();
+                }
+                
+                updateActionButtons();
+            } catch (error) {
+                console.error('Error hitting:', error);
+                showNotification(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function playerStand() {
+            // Prevent double-clicks and rapid clicks
+            const standButton = document.getElementById('standButton');
+            if (standButton && standButton.disabled) {
+                console.log('Stand button already disabled, ignoring click');
+                return;
+            }
+            
+            if (gameState !== 'playing') {
+                console.log('Cannot stand: game not in playing state. Current state:', gameState);
+                showNotification('No active hand. Please deal cards first.', 'error');
+                return;
+            }
+            
+            // Check if we have an active hand by verifying player cards exist
+            const playerCardsEl = document.getElementById('playerCards');
+            if (!playerCardsEl || playerCardsEl.children.length === 0) {
+                console.log('Cannot stand: no player cards found');
+                showNotification('No active hand. Please deal cards first.', 'error');
+                gameState = 'waiting';
+                updateActionButtons();
+                return;
+            }
+            
+            const username = localStorage.getItem('vegas.username') || localStorage.getItem('vegasUser') || 'Anonymous';
+            console.log(`[Blackjack] 🎯 Stand called by user "${username}", current gameState="${gameState}", playerCards=${playerCardsEl.children.length}`);
+            
+            // Disable button immediately to prevent double-clicks
+            if (standButton) {
+                standButton.disabled = true;
+            }
+            // Also disable other action buttons
+            const hitButton = document.getElementById('hitButton');
+            const doubleButton = document.getElementById('doubleButton');
+            if (hitButton) hitButton.disabled = true;
+            if (doubleButton) doubleButton.disabled = true;
+            
+            // Don't change local gameState before backend call - let backend handle state transitions
+            // Only update UI to show we're processing
+            updateGameStatus('Processing...');
+            
+            try {
+                // Call backend via gRPC-Web (backend will handle state transition to dealer_turn)
+                const result = await callBlackjackService('Stand', {});
+                
+                // Check if backend indicates no active game state
+                const gameStatus = result.gameStatus || result.game_status || 'unknown';
+                let gameResult = result.result || 'unknown';
+                
+                if (gameStatus === 'no_state' || gameResult === 'no_active_game') {
+                    console.warn('[Blackjack] Backend returned no active game state - resetting to waiting state');
+                    gameState = 'waiting';
+                    // Clear cards if they exist
+                    const playerCardsEl = document.getElementById('playerCards');
+                    const dealerCardsEl = document.getElementById('dealerCards');
+                    if (playerCardsEl) playerCardsEl.innerHTML = '';
+                    if (dealerCardsEl) dealerCardsEl.innerHTML = '';
+                    updateScores(0, 0);
+                    updateGameStatus('Place your bet to start playing!');
+                    updateActionButtons();
+                    return; // Exit early, don't process as a normal game result
+                }
+                
+                // Update local state based on backend response
+                if (gameStatus && gameStatus !== 'no_state') {
+                    gameState = gameStatus;
+                } else {
+                    gameState = 'dealer_turn'; // Default if not provided
+                }
+                currentGameState = result;
+                
+                // Update balance from response
+                if (result.newBalance !== undefined) {
+                    document.getElementById('balanceDisplay').textContent = `$${result.newBalance}`;
+                    localStorage.setItem('vegasBalance', String(result.newBalance));
+                }
+                
+                // Reveal dealer's hidden card and show all dealer cards
+                await revealDealerCard();
+                
+                // Render dealer's final hand (handle both formats)
+                const dealerFinalHand = result.dealerFinalHand || result.dealer_final_hand;
+                if (dealerFinalHand) {
+                    // Clear and re-render dealer cards
+                    document.getElementById('dealerCards').innerHTML = '';
+                    for (const card of dealerFinalHand) {
+                        addCardToHand('dealer', card);
+                    }
+                }
+                
+                // Update scores from backend (handle both formats)
+                const playerScore = result.playerScore !== undefined ? result.playerScore : (result.player_score || 0);
+                const dealerScore = result.dealerScore !== undefined ? result.dealerScore : (result.dealer_score || 0);
+                updateScores(playerScore, dealerScore);
+                
+                // Determine result message (gameResult was already declared above)
+                gameState = 'finished';
+                // Update gameResult if result changed (it was declared as let above)
+                if (result.result && result.result !== 'no_active_game') {
+                    gameResult = result.result;
+                }
+                let message = '';
+                if (gameResult === 'win') {
+                    message = dealerScore > 21 ? 'Dealer busts! You win!' : 'You win!';
+                } else if (gameResult === 'push') {
+                    message = 'Push! Tie game.';
+                } else {
+                    message = 'Dealer wins.';
+                }
+                
+                // Apply cheat boost if active and losing (client-side cheat logic)
+                let finalPayout = result.payout || 0;
+                if (cheatState.active && gameResult === 'lose') {
+                    const cheat = cheatMethods[cheatState.active];
+                    if (Math.random() * 100 < cheat.winBoost) {
+                        finalPayout = currentBet * 2;
+                        message = `🎯 ${cheat.name} Activated! You win!`;
+                        
+                        // Show cheat activation message
+                        const cheatMsg = document.createElement('div');
+                        cheatMsg.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 text-2xl font-bold text-red-400 z-50 animate-pulse';
+                        cheatMsg.textContent = `🎯 ${cheat.name} Activated!`;
+                        document.body.appendChild(cheatMsg);
+                        setTimeout(() => cheatMsg.remove(), 3000);
+                    }
+                }
+                
+                // Handle game end
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                handleGameEnd(gameResult, message, finalPayout);
+            } catch (error) {
+                console.error('Error standing:', error);
+                // For "No active hand" cases, treat this as a benign state-sync issue
+                // (e.g. extra Stand after game already finished) and avoid noisy UI errors.
+                if (error.message && error.message.includes('No active hand')) {
+                    console.warn('[Blackjack] Stand failed with "No active hand" - treating as finished and resetting to waiting state.');
+                    gameState = 'waiting';
+                    // Clear cards if they exist
+                    const playerCardsEl = document.getElementById('playerCards');
+                    const dealerCardsEl = document.getElementById('dealerCards');
+                    if (playerCardsEl) playerCardsEl.innerHTML = '';
+                    if (dealerCardsEl) dealerCardsEl.innerHTML = '';
+                    updateScores(0, 0);
+                    // Reset status message
+                    updateGameStatus('Place your bet to start playing!');
+                } else {
+                    // Only show a visible error notification for unexpected failures
+                    showNotification(`Error: ${error.message}`, 'error');
+                    // For other errors, try to revert to playing state if we were in playing state
+                    // But only if we still have cards
+                    const playerCardsEl = document.getElementById('playerCards');
+                    if (playerCardsEl && playerCardsEl.children.length > 0) {
+                        gameState = 'playing'; // Revert to playing state on error if cards still exist
+                        console.log('[Blackjack] Reverted to playing state after error');
+                    } else {
+                        gameState = 'waiting'; // No cards, reset to waiting
+                        console.log('[Blackjack] No cards found, reset to waiting state');
+                    }
+                }
+                updateActionButtons();
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
             }
         }
         
         async function playerDouble() {
+<<<<<<< HEAD
             if (gameState !== 'playing' || playerHand.length !== 2) return;
             
             const currentBalance = parseInt((document.getElementById('balanceDisplay').textContent || '0').replace(/[^0-9]/g, '')) || 0;
+=======
+            if (gameState !== 'playing') {
+                console.log('Cannot double: game not in playing state. Current state:', gameState);
+                showNotification('No active hand. Please deal cards first.', 'error');
+                return;
+            }
+            
+            // Check if we have an active hand by verifying player cards exist
+            const playerCardsEl = document.getElementById('playerCards');
+            const domCardCount = playerCardsEl ? playerCardsEl.children.length : 0;
+            const variableCardCount = playerHand ? playerHand.length : 0;
+            
+            console.log(`[Blackjack] Double down check: DOM cards=${domCardCount}, variable cards=${variableCardCount}, gameState=${gameState}`);
+            
+            if (!playerCardsEl || domCardCount === 0) {
+                console.log('Cannot double: no player cards found in DOM');
+                showNotification('No active hand. Please deal cards first.', 'error');
+                gameState = 'waiting';
+                updateActionButtons();
+                return;
+            }
+            
+            // Double down requires exactly 2 cards
+            if (domCardCount !== 2) {
+                console.log(`Cannot double: player has ${domCardCount} cards, need exactly 2`);
+                showNotification('Double down is only available with exactly 2 cards.', 'error');
+                return;
+            }
+
+            const username = localStorage.getItem('vegas.username') || localStorage.getItem('vegasUser') || 'Anonymous';
+            const currentBalance = parseInt((document.getElementById('balanceDisplay').textContent || '0').replace(/[^0-9]/g, '')) || 0;
+
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
             if (currentBalance < currentBet) {
                 showNotification('Insufficient balance to double!', 'error');
                 return;
             }
             
+<<<<<<< HEAD
             // Deduct additional bet amount
             const newBalance = currentBalance - currentBet;
             localStorage.setItem('vegasBalance', String(newBalance));
@@ -1394,6 +1866,175 @@
                 // Auto-stand after double
                 updateGameStatus('Doubled down! Standing automatically...');
                 setTimeout(() => playerStand(), 1000);
+=======
+            // Disable button immediately to prevent double-clicks
+            const doubleButton = document.getElementById('doubleButton');
+            if (doubleButton) {
+                doubleButton.disabled = true;
+            }
+            const hitButton = document.getElementById('hitButton');
+            const standButton = document.getElementById('standButton');
+            if (hitButton) hitButton.disabled = true;
+            if (standButton) standButton.disabled = true;
+            
+            updateGameStatus('Doubling down...');
+            
+            try {
+                // Call backend via gRPC-Web
+                const result = await callBlackjackService('Double', {});
+                currentGameState = result;
+                
+                // Update balance from response
+                if (result.newBalance !== undefined) {
+                    document.getElementById('balanceDisplay').textContent = `$${result.newBalance}`;
+                    localStorage.setItem('vegasBalance', String(result.newBalance));
+                }
+                
+                // Update bet display (doubled)
+                if (result.additionalBet) {
+                    currentBet = currentBet * 2;
+                    document.getElementById('currentBet').textContent = `$${currentBet}`;
+                }
+                
+                // Log the full response for debugging
+                console.log('[Blackjack] Double down response:', JSON.stringify(result));
+                
+                // Update playerHand array from backend response FIRST to get the complete hand
+                const updatedPlayerHand = result.playerHand || result.player_hand;
+                if (updatedPlayerHand && Array.isArray(updatedPlayerHand)) {
+                    playerHand = updatedPlayerHand;
+                    console.log('[Blackjack] Updated playerHand from backend:', playerHand);
+                    console.log('[Blackjack] Player hand now has', playerHand.length, 'cards');
+                    
+                    // Re-render the entire player hand to ensure all cards are displayed
+                    // This ensures we show all 3 cards (2 original + 1 new from double down)
+                    const playerCardsEl = document.getElementById('playerCards');
+                    if (playerCardsEl && playerHand.length > 0) {
+                        console.log('[Blackjack] Re-rendering all player cards from backend response');
+                        // Clear existing cards
+                        playerCardsEl.innerHTML = '';
+                        // Add all cards from the backend (should be 3 cards: 2 original + 1 new)
+                        for (let i = 0; i < playerHand.length; i++) {
+                            const card = playerHand[i];
+                            // Add a small delay between cards for visual effect
+                            if (i === playerHand.length - 1) {
+                                // Last card (the new one from double down) gets a longer delay
+                                await new Promise(resolve => setTimeout(resolve, 500));
+                            } else if (i > 0) {
+                                // Middle cards get a short delay
+                                await new Promise(resolve => setTimeout(resolve, 100));
+                            }
+                            addCardToHand('player', card);
+                        }
+                        console.log(`[Blackjack] ✅ Re-rendered ${playerHand.length} player cards`);
+                    }
+                } else {
+                    // Fallback: if player_hand is not available, try to add just the new card
+                    console.warn('[Blackjack] No player_hand in response, attempting to add new card only');
+                    let newCard = result.newCard || result.new_card;
+                    if (!newCard || !newCard.rank || !newCard.suit) {
+                        console.error('[Blackjack] No valid new card found in double down response');
+                    } else {
+                        console.log('[Blackjack] Adding new card to player hand:', newCard);
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        addCardToHand('player', newCard);
+                        console.log('[Blackjack] New card added to player hand');
+                    }
+                }
+                
+                // Ensure buttons are disabled after double down
+                updateActionButtons();
+                
+                // Handle both response formats
+                const gameStatus = result.gameStatus || result.game_status || 'playing';
+                const gameResult = result.result || 'unknown';
+                const playerScore = result.playerScore !== undefined ? result.playerScore : (result.player_score || 0);
+                const dealerScore = result.dealerScore !== undefined ? result.dealerScore : (result.dealer_score || 0);
+                const payout = result.payout || 0;
+                const additionalBet = result.additionalBet || result.additional_bet;
+                
+                console.log('[Blackjack] Double down game state:', {
+                    gameStatus,
+                    gameResult,
+                    playerScore,
+                    dealerScore,
+                    payout,
+                    additionalBet
+                });
+                
+                // If game is finished (busted), show result immediately
+                if (gameStatus === 'finished' && gameResult === 'bust') {
+                    console.log('[Blackjack] Player busted after double down');
+                    gameState = 'finished';
+                    updateScores(playerScore, dealerScore);
+                    handleGameEnd('bust', 'Bust! You lose.', payout);
+                } else if (gameStatus === 'finished') {
+                    // Game finished (dealer played automatically after double)
+                    console.log('[Blackjack] Game finished after double down, showing dealer cards');
+                    gameState = 'finished';
+                    
+                    // Show dealer's final hand (handle both formats)
+                    const dealerFinalHand = result.dealerFinalHand || result.dealer_final_hand;
+                    console.log('[Blackjack] Dealer final hand:', dealerFinalHand);
+                    
+                    if (dealerFinalHand && Array.isArray(dealerFinalHand)) {
+                        const dealerCardsEl = document.getElementById('dealerCards');
+                        if (dealerCardsEl) {
+                            // Clear existing dealer cards (including hidden card)
+                            dealerCardsEl.innerHTML = '';
+                            // Add all dealer cards
+                            for (const card of dealerFinalHand) {
+                                addCardToHand('dealer', card);
+                            }
+                            console.log('[Blackjack] Dealer cards displayed');
+                        }
+                    } else {
+                        console.warn('[Blackjack] No dealer final hand in response');
+                    }
+                    
+                    updateScores(playerScore, dealerScore);
+                    
+                    let message = '';
+                    if (gameResult === 'win') {
+                        message = 'You win!';
+                    } else if (gameResult === 'push') {
+                        message = 'Push! Tie game.';
+                    } else {
+                        message = 'Dealer wins.';
+                    }
+                    
+                    console.log('[Blackjack] Game result:', gameResult, 'Message:', message);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    handleGameEnd(gameResult, message, payout);
+                } else {
+                    // Should not happen - double should always finish the game
+                    console.warn('[Blackjack] Double down did not finish game, gameStatus:', gameStatus);
+                    updateScores(playerScore, dealerScore);
+                    updateGameStatus('Standing automatically...');
+                    setTimeout(() => playerStand(), 1000);
+                }
+            } catch (error) {
+                console.error('Error doubling down:', error);
+                // For "invalid game state" errors, treat as a benign state-sync issue
+                if (error.message && error.message.includes('invalid game state')) {
+                    console.warn('[Blackjack] Double down failed with "invalid game state" - game may have already finished or state not saved yet');
+                    // Try to revert to playing state if we still have cards
+                    const playerCardsEl = document.getElementById('playerCards');
+                    if (playerCardsEl && playerCardsEl.children.length === 2) {
+                        gameState = 'playing'; // Revert to playing state on error if we still have 2 cards
+                        console.log('[Blackjack] Reverted to playing state after double down error');
+                        updateActionButtons();
+                    } else {
+                        gameState = 'waiting'; // No cards or wrong count, reset to waiting
+                        updateActionButtons();
+                    }
+                } else {
+                    // Only show a visible error notification for unexpected failures
+                    showNotification(`Error: ${error.message}`, 'error');
+                    // Re-enable buttons on error
+                    updateActionButtons();
+                }
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
             }
         }
         
@@ -1738,8 +2379,17 @@
                 case 'playing':
                     hitButton.disabled = false;
                     standButton.disabled = false;
+<<<<<<< HEAD
                     doubleButton.disabled = playerHand.length !== 2 || 
                         parseInt(localStorage.getItem('vegasBalance') || '0') < currentBet;
+=======
+                    // Check playerHand length from variable, or fallback to DOM count
+                    const playerCardsEl = document.getElementById('playerCards');
+                    const playerCardCount = playerHand.length || (playerCardsEl ? playerCardsEl.children.length : 0);
+                    const currentBalance = parseInt((document.getElementById('balanceDisplay').textContent || '0').replace(/[^0-9]/g, '')) || 0;
+                    // Double down is only allowed with exactly 2 cards and sufficient balance
+                    doubleButton.disabled = playerCardCount !== 2 || currentBalance < currentBet;
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
                     break;
                     
                 case 'dealer_turn':
@@ -1806,6 +2456,7 @@
             hintElement.textContent = hint || 'Analyze the situation carefully...';
         }
         
+<<<<<<< HEAD
         function calculateScore(hand) {
             let score = 0;
             let aces = 0;
@@ -1826,6 +2477,9 @@
             
             return score;
         }
+=======
+        // Duplicate calculateScore removed - backend handles all scoring
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
         
         async function addFunds() {
             const username = localStorage.getItem('vegas.username') || localStorage.getItem('vegasUser') || 'Anonymous';
@@ -1901,8 +2555,13 @@
             }
             updateBalanceDisplay();
             
+<<<<<<< HEAD
             // Initialize deck
             createDeck();
+=======
+            // Deck is managed by backend - no need to initialize on frontend
+            // createDeck(); // Removed - backend handles deck state
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
             
             updateActionButtons();
             updateStrategyHint();
@@ -1955,9 +2614,14 @@
         });
         
         // Socket event handlers
+<<<<<<< HEAD
         socket.on('connect', () => {
             console.log('🔌 Connected to blackjack game');
         });
+=======
+        // Socket.IO removed - using HTTP/gRPC architecture instead
+        // Socket event handlers no longer needed
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     </script>
 </body>
 </html>

@@ -4,11 +4,20 @@
 # Global configuration
 global:
   imageRegistry: hrexed/vegasapp
+<<<<<<< HEAD
   imageTag: "0.21"
+=======
+  imageTag: "0.39"
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
   imagePullPolicy: IfNotPresent
   namespace: vegas-casino
   # Set to false if you want to use an existing namespace
   createNamespace: true
+<<<<<<< HEAD
+=======
+  # Set to true for codespace deployment (uses NodePort and port-forward)
+  codespace: false
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
   
 # OpenTelemetry configuration
 opentelemetry:
@@ -86,6 +95,10 @@ frontend:
     ROULETTE_SERVICE_GRPC: "vegas-casino-roulette:50052"
     DICE_SERVICE_GRPC: "vegas-casino-dice:50053"
     BLACKJACK_SERVICE_GRPC: "vegas-casino-blackjack:50054"
+<<<<<<< HEAD
+=======
+    DASHBOARD_SERVICE_GRPC: "vegas-casino-dashboard:50055"
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     SCORING_SERVICE_URL: "http://vegas-casino-scoring:8085"  # Full URL to scoring service (http://service-name:port)
 
 # Slots service configuration
@@ -412,6 +425,10 @@ dashboard:
   service:
     type: ClusterIP
     port: 3001
+<<<<<<< HEAD
+=======
+    grpcPort: 50055
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
   replicaCount: 1
   resources:
     requests:
@@ -544,6 +561,17 @@ flagd:
         variants:
           "true": true
           "false": false
+<<<<<<< HEAD
+=======
+    # Casino-wide feature flags (not displayed in UI)
+    casino:
+      house-advantage:
+        state: "ENABLED"
+        defaultVariant: "false"
+        variants:
+          "true": true
+          "false": false
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 
 # Playwright automation service configuration
 playwright:
@@ -556,7 +584,11 @@ playwright:
   replicaCount: 1
   # Frontend URL - if not specified, defaults to internal service URL
   # Can be set to external URL (e.g., "http://vegas-casino.example.com") for external access
+<<<<<<< HEAD
   casinoUrl: "http://10.0.0.151"  # Empty = auto-detect from frontend service
+=======
+  casinoUrl: "http://vegas-casino-frontend.vegas-casino.svc.cluster.local:3000"  # Empty = auto-detect from frontend service
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
   userName: "PlaywrightUser"
   userEmail: "playwright@example.com"
   userCompany: "Dynatrace"

@@ -18,6 +18,10 @@ COPY services/dice/go/dice-service*.go ./
 COPY services/dice/go/opentelemetry.go ./
 COPY services/dice/go/featureflags.go ./
 COPY services/dice/go/scoring.go ./
+<<<<<<< HEAD
+=======
+COPY services/dice/go/redis.go ./
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 RUN go mod tidy
 
 # Copy proto files and generate Go code
@@ -30,8 +34,13 @@ RUN mkdir -p proto && \
 
 # Source code already copied above for go mod tidy
 
+<<<<<<< HEAD
 # Build the application (only gRPC version, not the HTTP-only dice-service.go)
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o dice-service-grpc dice-service-grpc.go opentelemetry.go featureflags.go scoring.go
+=======
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o dice-service-grpc dice-service-grpc.go opentelemetry.go featureflags.go scoring.go redis.go
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 
 # Runtime stage
 FROM alpine:latest

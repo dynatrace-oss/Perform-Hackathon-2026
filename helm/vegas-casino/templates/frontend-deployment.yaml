@@ -98,6 +98,8 @@ spec:
           value: "{{ include "vegas-casino.fullname" . }}-dice:{{ .Values.dice.service.grpcPort }}"
         - name: BLACKJACK_SERVICE_GRPC
           value: "{{ include "vegas-casino.fullname" . }}-blackjack:{{ .Values.blackjack.service.grpcPort }}"
+        - name: DASHBOARD_SERVICE_GRPC
+          value: "{{ include "vegas-casino.fullname" . }}-dashboard:{{ .Values.dashboard.service.grpcPort }}"
         # HTTP service endpoints (for fallback when gRPC is not available)
         - name: SLOTS_SERVICE_URL
           value: "http://{{ include "vegas-casino.fullname" . }}-slots:{{ .Values.slots.service.httpPort }}"

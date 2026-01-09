@@ -8,7 +8,12 @@ const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumenta
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-otlp-grpc');
+<<<<<<< HEAD
 const { trace } = require('@opentelemetry/api');
+=======
+const { trace, propagation } = require('@opentelemetry/api');
+const { W3CTraceContextPropagator } = require('@opentelemetry/core');
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 
 // Initialize OpenTelemetry SDK
 function initializeTelemetry(serviceName, serviceMetadata = {}) {
@@ -71,8 +76,66 @@ function initializeTelemetry(serviceName, serviceMetadata = {}) {
     ],
   });
 
+<<<<<<< HEAD
   sdk.start();
   console.log(`[OpenTelemetry] Initialized for service: ${serviceName}`);
+=======
+  // Configure W3C TraceContext propagator for trace context propagation
+  propagation.setGlobalPropagator(new W3CTraceContextPropagator());
+
+  // Explicitly start the SDK so that auto-instrumentations and exporters are active.
+  // Handle both Promise-returning and synchronous start() methods
+  try {
+    const startResult = sdk.start();
+    if (startResult && typeof startResult.then === 'function') {
+      // start() returns a Promise
+      startResult
+        .then(() => {
+          console.log(
+            `[OpenTelemetry] SDK started for service: ${serviceName} with W3C TraceContext propagator (endpoint: ${
+              endpoint || 'default'
+            })`
+          );
+        })
+        .catch((error) => {
+          console.error('[OpenTelemetry] Failed to start SDK', error);
+        });
+    } else {
+      // start() is synchronous or doesn't return a Promise
+      console.log(
+        `[OpenTelemetry] SDK initialized for service: ${serviceName} with W3C TraceContext propagator (endpoint: ${
+          endpoint || 'default'
+        })`
+      );
+    }
+  } catch (error) {
+    console.error('[OpenTelemetry] Error during SDK start:', error);
+  }
+
+  // Ensure spans are flushed on shutdown
+  const shutdown = () => {
+    try {
+      const shutdownResult = sdk.shutdown();
+      if (shutdownResult && typeof shutdownResult.then === 'function') {
+        // shutdown() returns a Promise
+        shutdownResult
+          .then(() => console.log('[OpenTelemetry] SDK shutdown complete'))
+          .catch((err) => console.error('[OpenTelemetry] Error during SDK shutdown', err))
+          .finally(() => {
+            // Do not force-exit here; let the process decide.
+          });
+      } else {
+        // shutdown() is synchronous
+        console.log('[OpenTelemetry] SDK shutdown initiated');
+      }
+    } catch (err) {
+      console.error('[OpenTelemetry] Error during SDK shutdown', err);
+    }
+  };
+
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 
   return trace.getTracer(serviceName);
 }

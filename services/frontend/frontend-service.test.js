@@ -76,3 +76,9 @@ describe('Frontend Service', () => {
 
 
 
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)

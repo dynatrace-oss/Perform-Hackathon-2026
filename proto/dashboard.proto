@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+package dashboard;
+
+option go_package = "vegas-casino/proto/dashboard";
+
+// Dashboard Service
+service DashboardService {
+  // Health check
+  rpc Health(HealthRequest) returns (HealthResponse);
+  
+  // Get dashboard stats for a specific game
+  rpc GetDashboardStats(GetDashboardStatsRequest) returns (GetDashboardStatsResponse);
+  
+  // Get dashboard stats for all games
+  rpc GetAllDashboardStats(GetAllDashboardStatsRequest) returns (GetAllDashboardStatsResponse);
+  
+  // Get leaderboard for a specific game
+  rpc GetLeaderboard(GetLeaderboardRequest) returns (GetLeaderboardResponse);
+  
+  // Get game results for a specific game
+  rpc GetGameResults(GetGameResultsRequest) returns (GetGameResultsResponse);
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;
+  string service = 2;
+  map<string, string> metadata = 3;
+}
+
+message GetDashboardStatsRequest {
+  string game = 1;
+}
+
+message GetDashboardStatsResponse {
+  string game = 1;
+  DashboardStats stats = 2;
+}
+
+message GetAllDashboardStatsRequest {}
+
+message GetAllDashboardStatsResponse {
+  repeated DashboardStats stats = 1;
+}
+
+message GetLeaderboardRequest {
+  string game = 1;
+  int32 limit = 2;
+}
+
+message GetLeaderboardResponse {
+  string game = 1;
+  repeated PlayerScore leaderboard = 2;
+}
+
+message GetGameResultsRequest {
+  string game = 1;
+  int32 limit = 2;
+}
+
+message GetGameResultsResponse {
+  string game = 1;
+  repeated GameResult results = 2;
+}
+
+message DashboardStats {
+  string game = 1;
+  int64 total_games = 2;
+  int64 total_wins = 3;
+  int64 total_losses = 4;
+  double total_bet_amount = 5;
+  double total_payout = 6;
+  repeated PlayerScore top_players = 7;
+  repeated GameResult recent_games = 8;
+}
+
+message PlayerScore {
+  string username = 1;
+  string role = 2;
+  string game = 3;
+  double score = 4;
+  string metadata = 5;
+  double initial_bet = 6;  // Initial bet amount for this game
+  double winnings = 7;     // Total winnings (payout) for this game
+  int64 rank = 8;          // Player rank (1 = top player)
+}
+
+message GameResult {
+  string username = 1;
+  string game = 2;
+  string action = 3;
+  double bet_amount = 4;
+  double payout = 5;
+  bool win = 6;
+  string result = 7;
+  string game_data = 8;
+  string metadata = 9;
+  string timestamp = 10;
+}

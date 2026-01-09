@@ -224,4 +224,23 @@ spec:
           "false": false
           {{- end }}
         targeting: {}
+      # Casino-wide feature flag: House Advantage Mode
+      # When enabled, reduces win probability across all games to protect casino profits
+      # This flag is NOT displayed in the UI and should only be enabled via FeatureFlag CRD
+      "casino.house-advantage":
+        {{- $casino := .Values.flagd.casino | default dict }}
+        {{- $flag := index $casino "house-advantage" | default dict }}
+        {{- $variants := $flag.variants | default dict }}
+        state: {{ $flag.state | default "ENABLED" }}
+        defaultVariant: {{ $flag.defaultVariant | default "false" | quote }}
+        variants:
+          {{- if $variants }}
+          {{- range $key, $value := $variants }}
+          {{ $key | quote }}: {{ $value }}
+          {{- end }}
+          {{- else }}
+          "true": true
+          "false": false
+          {{- end }}
+        targeting: {}
 {{- end }}

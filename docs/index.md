@@ -59,3 +59,6 @@ kubectl apply -f helm/vegas-casino/templates/k6-deployment.yaml
 
 
 
+
+
+

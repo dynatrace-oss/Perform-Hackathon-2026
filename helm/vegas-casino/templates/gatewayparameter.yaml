@@ -1,0 +1,11 @@
+{{- if .Values.global.codespace }}
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayParameters
+metadata:
+  name: fixed-nodeport-params
+  namespace: kgateway-system
+spec:
+  kube:
+    service:
+      type: NodePort
+{{- end }}

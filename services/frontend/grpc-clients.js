@@ -12,7 +12,12 @@ const PROTO_PATH = {
   slots: './proto/slots.proto',
   roulette: './proto/roulette.proto',
   dice: './proto/dice.proto',
+<<<<<<< HEAD
   blackjack: './proto/blackjack.proto'
+=======
+  blackjack: './proto/blackjack.proto',
+  dashboard: './proto/dashboard.proto'
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 };
 
 function loadProto(protoPath) {
@@ -38,7 +43,12 @@ function createClient() {
     slots: process.env.SLOTS_SERVICE_GRPC || 'localhost:50051',
     roulette: process.env.ROULETTE_SERVICE_GRPC || 'localhost:50052',
     dice: process.env.DICE_SERVICE_GRPC || 'localhost:50053',
+<<<<<<< HEAD
     blackjack: process.env.BLACKJACK_SERVICE_GRPC || 'localhost:50054'
+=======
+    blackjack: process.env.BLACKJACK_SERVICE_GRPC || 'localhost:50054',
+    dashboard: process.env.DASHBOARD_SERVICE_GRPC || 'localhost:50055'
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
   };
 
   const clients = {};
@@ -107,6 +117,25 @@ function createClient() {
     clients.blackjack = createMockClient('blackjack');
   }
 
+<<<<<<< HEAD
+=======
+  // Create Dashboard client
+  try {
+    const dashboardProto = loadProto(PROTO_PATH.dashboard);
+    const rawClient = new dashboardProto.dashboard.DashboardService(
+      endpoints.dashboard,
+      grpc.credentials.createInsecure()
+    );
+    clients.dashboard = enhanceClient(rawClient, 'dashboard');
+    console.log(`✅ Dashboard gRPC client connected to ${endpoints.dashboard}`);
+  } catch (error) {
+    console.error(`❌ Failed to create Dashboard gRPC client to ${endpoints.dashboard}:`, error.message);
+    console.error('Error stack:', error.stack);
+    console.warn('⚠️  Falling back to HTTP mock client for dashboard');
+    clients.dashboard = createMockClient('dashboard');
+  }
+
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
   return clients;
 }
 
@@ -123,12 +152,28 @@ function promisifyGrpcCall(client, method, request) {
     
     // Get current trace context
     const activeContext = context.active();
+<<<<<<< HEAD
+=======
+    const activeSpan = trace.getActiveSpan(activeContext);
+    
+    // Log trace context for debugging
+    if (activeSpan) {
+      const spanContext = activeSpan.spanContext();
+      console.log(`[gRPC] Making ${method} call - Trace context: traceId=${spanContext.traceId}, spanId=${spanContext.spanId}`);
+    } else {
+      console.log(`[gRPC] Making ${method} call - No active span in context`);
+    }
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     
     // Inject trace context into gRPC metadata
     const metadata = new grpc.Metadata();
     const carrier = {
       set: (key, value) => {
         metadata.add(key, String(value));
+<<<<<<< HEAD
+=======
+        console.log(`[gRPC] Injected trace context header: ${key}=${value.substring(0, 50)}...`);
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
       }
     };
     propagation.inject(activeContext, carrier);
@@ -199,11 +244,15 @@ function enhanceClient(client, serviceName) {
       return promisifyGrpcCall(client, 'Health', {});
     },
 
+<<<<<<< HEAD
     // Get game assets
     getGameAssets: async (request) => {
       const req = { asset_type: request.assetType || 'all' };
       return promisifyGrpcCall(client, 'GetGameAssets', req);
     }
+=======
+    // Deprecated: getGameAssets removed - games are now static HTML files
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
   };
 
   // Add service-specific methods
@@ -267,6 +316,22 @@ function enhanceClient(client, serviceName) {
       };
       return promisifyGrpcCall(client, 'Double', req);
     };
+<<<<<<< HEAD
+=======
+  } else if (serviceName === 'dashboard') {
+    // Dashboard analytics service
+    enhanced.getDashboardStats = async (request) => {
+      const req = {
+        game: request.game || 'all',
+      };
+      return promisifyGrpcCall(client, 'GetDashboardStats', req);
+    };
+
+    enhanced.getAllDashboardStats = async () => {
+      const req = {};
+      return promisifyGrpcCall(client, 'GetAllDashboardStats', req);
+    };
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
   }
 
   return enhanced;
@@ -276,6 +341,7 @@ function enhanceClient(client, serviceName) {
 function createMockClient(gameType) {
   return {
     health: async () => ({ status: 'ok', service: gameType }),
+<<<<<<< HEAD
     getGameAssets: async (request) => {
       // Fallback to HTTP API
       const http = require('http');
@@ -303,6 +369,9 @@ function createMockClient(gameType) {
         req.end();
       });
     },
+=======
+    // Deprecated: getGameAssets removed - games are now static HTML files
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     // Mock game methods that fall back to HTTP
     spin: async (request) => {
       const http = require('http');

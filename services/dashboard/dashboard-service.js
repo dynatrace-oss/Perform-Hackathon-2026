@@ -532,10 +532,22 @@ app.get('/dashboard', (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 // Start server
 app.listen(PORT, () => {
   console.log(`📊 Dashboard service listening on port ${PORT}`);
   console.log(`📊 Scoring service URL: ${SCORING_SERVICE_URL}`);
 });
 
+=======
+// Start HTTP server
+app.listen(PORT, () => {
+  console.log(`📊 Dashboard HTTP server listening on port ${PORT}`);
+  console.log(`📊 Scoring service URL: ${SCORING_SERVICE_URL}`);
+});
+
+// Start gRPC server
+require('./dashboard-service-grpc');
+
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 

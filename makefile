@@ -11,7 +11,7 @@
 
 # Configuration
 REGISTRY ?= hrexed/vegasapp
-IMAGE_TAG ?= 0.21
+IMAGE_TAG ?= 0.39
 DOCKER_REGISTRY ?= $(REGISTRY)
 PLATFORM ?= linux/amd64
 BUILDER ?= podman

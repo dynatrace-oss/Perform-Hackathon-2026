@@ -3,6 +3,10 @@ module vegas-dice-service
 go 1.24
 
 require (
+<<<<<<< HEAD
+=======
+	github.com/redis/go-redis/v9 v9.3.0
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 	go.opentelemetry.io/otel v1.21.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.21.0
 	go.opentelemetry.io/otel/sdk v1.21.0

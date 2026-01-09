@@ -14,10 +14,15 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    - port: {{ .Values.dashboard.service.grpcPort }}
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
   selector:
     {{- include "vegas-casino.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: dashboard
 {{- end }}
+
 
 
 

@@ -10,7 +10,14 @@ resources:
   - roulette-deployment.yaml
   - dice-deployment.yaml
   - blackjack-deployment.yaml
+<<<<<<< HEAD
   - gateway-deployment.yaml
+=======
+  - frontend-deployment.yaml
+  - gateway-deployment.yaml
+  - scoring-deployment.yaml
+  - dashboard-deployment.yaml
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
   - ingress.yaml
 
 commonLabels:

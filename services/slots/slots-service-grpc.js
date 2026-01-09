@@ -9,7 +9,11 @@ const path = require('path');
 const { createService } = require('./common/service-runner');
 const { trace, context, propagation } = require('@opentelemetry/api');
 const { initializeOpenFeature, getFeatureFlag } = require('./common/openfeature');
+<<<<<<< HEAD
 const { initializeRedis, set, get } = require('./common/redis');
+=======
+const { initializeRedis, set, get, del } = require('./common/redis');
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 const { recordGameResult, recordScore } = require('./common/scoring');
 const Logger = require('./common/logger');
 
@@ -61,6 +65,7 @@ function extractMetadata(metadata) {
   return carrier;
 }
 
+<<<<<<< HEAD
 // Game logic from slots-service.js
 function calculateWin(result, betAmount) {
   const symbols = ['🍒', '🍋', '🍊', '🔔', '⭐', '💎', '7️⃣'];
@@ -86,6 +91,139 @@ function calculateWin(result, betAmount) {
   else if (result[0] === result[1] || result[1] === result[2]) winType = 'near-miss';
 
   return { win, winAmount, multiplier, winType };
+=======
+// Redis key prefix for game state
+const GAME_STATE_KEY_PREFIX = 'slots:game:';
+const GAME_STATE_TTL = 3600; // 1 hour
+
+// Helper functions for Redis game state management
+async function getGameState(username) {
+  const key = `${GAME_STATE_KEY_PREFIX}${username}`;
+  const stateJson = await get(key);
+  if (!stateJson) {
+    return null;
+  }
+  try {
+    return JSON.parse(stateJson);
+  } catch (error) {
+    console.error('Error parsing game state from Redis:', error);
+    return null;
+  }
+}
+
+async function saveGameState(username, gameState) {
+  const key = `${GAME_STATE_KEY_PREFIX}${username}`;
+  const stateJson = JSON.stringify(gameState);
+  return await set(key, stateJson, GAME_STATE_TTL);
+}
+
+async function deleteGameState(username) {
+  const { del } = require('./common/redis');
+  const key = `${GAME_STATE_KEY_PREFIX}${username}`;
+  return await del(key);
+}
+
+// Game logic - using Dynatrace symbols
+const icons = ['dynatrace', 'smartscape', 'application', 'database', 'server', 'cloud', 'shield'];
+
+// Payout Matrix
+const payoutMatrix = {
+  // Triple Matches - ALL 10x Bet Amount (6 Symbols)
+  triple: {
+    'smartscape': 10,
+    'application': 10,
+    'database': 10,
+    'server': 10,
+    'cloud': 10,
+    'shield': 10
+  },
+  // Double Matches - ALL 5x Bet Amount (6 Symbols)
+  double: {
+    'smartscape': 5,
+    'application': 5,
+    'database': 5,
+    'server': 5,
+    'cloud': 5,
+    'shield': 5
+  },
+  // Special Combinations
+  special: {
+    'dynatrace,dynatrace,dynatrace': 50   // DYNATRACE JACKPOT! (three logos = 50x)
+  }
+};
+
+function calculateWin(result, betAmount) {
+  let winAmount = 0;
+  let multiplier = 0;
+  let winType = 'none';
+  let description = '';
+  
+  // Check for special combinations first
+  const sortedResult = result.slice().sort().join(',');
+  if (payoutMatrix.special[sortedResult]) {
+    multiplier = payoutMatrix.special[sortedResult];
+    winAmount = betAmount * multiplier;
+    winType = 'special';
+    description = getSpecialComboName(sortedResult);
+  } else {
+    // Check for matches
+    const counts = result.reduce((m, s) => (m[s] = (m[s] || 0) + 1, m), {});
+    
+    // Triple match
+    const tripleIcon = Object.keys(counts).find(icon => counts[icon] === 3);
+    if (tripleIcon && payoutMatrix.triple[tripleIcon]) {
+      multiplier = payoutMatrix.triple[tripleIcon];
+      winAmount = betAmount * multiplier;
+      winType = 'triple';
+      description = getTripleName(tripleIcon);
+    } else {
+      // Double match
+      const doubleIcon = Object.keys(counts).find(icon => counts[icon] === 2);
+      if (doubleIcon && payoutMatrix.double[doubleIcon]) {
+        multiplier = payoutMatrix.double[doubleIcon];
+        winAmount = betAmount * multiplier;
+        winType = 'double';
+        description = getDoubleName(doubleIcon);
+      }
+    }
+  }
+  
+  const win = winAmount > 0;
+  
+  return { win, winAmount, multiplier, winType, description };
+}
+
+// Helper functions for win descriptions
+function getSpecialComboName(combo) {
+  const names = {
+    'dynatrace,dynatrace,dynatrace': 'DYNATRACE JACKPOT!'
+  };
+  return names[combo] || 'SPECIAL COMBO!';
+}
+
+function getTripleName(icon) {
+  const names = {
+    'smartscape': 'TOPOLOGY MASTERY!',
+    'application': 'APM BREAKTHROUGH!',
+    'database': 'DATA OBSERVABILITY CHAMPION!',
+    'server': 'INFRASTRUCTURE MASTERY!',
+    'cloud': 'CLOUD-NATIVE SUCCESS!',
+    'shield': 'SECURITY OBSERVABILITY EXPERT!'
+  };
+  return names[icon] || 'TRIPLE WIN!';
+}
+
+function getDoubleName(icon) {
+  const names = {
+    'smartscape': 'Topology Discovery!',
+    'application': 'APM Insight!',
+    'database': 'Data Connection!',
+    'server': 'Infrastructure Pair!',
+    'cloud': 'Cloud Duo!',
+    'shield': 'Security Alliance!'
+  };
+  return names[icon] || 'Double Match!';
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 }
 
 // gRPC Service Implementation
@@ -161,6 +299,7 @@ class SlotsServiceImpl {
       return callback({ code: grpc.status.INVALID_ARGUMENT, message: `Bet amount must be between ${minBet} and ${maxBet}` });
     }
 
+<<<<<<< HEAD
     const symbols = ['🍒', '🍋', '🍊', '🔔', '⭐', '💎', '7️⃣'];
     let result = [
       symbols[Math.floor(Math.random() * symbols.length)],
@@ -177,6 +316,77 @@ class SlotsServiceImpl {
     }
 
     const { win, winAmount, multiplier, winType } = calculateWin(result, betAmount);
+=======
+    // Check house advantage feature flag
+    const houseAdvantageEnabled = await getFeatureFlag('casino.house-advantage', false);
+    
+    // Add feature flag to span
+    if (houseAdvantageEnabled) {
+      span.setAttribute('feature_flag.house_advantage', true);
+      console.log(`[Slots] 🏠 House advantage mode enabled - reducing win probability`);
+    }
+    
+    // Generate random result using Dynatrace symbols
+    let result = Array.from({ length: 3 }, () => icons[Math.floor(Math.random() * icons.length)]);
+    
+    let cheatBoosted = false;
+    
+    // Apply cheat logic
+    if (cheatActive) {
+      const megaSymbols = ['dynatrace', 'smartscape', 'application'];
+      const premiumSymbols = ['database', 'server', 'cloud'];
+      const standardSymbols = ['shield'];
+      
+      if (cheatType === 'backdoor' && Math.random() < 0.05) {
+        // Backdoor has 5% chance for mega special combo
+        const megaCombos = [
+          ['smartscape', 'application'],
+          ['database', 'shield']
+        ];
+        result = megaCombos[Math.floor(Math.random() * megaCombos.length)];
+        cheatBoosted = true;
+      } else if ((cheatType === 'timing' || cheatType === 'backdoor') && Math.random() < 0.15) {
+        // Premium cheats have 15% chance for mega symbols triple
+        const winIcon = megaSymbols[Math.floor(Math.random() * megaSymbols.length)];
+        result = [winIcon, winIcon, winIcon];
+        cheatBoosted = true;
+      } else if (Math.random() < 0.3) {
+        // 30% chance for premium triple when cheating
+        const winIcon = Math.random() < 0.4 ? 
+          megaSymbols[Math.floor(Math.random() * megaSymbols.length)] :
+          premiumSymbols[Math.floor(Math.random() * premiumSymbols.length)];
+        result = [winIcon, winIcon, winIcon];
+        cheatBoosted = true;
+      } else {
+        // Double match with bias toward higher value symbols
+        const winIcon = Math.random() < 0.6 ? 
+          [...megaSymbols, ...premiumSymbols][Math.floor(Math.random() * 6)] :
+          standardSymbols[0];
+        result[0] = winIcon;
+        result[1] = winIcon;
+        // Leave third as random for double
+        cheatBoosted = true;
+      }
+    }
+
+    let { win, winAmount, multiplier, winType, description } = calculateWin(result, betAmount);
+    
+    // Apply house advantage if enabled and player would win
+    // This reduces win probability by 25% when the casino is losing too much money
+    if (win && winAmount > 0 && houseAdvantageEnabled) {
+      // 25% chance to convert a win into a loss
+      if (Math.random() < 0.25) {
+        win = false;
+        winAmount = 0;
+        multiplier = 0;
+        winType = 'none';
+        description = 'Better luck next time!';
+        // Force a non-winning result by ensuring no matches
+        result = [icons[0], icons[1], icons[2]]; // Different symbols
+        console.log(`[Slots] 🏠 House advantage applied: win converted to loss`);
+      }
+    }
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 
     // Log game end
     logger.logGameEnd('slots', Username, winType, winAmount, win, {
@@ -187,22 +397,44 @@ class SlotsServiceImpl {
     });
 
     // Store game state in Redis
+<<<<<<< HEAD
     const gameStateKey = `slots:${Username}:state`;
     await set(gameStateKey, JSON.stringify({
+=======
+    const gameState = {
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
       lastSpin: new Date().toISOString(),
       lastResult: result,
       lastWin: win,
       lastWinAmount: winAmount,
+<<<<<<< HEAD
     }), 3600); // Expire after 1 hour
 
     // Record game result in scoring service (async, don't block response)
+=======
+      betAmount: betAmount,
+      multiplier: multiplier,
+      winType: winType,
+      description: description,
+      cheatActive: cheatActive,
+      cheatType: cheatType,
+      cheatBoosted: cheatBoosted
+    };
+    await saveGameState(Username, gameState);
+
+    // Record game result in scoring service for ALL games (wins and losses) to track total bets
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
     recordGameResult({
       username: Username,
       game: 'slots',
       action: 'spin',
       betAmount: betAmount,
       payout: winAmount,
+<<<<<<< HEAD
       win: win,
+=======
+      win: win && winAmount > 0,
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
       result: win ? 'win' : 'lose',
       gameData: {
         result: result,
@@ -233,7 +465,11 @@ class SlotsServiceImpl {
       bet_amount: betAmount,
       multiplier: multiplier,
       win_type: winType,
+<<<<<<< HEAD
       description: win ? `You won ${winAmount}!` : 'Better luck next time!',
+=======
+      description: description || (win ? `You won ${winAmount}!` : 'Better luck next time!'),
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
       timestamp: new Date().toISOString(),
       cheat_active: cheatActive,
       cheat_type: cheatType,

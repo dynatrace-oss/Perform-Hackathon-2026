@@ -14,6 +14,16 @@ metadata:
   {{- end }}
 spec:
   gatewayClassName: {{ .Values.gatewayAPI.gateway.className }}
+<<<<<<< HEAD
+=======
+  {{- if .Values.global.codespace }}
+  infrastructure:
+    parametersRef:
+      name: fixed-nodeport-params
+      group: gateway.kgateway.dev
+      kind: GatewayParameters
+  {{- end }}
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
   listeners:
     {{- range .Values.gatewayAPI.gateway.listeners }}
     - name: {{ .name }}

@@ -55,6 +55,10 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+<<<<<<< HEAD
+=======
+  - Getting Started': getting-started.md
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
   - Overview:
     - Project Overview: overview/index.md
     - Hackathon Context: overview/hackathon.md
@@ -73,7 +77,13 @@ nav:
     - Deployment Overview: deployment/index.md
     - Helm Charts: deployment/helm.md
     - Kubernetes Manifests: deployment/manifests.md
+<<<<<<< HEAD
     - OpenFeature Operator: deployment/openfeature.md
+=======
+    - k8s/ vs Helm Comparison: deployment/k8s-vs-helm.md
+    - OpenFeature Operator: deployment/openfeature.md
+    - CI/CD and Releases: deployment/ci-cd.md
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
   - Contributing: contributing.md
 
 plugins:

@@ -10,6 +10,11 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.semconv.resource import ResourceAttributes
+<<<<<<< HEAD
+=======
+from opentelemetry.propagate import set_global_textmap
+from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 
 
 def initialize_telemetry(service_name, service_metadata=None):
@@ -49,6 +54,12 @@ def initialize_telemetry(service_name, service_metadata=None):
 
     # Set global tracer provider
     trace.set_tracer_provider(provider)
+<<<<<<< HEAD
+=======
+    
+    # Configure W3C TraceContext propagator for trace context propagation
+    set_global_textmap(TraceContextTextMapPropagator())
+>>>>>>> 808c574 (Prepare Perform Hackathon 2026: Update to OpenTelemetry v2 and various improvements)
 
     return trace.get_tracer(service_name)
 
