@@ -3,8 +3,8 @@ site_description: A microservices-based casino application designed for observab
 site_author: Vegas Casino Team
 site_url: https://vegas-casino.example.com
 
-repo_name: vegas-casino
-repo_url: https://github.com/vegas-casino/vegas-app
+repo_name: Perform-Hackathon-2026
+repo_url: https://github.com/dynatrace-oss/Perform-Hackathon-2026
 edit_uri: edit/main/docs/
 
 theme:
