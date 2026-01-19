@@ -29,35 +29,28 @@
 	},
 
 	// Install kind and run your setup scripts
-	"postCreateCommand": "bash -c 'chmod +x .devcontainer/post_create.sh &&  chmod +x /workspaces/${RepositoryName}/codespace/deployment.sh && .devcontainer/post_create.sh && /workspaces/${RepositoryName}/deployment.sh --clustername ${localEnv:NAME} --dtid ${localEnv:DT_ENVIRONMENT_ID} --dtingesttoken ${localEnv:DT_API_TOKEN} --dtoperatortoken ${localEnv:DT_OPERATOR_TOKEN} --environment ${localEnv:DT_ENVIRONMENT_TYPE} --oauthclientid ${OAUTH_CLIENT_ID} --oauthclientsecret ${OAUTH_CLIENT_SECRET} --oauthclienturn ${OAUTH_CLIENT_URN}'",
+	"postCreateCommand": "bash -c 'chmod +x .devcontainer/post_create.sh && chmd +x /workspaces/${RepositoryName}/codespace/configuration/init.sh  && chmod +x /workspaces/${RepositoryName}/codespace/deployment.sh && .devcontainer/post_create.sh && /workspaces/${RepositoryName}/codespace/configuration/init.sh && /workspaces/${RepositoryName}/deployment.sh ",
 
 	// Add recommended secrets
 	"secrets": {
 		"DT_ENVIRONMENT_ID": {
 			"description": "eg. abc12345 from https://abc12345.apps.dynatrace.com"
 		},
-		"DT_ENVIRONMENT_TYPE": {
-			"description": "live, sprint or dev. Leave blank for live. Defaults to live"
+		"DYNATRACE_ENVIRONMENT": {
+			"description": "Either `live`, `sprint` or `dev`. If unsure, use `live`"
 		},
-		"DT_API_TOKEN": {
-			"description": "Dynatrace API token with these permissions: `logs.ingest`, `metrics.ingest`, `openTelemetryTrace.ingest`, `events.ingest`"
-		},
-		"DT_OPERATOR_TOKEN": {
-			"description": "Dynatrace API token with these permissions: `Installer download`, `DataExport`, `settings.read`, `settings.write`,`entities.read`, `activeGateTokenManagement.create`"
-		},
-		
-		"NAME": {
-			"description": "Name of the environment"
-		},
-		"OAUTH_CLIENT_ID": {
-			"description": "Oauth client id"
-		},
-		"OAUTH_CLIENT_SECRET": {
-			"description": "Oauth client secret"
-		},
-		"OAUTH_CLIENT_URN": {
-			"description": "Oauth client urn"
-		}
+		"DYNATRACE_API_TOKEN": {
+			"description": "Dynatrace access token with these permissions: `apiTokens.read` & `apiTokens.write`"
+		  },
+		  "DYNATRACE_PLATFORM_TOKEN": {
+			"description": "Dynatrace platform token with these permissions: `davis-copilot:conversations:execute`"
+		  },
+		  "DYNATRACE_OAUTH_CLIENT_ID": {
+			"description": "Dynatrace OAuth client id. Needs these permissions: `automation:workflows:read`, `automation:workflows:write`, `document:documents:write`, `document:documents:read`, `document:documents:delete`, `app-engine:edge-connects:connect`, `app-engine:edge-connects:write`, `app-engine:edge-connects:read`, `app-engine:edge-connects:delete`, `oauth2:clients:manage`, `settings:objects:read`, `settings:objects:write`, `storage:events:write` ...etc"
+		  },
+		  "DYNATRACE_OAUTH_CLIENT_SECRET": {
+			"description": "Dynatrace OAuth client secret. See `DYNATRACE_OAUTH_CLIENT_ID` for permissions"
+		  }
 	
 	},
 

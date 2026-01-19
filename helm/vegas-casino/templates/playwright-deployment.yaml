@@ -23,6 +23,7 @@ spec:
       annotations:
         # Kyverno policy exception for Playwright (requires SYS_ADMIN for browser sandboxing)
         policies.kyverno.io/validation.disallow-capabilities: "skip"
+        dt.owner: 'vegas-casino-app'
     spec:
       # Playwright needs some privileges to run browsers
       securityContext:

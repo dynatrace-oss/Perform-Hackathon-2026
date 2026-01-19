@@ -20,6 +20,8 @@ spec:
         app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: redis
+      annotations:
+        dt.owner: 'vegas-casino-app'
     spec:
       {{- with .Values.podSecurityContext }}
       securityContext:

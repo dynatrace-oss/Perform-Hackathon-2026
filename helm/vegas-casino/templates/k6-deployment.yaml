@@ -23,6 +23,8 @@ spec:
         app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: k6
+      annotations:
+        dt.owner: 'vegas-casino-app'
     spec:
       {{- if .Values.k6.restartPolicy }}
       restartPolicy: {{ .Values.k6.restartPolicy }}

@@ -1,76 +1,118 @@
 --8<-- "snippets/tenant-id.md"
 
-## Gather Details: Create API Token
 
-This Workshop requires 2 API tokens:
-* One to deploy the Dynatrace Operator
-* One to ingest metrics, logs, traces and events
+## 1. Prepare Your Environment
 
-You have been invited to a Dynatrace tenant.
+The [GitHub Codespace](https://github.com/features/codespaces){target="_blank"}, you will create within this demo, will automatically set
+up a local Kubernetes cluster and deploy the necessary Dynatrace resources. To make this work, you'll need to provide
+the below credentials and settings.
 
-All the relevant applications are displayed on your welcome screen:
-<img src="..//images/home_dt.png" width="100%" alt="welcome" />
+- A [Dynatrace API token](https://docs.dynatrace.com/docs/dynatrace-api/basics/dynatrace-api-authentication#dynatrace-api-tokens-and-authentication){target="_blank"}
+to generate [other tokens used in this demo](https://github.com/Dynatrace/obslab-predictive-kubernetes-scaling/blob/main/dynatrace/tokens.tf){target="_blank"}. Permissions:
+    - `apiTokens.read`
+    - `apiTokens.write`
+- A [Dynatrace OAuth 2.0 client](https://docs.dynatrace.com/docs/platform-modules/automations/cloud-automation/setup-cloud-automation/authentication#client){target="_blank"}
+to deploy the workflows and notebook used in this demo. Permissions:
+    - `app-settings:objects:read` 
+    - `automation:workflows:write`
+    - `automation:workflows:read`
+    - `automation:workflows:run`  
+    - `document:documents:write`
+    - `document:documents:read`
+    - `document:documents:delete`
+    - `app-engine:edge-connects:connect`
+    - `app-engine:edge-connects:write`
+    - `app-engine:edge-connects:read`
+    - `app-engine:edge-connects:delete`
+    - `davis-copilot:conversations:execute`  
+    - `davis-copilot:nl2dql:execute` 
+    - `davis-copilot:dql2nl:execute`
+    - `davis:analyzers:read` 
+    - `davis:analyzers:execute` 
+    - `email:emails:send` 
+    - `document:documents:read` 
+    - `document:documents:write`
+    - `oauth2:clients:manage`
+    - `settings:objects:read`
+    - `settings:objects:write`
+    -  `storage:buckets:read` 
+    -  `storage:logs:read` 
+    -  `storage:metrics:read`
+    -  `storage:bizevents:read` 
+    -  `storage:spans:read` 
+    -  `storage:entities:read` 
+    -  `storage:events:read` 
+    -  `storage:security.events:read`
+    -  `storage:system:read` 
+    -  `storage:user.events:read` 
+    -  `storage:user.sessions:read`
+    -  `storage:smartscape:read` 
+    -  `storage:events:write` 
 
---8<-- "snippets/api-token.md"
+- A Dynatrace [Platform token](https://docs.dynatrace.com/docs/manage/identity-access-management/access-tokens-and-oauth-clients/platform-tokens){target=_blank} to trigger the Davis CoPilot from the demo workflow. Permissions:
+    - `davis-copilot:conversations:execute`
+- [Allow an outbound connection from Dynatrace](https://developer.dynatrace.com/develop/functions/allow-outbound-connections/){target="_blank"}
+  to `api.github.com` so that the demo workflow can communicate with GitHub.
 
-## Gather Details: Create EdgeConnect OAuth Client
+!!! info "Wait for GitHub to Index Your Fork"
+    The Dynatrace workflow relies on GitHub search functionality. Therefore it is important to wait until GitHub search has indexed your fork.
 
-EdgeConnect requires an OAuth client to authenticate with your Dynatrace environment. The OAuth client is automatically created when you create an EdgeConnect configuration in Dynatrace.
+    To test this, try searching your fork for `predictive-kubernetes-scaling.observability-labs.dynatrace.com`
 
-### Step 1: Create EdgeConnect Configuration
+    If you get a warning: `⚠️ This repository's code is being indexed right now. Try again in a few minutes.` you should not proceed.
 
-1. Go to **Settings** > **General** > **External Requests** > **EdgeConnect** in your Dynatrace environment.
-2. Select **New EdgeConnect**.
-3. Enter a unique **Name** for the EdgeConnect instance (e.g., `obs-istio-edgeconnect`).
-   - Name must be RFC 1123 Label Names compliant with maximum length of 50 characters
-4. Provide the **Host patterns** of the requests that should be handled by the EdgeConnect instance.
-   - You can use wildcards to replace the first parts of the host domain (e.g., `*.myapp.org` matches `staging.myapp.org` and `prod.myapp.org`)
-   - For Kubernetes automation, you might use patterns like `kubernetes.default.svc.cluster.local` or `*.svc.cluster.local`
-5. Select **Create**.
+    Wait until the search completes successfully, then proceed.
 
-### Step 2: Download EdgeConnect Configuration File
+## 2. Create Your Development Environment
 
-1. After creating the EdgeConnect configuration, download the `edgeConnect.yaml` configuration file.
-   - This file contains all the OAuth credentials you need
-   - **Important**: The OAuth client secret is only displayed once and cannot be retrieved later
-   - Make sure to save this file securely
+--8<-- "snippets/codespace-details-warning-box.md"
 
-### Step 3: Extract OAuth Credentials
+- Fork [this repository](https://github.com/Dynatrace/obslab-predictive-kubernetes-scaling/tree/main){target="_blank"} to your GitHub account. This will allow you to make changes and submit pull requests
+  later on.
+- Adjust the `predictive-kubernetes-scaling.observability-labs.dynatrace.com/managed-by-repo` annotations in 
+- [`apps/horizontal-scaling/deployment.yaml`](https://github.com/Dynatrace/obslab-predictive-kubernetes-scaling/blob/main/apps/horizontal-scaling/deployment.yaml){target="_blank"} and
+  [`apps/vertical-scaling/deployment.yaml`](https://github.com/Dynatrace/obslab-predictive-kubernetes-scaling/blob/main/apps/vertical-scaling/deployment.yaml){target="_blank"} to match your forked repository.
+- Create a new Codespace
+    - Go to [https://codespaces.new](https://codespaces.new){target=_blank}
+    - Set the `repository` to your forked repo
+    - Complete the variables requested in the form
+    - Click `Create Codespace`
+- Wait for the Setup to complete. The Codespace will run a `postCreate` command to initialize your environment. This may
+  take a few minutes. You'll know it's ready when the `zsh` shell is shown again.
+    - If you want to check the progress, you can press `Ctrl + Shift + P` and type `Creation Log` to see the setup logs
+      once the Codespace has initialized.
 
-Open the downloaded `edgeConnect.yaml` file and extract the following values:
+## 3. Explore What Has Been Deployed
 
-```yaml
-name: obs-istio-edgeconnect
-api_endpoint_host: abc12345.apps.dynatrace.com
-oauth:
-  endpoint: https://sso.dynatrace.com/sso/oauth2/token
-  client_id: dt0s10.your-oauth-client-id
-  client_secret: ********  # This is only shown once!
-  resource: urn:dtenvironment:abc12345
-```
+Your Codespace has now deployed the following resources:
 
-You'll need these values for your environment variables:
+- A local Kubernetes ([kind](https://kind.sigs.k8s.io/){target="_blank"}) cluster monitored by Dynatrace, with some pre-deployed apps
+  that will be used later in the demo.
+- Three [Dynatrace workflows](https://www.dynatrace.com/platform/workflows/){target="_blank"}:
+    - **Predict Kubernetes Resource Usage**: This workflow predicts the future resource usage of Kubernetes workloads
+      using Davis predictive AI. If a workload is likely to exceed its resource quotas, the workflow creates a custom
+      Davis event with all necessary information.
+    - **Commit Davis Suggestions**: Triggered by the predictive workflow's events, this workflow uses Davis CoPilot and
+      the GitHub for Workflows app to create pull requests for remediation suggestions.
+    - **React to Resource Saturation**: If the prediction actually misses some resource spikes, this workflow will get
+      alerted via the automatically created Davis problem and will trigger the prediction workflow to immediately react
+      and create a pull request. This workflow is disabled by default to avoid unwanted triggers of the prediction
+      workflow.
+- A [Dynatrace notebook](https://www.dynatrace.com/platform/notebooks/){target="_blank"} that provides a more in-depth overview of how
+  the deployed workflows work.
+- A [Dynatrace dashboard](https://www.dynatrace.com/platform/dashboards/){target="_blank"} that shows a summary of all predictions and 
+  their accuracy.
 
-- **OAUTH_CLIENT_ID**: The `oauth.client_id` value (e.g., `dt0s10.your-oauth-client-id`)
-- **OAUTH_CLIENT_SECRET**: The `oauth.client_secret` value
-- **OAUTH_CLIENT_URN**: The `oauth.resource` value (e.g., `urn:dtenvironment:abc12345`)
+## 4. Grab a Coffee
 
-### Step 4: Verify EdgeConnect Connection
+Before moving on, Davis AI needs around 20 minutes to analyze your Kubernetes workloads and establish a baseline for
+predictive analysis. You can check its progress by navigating to the newly deployed "Predictive Kubernetes Scaling"
+notebook and running the DQL query in the "2. Predict Resource Usage" step. If the results indicate that Davis AI is
+ready, you can proceed to [step 5](#5-generate-some-load).
 
-After deploying EdgeConnect (see deployment instructions), validate the connection:
-
-1. Go to **Settings** > **General** > **External Requests** > **EdgeConnect**.
-2. Check the **Availability** column. It should display **online**.
-   - If it's still offline, check the container logs for error messages.
-
-For more details, see the [Dynatrace EdgeConnect documentation](https://docs.dynatrace.com/docs/ingest-from/edgeconnect#appconfigurations).
-
-### Alternative: Using Dynatrace Operator with Provisioner
-
-If you're using the Dynatrace Operator with `oauth.provisioner: true` in your EdgeConnect custom resource (as shown in `codespace/dynatrace/edge-connect.yaml`), the Operator will automatically create and manage the OAuth client for you. In this case, you don't need to manually create the EdgeConnect configuration in the Dynatrace UI.
-
---8<-- "snippets/info-required.md"
-
+Just make sure that your Codespace does not expire within that time by e.g. clicking into the window from time to time.
+Check out the [GitHub Codespace documentation](https://docs.github.com/en/codespaces/setting-your-user-preferences/setting-your-timeout-period-for-github-codespaces){target="_blank"}
+to read more about timeout periods for Codespaces and how to configure them.
 
 ## Start Demo
 

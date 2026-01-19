@@ -8,7 +8,7 @@ global:
   imagePullPolicy: IfNotPresent
   namespace: vegas-casino
   # Set to false if you want to use an existing namespace
-  createNamespace: true
+  createNamespace: false
   # Set to true for codespace deployment (uses NodePort and port-forward)
   codespace: false
   

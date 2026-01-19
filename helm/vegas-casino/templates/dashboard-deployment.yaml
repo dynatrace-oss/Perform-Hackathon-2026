@@ -17,10 +17,12 @@ spec:
   template:
     metadata:
       labels:
+
         app.kubernetes.io/name: {{ include "vegas-casino.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: dashboard
       annotations:
+        dt.owner: 'vegas-casino-app'
         prometheus.io/scrape: "true"
         prometheus.io/port: "{{ .Values.dashboard.service.port }}"
         prometheus.io/path: "/health"

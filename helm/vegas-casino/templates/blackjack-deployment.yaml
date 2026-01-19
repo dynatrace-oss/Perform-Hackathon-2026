@@ -21,6 +21,7 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: blackjack
       annotations:
+        dt.owner: 'vegas-casino-app'
         prometheus.io/scrape: "true"
         prometheus.io/port: "{{ .Values.blackjack.service.httpPort }}"
         prometheus.io/path: "/health"
