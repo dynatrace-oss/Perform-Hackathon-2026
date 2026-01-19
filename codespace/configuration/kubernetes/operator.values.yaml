@@ -1,0 +1,18 @@
+operator:
+  requests:
+    cpu: 20m
+    memory: 32Mi
+  limits:
+    cpu: 20m
+    memory: 32Mi
+
+webhook:
+  requests:
+    cpu: 20m
+    memory: 32Mi
+  limits:
+    cpu: 20m
+    memory: 32Mi
+
+
+

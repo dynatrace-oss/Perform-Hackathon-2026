@@ -113,11 +113,20 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 # Wait for pod webhook started
 kubectl wait pod -l app.kubernetes.io/component=webhook -n cert-manager --for=condition=Ready --timeout=2m
 
-
+# Determine kubernetes directory path (relative to current directory)
+if [ -d "kubernetes" ]; then
+    K8S_DIR="kubernetes"
+elif [ -d "$WORKDIR/codespace/configuration/kubernetes" ]; then
+    K8S_DIR="$WORKDIR/codespace/configuration/kubernetes"
+else
+    echo "⚠️ Kubernetes directory not found, trying to continue..."
+    K8S_DIR="kubernetes"
+fi
 
 helm install dynatrace-operator oci://public.ecr.aws/dynatrace/dynatrace-operator \
   --version 1.7.2 \
   --create-namespace --namespace dynatrace \
+  -f $K8S_DIR/operator.values.yaml"
   --atomic
 
 kubectl -n dynatrace wait pod --for=condition=ready --selector=app.kubernetes.io/name=dynatrace-operator,app.kubernetes.io/component=webhook --timeout=300s
@@ -133,15 +142,7 @@ kubectl create secret generic dynatrace \
    --from-literal=dt_api_token="$DYNATRACE_KUBERNETES_DATA_INGEST_TOKEN" \
    --from-literal=clustername="$CLUSTER_NAME"
 
-# Determine kubernetes directory path (relative to current directory)
-if [ -d "kubernetes" ]; then
-    K8S_DIR="kubernetes"
-elif [ -d "$WORKDIR/codespace/configuration/kubernetes" ]; then
-    K8S_DIR="$WORKDIR/codespace/configuration/kubernetes"
-else
-    echo "⚠️ Kubernetes directory not found, trying to continue..."
-    K8S_DIR="kubernetes"
-fi
+
 
 sed -i "s|DYNATRACE_LIVE_URL|$DYNATRACE_LIVE_URL|g" "$K8S_DIR/dynakube.yaml"
 sed -i "s|CLUSTER_NAME|$CLUSTER_NAME|g" "$K8S_DIR/dynakube.yaml"
