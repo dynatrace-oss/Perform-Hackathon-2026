@@ -4,6 +4,11 @@ set -e
 
 # Set workspace root directory
 WORKDIR="/workspaces/Vegas-App"
+### Pre-flight checks for dependencies
+if ! command -v terraform >/dev/null 2>&1; then
+    echo "Please install terraform before continuing"
+    exit 1
+fi
 
 ######################
 ### Infrastructure ###
@@ -37,6 +42,22 @@ export DYNATRACE_AUTOMATION_CLIENT_SECRET=$DYNATRACE_OAUTH_CLIENT_SECRET
 export DYNATRACE_DEBUG=true
 export DYNATRACE_LOG_HTTP=terraform-provider-dynatrace.http.log
 export DYNATRACE_HTTP_RESPONSE=true
+
+# Change to configuration directory for Terraform
+# Try multiple possible paths
+if [ -d "$WORKDIR/codespace/configuration" ]; then
+    cd "$WORKDIR/codespace/configuration"
+elif [ -d "codespace/configuration" ]; then
+    cd codespace/configuration
+elif [ -d "configuration" ]; then
+    cd configuration
+else
+    echo "❌ Could not find configuration directory"
+    echo "Current directory: $(pwd)"
+    echo "Looking for: $WORKDIR/codespace/configuration or codespace/configuration or configuration"
+    exit 1
+fi
+echo "Working in: $(pwd)"
 
 terraform init
 
@@ -97,10 +118,20 @@ kubectl create secret generic dynatrace \
    --from-literal=dt_api_token="$DYNATRACE_KUBERNETES_DATA_INGEST_TOKEN" \
    --from-literal=clustername="$CLUSTER_NAME"
 
-sed -i "s|DYNATRACE_LIVE_URL|$DYNATRACE_LIVE_URL|g" $WORKDIR/codespace/kubernetes/dynakube.yaml
-sed -i "s|CLUSTER_NAME|$CLUSTER_NAME|g" $WORKDIR/codespace/kubernetes/dynakube.yaml
+# Determine kubernetes directory path (relative to current directory)
+if [ -d "kubernetes" ]; then
+    K8S_DIR="kubernetes"
+elif [ -d "$WORKDIR/codespace/configuration/kubernetes" ]; then
+    K8S_DIR="$WORKDIR/codespace/configuration/kubernetes"
+else
+    echo "⚠️ Kubernetes directory not found, trying to continue..."
+    K8S_DIR="kubernetes"
+fi
 
-kubectl apply --filename kubernetes/dynakube.yaml
+sed -i "s|DYNATRACE_LIVE_URL|$DYNATRACE_LIVE_URL|g" "$K8S_DIR/dynakube.yaml"
+sed -i "s|CLUSTER_NAME|$CLUSTER_NAME|g" "$K8S_DIR/dynakube.yaml"
+
+kubectl apply --filename "$K8S_DIR/dynakube.yaml"
 
 ###############################
 ### Kubernetes Edge Connect ###
@@ -111,14 +142,13 @@ kubectl --namespace dynatrace \
   --from-literal=oauth-client-id="$DYNATRACE_OAUTH_CLIENT_ID" \
   --from-literal=oauth-client-secret="$DYNATRACE_OAUTH_CLIENT_SECRET"
 
-sed -i "s|CODESPACE_NAME|${CODESPACE_NAME:0:40}|g" $WORKDIR/codespace/kubernetes/edge-connect.yaml
-sed -i "s|DYNATRACE_ENVIRONMENT_ID|$DYNATRACE_ENVIRONMENT_ID|g" $WORKDIR/codespace/kubernetes/edge-connect.yaml
-sed -i "s|DYNATRACE_APPS_URL|$DYNATRACE_APPS_URL|g" $WORKDIR/codespace/kubernetes/edge-connect.yaml
-sed -i "s|DYNATRACE_SSO_URL|$DYNATRACE_SSO_URL|g" $WORKDIR/codespace/kubernetes/edge-connect.yaml
-sed -i "s|DYNATRACE_ACCOUNT_ID|$DYNATRACE_ACCOUNT_ID|g" $WORKDIR/codespace/kubernetes/edge-connect.yaml
+sed -i "s|CODESPACE_NAME|${CODESPACE_NAME:0:40}|g" "$K8S_DIR/edge-connect.yaml"
+sed -i "s|DYNATRACE_ENVIRONMENT_ID|$DYNATRACE_ENVIRONMENT_ID|g" "$K8S_DIR/edge-connect.yaml"
+sed -i "s|DYNATRACE_APPS_URL|$DYNATRACE_APPS_URL|g" "$K8S_DIR/edge-connect.yaml"
+sed -i "s|DYNATRACE_SSO_URL|$DYNATRACE_SSO_URL|g" "$K8S_DIR/edge-connect.yaml"
+sed -i "s|DYNATRACE_ACCOUNT_ID|$DYNATRACE_ACCOUNT_ID|g" "$K8S_DIR/edge-connect.yaml"
 
-
-kubectl apply --filename $WORKDIR/codespace/kubernetes/edge-connect.yaml
+kubectl apply --filename "$K8S_DIR/edge-connect.yaml"
 
 # Sleep a bit to allow the Edge Connect to start
 sleep 60

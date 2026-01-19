@@ -4,7 +4,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 echo "Installing system packages..."
 sudo apt update
-sudo apt install -y jq curl vim gpg ca-certificates apt-transport-https
+sudo apt install -y jq curl vim gpg ca-certificates apt-transport-https lsb-release software-properties-common
 
 echo "Installing kubectl..."
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -28,10 +28,18 @@ curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64
 chmod +x /tmp/kind
 sudo mv /tmp/kind /usr/local/bin/kind
 
+echo "Installing Terraform..."
+TERRAFORM_VERSION="1.6.0"
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt-get update
+sudo apt-get install -y terraform=${TERRAFORM_VERSION}
+
 echo "Verifying tools are available..."
 helm version
 kubectl version --client
 kind version
+terraform version
 
 echo "Setting up Docker access..."
 # Docker-in-Docker feature handles Docker installation and daemon
