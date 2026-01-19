@@ -65,11 +65,8 @@ to deploy the workflows and notebook used in this demo. Permissions:
 
 --8<-- "snippets/codespace-details-warning-box.md"
 
-- Fork [this repository](https://github.com/Dynatrace/obslab-predictive-kubernetes-scaling/tree/main){target="_blank"} to your GitHub account. This will allow you to make changes and submit pull requests
+- Fork [this repository](https://github.com/dynatrace-oss/Perform-Hackathon-2026/tree/main){target="_blank"} to your GitHub account. This will allow you to make changes and submit pull requests
   later on.
-- Adjust the `predictive-kubernetes-scaling.observability-labs.dynatrace.com/managed-by-repo` annotations in 
-- [`apps/horizontal-scaling/deployment.yaml`](https://github.com/Dynatrace/obslab-predictive-kubernetes-scaling/blob/main/apps/horizontal-scaling/deployment.yaml){target="_blank"} and
-  [`apps/vertical-scaling/deployment.yaml`](https://github.com/Dynatrace/obslab-predictive-kubernetes-scaling/blob/main/apps/vertical-scaling/deployment.yaml){target="_blank"} to match your forked repository.
 - Create a new Codespace
     - Go to [https://codespaces.new](https://codespaces.new){target=_blank}
     - Set the `repository` to your forked repo
@@ -96,10 +93,7 @@ Your Codespace has now deployed the following resources:
       alerted via the automatically created Davis problem and will trigger the prediction workflow to immediately react
       and create a pull request. This workflow is disabled by default to avoid unwanted triggers of the prediction
       workflow.
-- A [Dynatrace notebook](https://www.dynatrace.com/platform/notebooks/){target="_blank"} that provides a more in-depth overview of how
-  the deployed workflows work.
-- A [Dynatrace dashboard](https://www.dynatrace.com/platform/dashboards/){target="_blank"} that shows a summary of all predictions and 
-  their accuracy.
+
 
 ## 4. Grab a Coffee
 
