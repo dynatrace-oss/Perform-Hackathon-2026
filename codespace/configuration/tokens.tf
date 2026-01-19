@@ -1,6 +1,10 @@
+# API tokens with unique names per codespace to avoid conflicts
+# Token names include codespace name to ensure uniqueness across multiple deployments.
+# This prevents conflicts when multiple codespaces are deployed to the same Dynatrace environment.
+# Format: "Token Type [demo_name] [codespace_name]"
 resource "dynatrace_api_token" "manage_workflows" {
   provider = dynatrace.get_tokens
-  name     = "Manage Workflow [${var.demo_name}]"
+  name     = "Manage Workflow [${var.demo_name}] [${var.codespace_name}]"
   enabled  = true
   scopes = [
     // Manage credentials in the credential Vault
@@ -14,7 +18,7 @@ resource "dynatrace_api_token" "manage_workflows" {
 
 resource "dynatrace_api_token" "kubernetes_operator" {
   provider = dynatrace.get_tokens
-  name    = "Kubernetes Operator [${var.demo_name}]"
+  name    = "Kubernetes Operator [${var.demo_name}] [${var.codespace_name}]"
   enabled = true
   scopes = [
     "activeGateTokenManagement.create",
@@ -28,7 +32,7 @@ resource "dynatrace_api_token" "kubernetes_operator" {
 
 resource "dynatrace_api_token" "kubernetes_data_ingest" {
   provider = dynatrace.get_tokens
-  name    = "Kubernetes Data Ingest [${var.demo_name}]"
+  name    = "Kubernetes Data Ingest [${var.demo_name}] [${var.codespace_name}]"
   enabled = true
   scopes = [
     "metrics.ingest",
@@ -39,7 +43,7 @@ resource "dynatrace_api_token" "kubernetes_data_ingest" {
 
 resource "dynatrace_api_token" "read_settings_objects" {
   provider = dynatrace.get_tokens
-  name     = "Read Settings Objects [${var.demo_name}]"
+  name     = "Read Settings Objects [${var.demo_name}] [${var.codespace_name}]"
   enabled  = true
   scopes = [
     "settings.read"
