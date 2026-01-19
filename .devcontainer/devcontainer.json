@@ -50,8 +50,10 @@
 		  },
 		  "DYNATRACE_OAUTH_CLIENT_SECRET": {
 			"description": "Dynatrace OAuth client secret. See `DYNATRACE_OAUTH_CLIENT_ID` for permissions"
+		  },
+		  "DYNATRACE_ACCOUNT_ID": {
+			"description": "Dynatrace account id"
 		  }
-	
 	},
 
 	// Add Kubernetes VSCode extensions

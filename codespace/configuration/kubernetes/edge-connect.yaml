@@ -72,6 +72,6 @@ spec:
     provisioner: true
     clientSecret: edge-connect-CODESPACE_NAME-credentials
     endpoint: https://DYNATRACE_SSO_URL
-    resource: "urn:dtenvironment:DYNATRACE_ENVIRONMENT_ID"
+    resource: "urn:dtaccount:DYNATRACE_ACCOUNT_ID"
   kubernetesAutomation:
     enabled: true

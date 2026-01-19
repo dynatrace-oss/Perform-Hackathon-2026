@@ -28,7 +28,6 @@ export TF_VAR_dynatrace_live_url="https://$DYNATRACE_LIVE_URL"
 export TF_VAR_dynatrace_environment_id=$DYNATRACE_ENVIRONMENT_ID
 export TF_VAR_codespace_name=$CODESPACE_NAME
 
-export CLUSTER_NAME="Perform-Vegas-Casino"
 
 
 export DYNATRACE_AUTOMATION_CLIENT_ID=$DYNATRACE_OAUTH_CLIENT_ID
@@ -115,6 +114,7 @@ sed -i '' "s|CODESPACE_NAME|${CODESPACE_NAME:0:40}|g" kubernetes/edge-connect.ya
 sed -i '' "s|DYNATRACE_ENVIRONMENT_ID|$DYNATRACE_ENVIRONMENT_ID|g" kubernetes/edge-connect.yaml
 sed -i '' "s|DYNATRACE_APPS_URL|$DYNATRACE_APPS_URL|g" kubernetes/edge-connect.yaml
 sed -i '' "s|DYNATRACE_SSO_URL|$DYNATRACE_SSO_URL|g" kubernetes/edge-connect.yaml
+sed -i '' "s|DYNATRACE_ACCOUNT_ID|$DYNATRACE_ACCOUNT_ID|g" kubernetes/edge-connect.yaml
 
 
 kubectl apply --filename kubernetes/edge-connect.yaml
