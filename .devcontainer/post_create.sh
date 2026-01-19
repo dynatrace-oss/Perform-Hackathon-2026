@@ -34,26 +34,25 @@ kubectl version --client
 kind version
 
 echo "Setting up Docker access..."
-# Install docker CLI if not available
-if ! command -v docker &> /dev/null; then
-    echo "Installing Docker CLI..."
-    curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
-    sudo sh /tmp/get-docker.sh
-    sudo usermod -aG docker vscode 2>/dev/null || true
-fi
-
-# In Codespaces, Docker is available via host socket
-if [ -S /var/run/docker-host.sock ]; then
-    echo "Docker host socket found, creating symlink..."
-    sudo ln -sf /var/run/docker-host.sock /var/run/docker.sock
-    sudo chmod 666 /var/run/docker.sock 2>/dev/null || true
-    sleep 2
-fi
-
+# Docker-in-Docker feature handles Docker installation and daemon
+# Just wait for Docker to be ready
 echo "Waiting for Docker to be ready..."
-timeout 60 bash -c 'until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 2; done' || {
-    echo "⚠️ Docker may not be fully ready, but continuing..."
-}
+max_attempts=30
+attempt=0
+while [ $attempt -lt $max_attempts ]; do
+    if docker info > /dev/null 2>&1; then
+        echo "✅ Docker is ready!"
+        break
+    fi
+    echo "Waiting for Docker... (attempt $((attempt+1))/$max_attempts)"
+    sleep 2
+    attempt=$((attempt+1))
+done
+
+if [ $attempt -eq $max_attempts ]; then
+    echo "❌ Docker failed to start within expected time"
+    exit 1
+fi
 
 echo "Current directory: $(pwd)"
 echo "Looking for kind config..."

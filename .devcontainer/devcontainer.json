@@ -8,8 +8,12 @@
 		"cpus": 4
 	},
 
-	"features": {}
-	,
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"version": "latest",
+			"enableNonRootDocker": "true"
+		}
+	},
 
 	// Set the remote user
 	"remoteUser": "vscode",
