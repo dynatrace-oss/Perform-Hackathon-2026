@@ -22,7 +22,7 @@ variable "codespace_name" {
 
 variable "demo_name" {
   type    = string
-  default = "Predictive Kubernetes Scaling"
+  default = "vegas-casino-app"
 }
 
 variable "demo_name_kebab" {

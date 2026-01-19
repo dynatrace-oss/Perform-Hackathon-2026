@@ -13,6 +13,19 @@ fi
 ######################
 ### Infrastructure ###
 ######################
+# Set DYNATRACE_API_TOKEN for the get_tokens provider
+# This token needs permissions: apiTokens.read & apiTokens.write
+if [ -z "$DYNATRACE_API_TOKEN" ]; then
+    echo "❌ Error: DYNATRACE_API_TOKEN is not set!"
+    echo "   This is required for the Terraform provider to create API tokens."
+    echo "   Please configure DYNATRACE_API_TOKEN secret in Codespace settings with:"
+    echo "   - apiTokens.read scope"
+    echo "   - apiTokens.write scope"
+    exit 1
+fi
+echo "✅ DYNATRACE_API_TOKEN is set (length: ${#DYNATRACE_API_TOKEN} characters)"
+export DYNATRACE_API_TOKEN
+fi
 
 # Get Dynatrace URLs
 environment="$DYNATRACE_ENVIRONMENT"
