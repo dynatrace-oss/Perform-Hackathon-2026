@@ -14,6 +14,9 @@ terraform {
 provider "dynatrace" {
   alias = "get_tokens"
   dt_env_url = var.dynatrace_live_url
+  # Authentication: Uses DYNATRACE_API_TOKEN environment variable
+  # This token must have: apiTokens.read and apiTokens.write scopes
+  # The provider automatically reads DYNATRACE_API_TOKEN from environment
 }
 
 provider "dynatrace" {
