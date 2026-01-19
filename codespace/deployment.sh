@@ -7,7 +7,7 @@
 ### dttoken: Dynatrace api token with ingest metrics and otlp ingest scope
 ### dturl : url of your DT tenant wihtout any / at the end for example: https://dedede.live.dynatrace.com
 ################################################################################
-
+WORKDIR="/workspaces/Vegas-App"
 
 ### Pre-flight checks for dependencies
 if ! command -v jq >/dev/null 2>&1; then
@@ -33,9 +33,9 @@ fi
 echo "parsing arguments"
 
 kubectl label namespace  default oneagent=false
-kubectl apply -f codespace/manifests/rbac.yaml
-kubectl apply -f codespace/manifests/openTelemetry-manifest_ds.yaml
-kubectl apply -f codespace/manifests/openTelemetry-manifest_statefulset.yaml
+kubectl apply -f $WORKDIR/codespace/manifests/rbac.yaml
+kubectl apply -f $WORKDIR/codespace/manifests/openTelemetry-manifest_ds.yaml
+kubectl apply -f $WORKDIR/codespace/manifests/openTelemetry-manifest_statefulset.yaml
 
 
 
@@ -50,7 +50,7 @@ helm install open-feature-operator openfeature/open-feature-operator \
 kubectl create namespace vegas-casino
 kubectl label namespace vegas-casino oneagent=false
 
-helm install vegas-casino ./helm/vegas-casino \
+helm install vegas-casino $WORKDIR/helm/vegas-casino \
    --set global.codespace=true \
    --namespace vegas-casino
 
