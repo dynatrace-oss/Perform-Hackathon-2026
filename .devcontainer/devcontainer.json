@@ -33,7 +33,7 @@
 
 	// Add recommended secrets
 	"secrets": {
-		"DT_ENVIRONMENT_ID": {
+		"DYNATRACE_ENVIRONMENT_ID": {
 			"description": "eg. abc12345 from https://abc12345.apps.dynatrace.com"
 		},
 		"DYNATRACE_ENVIRONMENT": {

@@ -17,9 +17,6 @@ to deploy the workflows and notebook used in this demo. Permissions:
     - `automation:workflows:write`
     - `automation:workflows:read`
     - `automation:workflows:run`  
-    - `document:documents:write`
-    - `document:documents:read`
-    - `document:documents:delete`
     - `app-engine:edge-connects:connect`
     - `app-engine:edge-connects:write`
     - `app-engine:edge-connects:read`
@@ -30,8 +27,9 @@ to deploy the workflows and notebook used in this demo. Permissions:
     - `davis:analyzers:read` 
     - `davis:analyzers:execute` 
     - `email:emails:send` 
-    - `document:documents:read` 
     - `document:documents:write`
+    - `document:documents:read`
+    - `document:documents:delete`
     - `oauth2:clients:manage`
     - `settings:objects:read`
     - `settings:objects:write`
@@ -134,14 +132,12 @@ to read more about timeout periods for Codespaces and how to configure them.
     * Open a new terminal in VSCode and set your environment variables as appropriate:
 
     ```
-    set DT_ENVIRONMENT_ID=abc12345
-    set DT_ENVIRONMENT_TYPE=live
-    set DT_API_TOKEN=dt0c01.******.***********
-    set DT_OPERATOR_TOKEN=dt0c01.******.***********
-    set OAUTH_CLIENT_ID=****
-    set OAUTH_CLIENT_SECRET=******
-    set OAUTH_CLIENT_URN=*****
-    set NAME= <Name of your environment>
+    set DYNATRACE_ENVIRONMENT_ID=abc12345
+    set DYNATRACE_ENVIRONMENT=live
+    set DYNATRACE_API_TOKEN=dt0c01.******.***********
+    set DYNATRACE_PLATFORM_TOKEN=dt0c01.******.***********
+    set DYNATRACE_OAUTH_CLIENT_ID=****
+    set DYNATRACE_OAUTH_CLIENT_SECRET=******
     ```
 
     * Start Docker / Podman
