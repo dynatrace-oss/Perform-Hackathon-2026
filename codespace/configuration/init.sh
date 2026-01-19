@@ -126,7 +126,7 @@ fi
 helm install dynatrace-operator oci://public.ecr.aws/dynatrace/dynatrace-operator \
   --version 1.7.2 \
   --create-namespace --namespace dynatrace \
-  -f $K8S_DIR/operator.values.yaml
+  -f $K8S_DIR/operator.values.yaml \
   --atomic
 
 kubectl -n dynatrace wait pod --for=condition=ready --selector=app.kubernetes.io/name=dynatrace-operator,app.kubernetes.io/component=webhook --timeout=300s
