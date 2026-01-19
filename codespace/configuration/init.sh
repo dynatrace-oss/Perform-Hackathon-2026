@@ -25,7 +25,7 @@ if [ -z "$DYNATRACE_API_TOKEN" ]; then
 fi
 echo "✅ DYNATRACE_API_TOKEN is set (length: ${#DYNATRACE_API_TOKEN} characters)"
 export DYNATRACE_API_TOKEN
-fi
+
 
 # Get Dynatrace URLs
 environment="$DYNATRACE_ENVIRONMENT"
