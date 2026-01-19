@@ -170,5 +170,24 @@ sleep 60
 ### Infrastructure ###
 ######################
 
+# Try to import existing team if it exists (prevents recreation errors)
+# This allows Terraform to manage existing teams without trying to recreate them
+echo "Checking if team already exists and importing if needed..."
+TEAM_IDENTIFIER="${TF_VAR_demo_name_kebab:-vegas-casino-app}"
+
+# Check if team is already in Terraform state
+if terraform state show dynatrace_ownership_teams.demo >/dev/null 2>&1; then
+    echo "✅ Team '$TEAM_IDENTIFIER' is already in Terraform state"
+else
+    # Try to import the team if it exists in Dynatrace
+    echo "Attempting to import team '$TEAM_IDENTIFIER' from Dynatrace..."
+    if terraform import dynatrace_ownership_teams.demo "$TEAM_IDENTIFIER" 2>/dev/null; then
+        echo "✅ Successfully imported existing team: $TEAM_IDENTIFIER"
+    else
+        echo "ℹ️ Team '$TEAM_IDENTIFIER' does not exist in Dynatrace, will be created by Terraform"
+        # Continue - Terraform will create it
+    fi
+fi
+
 # Finally deploy all infrastructure
 terraform apply -auto-approve
