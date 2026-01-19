@@ -107,11 +107,11 @@ helm install  --namespace kgateway-system --version v2.2.0-main \
 kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
 --set controller.image.pullPolicy=Always 
 
-
-# Note: OpenTelemetry Operator and cert-manager are no longer required
-# The OpenTelemetry collectors are now deployed as traditional Kubernetes Deployments
-# using ConfigMaps for configuration, reducing resource requirements
-
+#### Deploy the cert-manager (required for OpenFeature Operator)
+echo "Deploying Cert Manager (required for OpenFeature Operator)"
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.10.0/cert-manager.yaml
+# Wait for pod webhook started
+kubectl wait pod -l app.kubernetes.io/component=webhook -n cert-manager --for=condition=Ready --timeout=2m
 
 
 
