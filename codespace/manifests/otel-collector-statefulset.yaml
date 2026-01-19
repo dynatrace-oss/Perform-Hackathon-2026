@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: otel-collector-statefulset
+  namespace: default
+  labels:
+    app: opentelemetry
+    app.kubernetes.io/component: otel-statefulset
+spec:
+  serviceName: otel-collector-statefulset
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opentelemetry
+      app.kubernetes.io/component: otel-statefulset
+  template:
+    metadata:
+      labels:
+        app: opentelemetry
+        app.kubernetes.io/component: otel-statefulset
+    spec:
+      serviceAccountName: otelcontribcol
+      containers:
+      - name: otel-collector
+        image: otel/opentelemetry-collector-contrib:0.133.0
+        command:
+          - "/otelcol-contrib"
+          - "--config=/etc/otelcol/config.yaml"
+        ports:
+        - name: prometheus
+          containerPort: 9090
+          protocol: TCP
+        - name: otlp-grpc
+          containerPort: 4317
+          protocol: TCP
+        - name: otlp-http
+          containerPort: 4318
+          protocol: TCP
+        env:
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: DT_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: dynatrace
+              key: dynatrace_oltp_url
+        - name: DT_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: dynatrace
+              key: dt_api_token
+        - name: CLUSTERNAME
+          valueFrom:
+            secretKeyRef:
+              name: dynatrace
+              key: clustername
+        - name: OTEL_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app.kubernetes.io/component']
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: service.name=$(OTEL_SERVICE_NAME)
+        volumeMounts:
+        - name: config
+          mountPath: /etc/otelcol
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "300m"
+      volumes:
+      - name: config
+        configMap:
+          name: otel-collector-statefulset-config

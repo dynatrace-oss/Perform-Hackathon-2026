@@ -244,7 +244,7 @@ docs-serve:
 	@echo "$(BLUE)Serving MkDocs documentation...$(NC)"
 	@if ! command -v mkdocs &> /dev/null; then \
 		echo "$(YELLOW)MkDocs not found. Installing...$(NC)"; \
-		pip install -r requirements-docs.txt; \
+		pip install mkdocs==1.5.3 mkdocs-material==9.5.3 mkdocs-git-revision-date-localized-plugin==1.2.0 pymdown-extensions==10.5; \
 	fi
 	@mkdocs serve
 
@@ -253,7 +253,7 @@ docs-build:
 	@echo "$(BLUE)Building MkDocs documentation...$(NC)"
 	@if ! command -v mkdocs &> /dev/null; then \
 		echo "$(YELLOW)MkDocs not found. Installing...$(NC)"; \
-		pip install -r requirements-docs.txt; \
+		pip install mkdocs==1.5.3 mkdocs-material==9.5.3 mkdocs-git-revision-date-localized-plugin==1.2.0 pymdown-extensions==10.5; \
 	fi
 	@mkdocs build
 

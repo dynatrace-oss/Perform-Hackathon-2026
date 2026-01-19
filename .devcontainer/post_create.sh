@@ -4,7 +4,12 @@ export DEBIAN_FRONTEND=noninteractive
 
 echo "Installing system packages..."
 sudo apt update
-sudo apt install -y jq curl vim gpg ca-certificates apt-transport-https
+sudo apt install -y jq curl vim gpg ca-certificates apt-transport-https lsb-release software-properties-common
+
+echo "Installing kubectl..."
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
 
 echo "Installing step-cli..."
 curl -fsSL https://packages.smallstep.com/keys/apt/repo-signing-key.gpg -o /tmp/smallstep.asc
@@ -23,13 +28,42 @@ curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64
 chmod +x /tmp/kind
 sudo mv /tmp/kind /usr/local/bin/kind
 
+echo "Installing Terraform..."
+TERRAFORM_VERSION="1.6.6"
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt-get update
+if ! sudo apt-get install -y terraform=${TERRAFORM_VERSION}; then
+    echo "Terraform ${TERRAFORM_VERSION} not found, installing latest available instead..."
+    sudo apt-get install -y terraform
+fi
+
 echo "Verifying tools are available..."
 helm version
 kubectl version --client
 kind version
+terraform version
 
+echo "Setting up Docker access..."
+# Docker-in-Docker feature handles Docker installation and daemon
+# Just wait for Docker to be ready
 echo "Waiting for Docker to be ready..."
-timeout 60 bash -c 'until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 2; done'
+max_attempts=30
+attempt=0
+while [ $attempt -lt $max_attempts ]; do
+    if docker info > /dev/null 2>&1; then
+        echo "✅ Docker is ready!"
+        break
+    fi
+    echo "Waiting for Docker... (attempt $((attempt+1))/$max_attempts)"
+    sleep 2
+    attempt=$((attempt+1))
+done
+
+if [ $attempt -eq $max_attempts ]; then
+    echo "❌ Docker failed to start within expected time"
+    exit 1
+fi
 
 echo "Current directory: $(pwd)"
 echo "Looking for kind config..."
