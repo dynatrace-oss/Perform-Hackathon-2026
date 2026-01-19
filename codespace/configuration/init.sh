@@ -108,15 +108,9 @@ kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
 --set controller.image.pullPolicy=Always 
 
 
-#### Deploy the cert-manager
-echo "Deploying Cert Manager ( for OpenTelemetry Operator)"
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.10.0/cert-manager.yaml
-# Wait for pod webhook started
-kubectl wait pod -l app.kubernetes.io/component=webhook -n cert-manager --for=condition=Ready --timeout=2m
-# Deploy the opentelemetry operator
-sleep 10
-echo "Deploying the OpenTelemetry Operator"
-kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
+# Note: OpenTelemetry Operator and cert-manager are no longer required
+# The OpenTelemetry collectors are now deployed as traditional Kubernetes Deployments
+# using ConfigMaps for configuration, reducing resource requirements
 
 
 

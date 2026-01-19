@@ -34,8 +34,14 @@ echo "parsing arguments"
 
 kubectl label namespace  default oneagent=false
 kubectl apply -f $WORKDIR/codespace/manifests/rbac.yaml
-kubectl apply -f $WORKDIR/codespace/manifests/openTelemetry-manifest_ds.yaml
-kubectl apply -f $WORKDIR/codespace/manifests/openTelemetry-manifest_statefulset.yaml
+# Apply OpenTelemetry collector ConfigMaps and Deployments (no operator required)
+# This reduces resource usage by removing cert-manager and OpenTelemetry Operator dependencies
+echo "Deploying OpenTelemetry collectors (traditional Kubernetes resources)"
+kubectl apply -f $WORKDIR/codespace/manifests/otel-collector-daemonset-config.yaml
+kubectl apply -f $WORKDIR/codespace/manifests/otel-collector-statefulset-config.yaml
+kubectl apply -f $WORKDIR/codespace/manifests/otel-collector-daemonset.yaml
+kubectl apply -f $WORKDIR/codespace/manifests/otel-collector-statefulset.yaml
+kubectl apply -f $WORKDIR/codespace/manifests/otel-collector-service.yaml
 
 
 
