@@ -6,6 +6,11 @@ echo "Installing system packages..."
 sudo apt update
 sudo apt install -y jq curl vim gpg ca-certificates apt-transport-https
 
+echo "Installing kubectl..."
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
+
 echo "Installing step-cli..."
 curl -fsSL https://packages.smallstep.com/keys/apt/repo-signing-key.gpg -o /tmp/smallstep.asc
 sudo cp /tmp/smallstep.asc /etc/apt/trusted.gpg.d/smallstep.asc
