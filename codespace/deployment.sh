@@ -51,7 +51,8 @@ kubectl create namespace vegas-casino
 kubectl label namespace vegas-casino oneagent=false
 
 helm install vegas-casino ./helm/vegas-casino \
-   --set global.codesp
+   --set global.codespace=true \
+   --namespace vegas-casino
 
 HTTP_IDX=$(kubectl get svc vegas-casino-gateway  -n vegas-casino -o json |  jq -r '.spec.ports | to_entries | .[] | select(.value.name == "listener-80") | .key')
 PATCH_OPS="[{\"op\": \"replace\", \"path\": \"/spec/ports/${HTTP_IDX}/nodePort\", \"value\": 30080}]"

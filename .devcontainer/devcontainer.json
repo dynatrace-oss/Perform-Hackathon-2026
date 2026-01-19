@@ -29,7 +29,7 @@
 	},
 
 	// Install kind and run your setup scripts
-	"postCreateCommand": "bash -c 'chmod +x .devcontainer/post_create.sh && chmd +x /workspaces/${RepositoryName}/codespace/configuration/init.sh  && chmod +x /workspaces/${RepositoryName}/codespace/deployment.sh && .devcontainer/post_create.sh && /workspaces/${RepositoryName}/codespace/configuration/init.sh && /workspaces/${RepositoryName}/deployment.sh ",
+	"postCreateCommand": "bash -c 'set -e; chmod +x .devcontainer/post_create.sh && chmod +x codespace/configuration/init.sh && chmod +x codespace/deployment.sh && echo \"Running post_create.sh...\" && .devcontainer/post_create.sh && echo \"Running init.sh...\" && codespace/configuration/init.sh && echo \"Running deployment.sh...\" && codespace/deployment.sh'",
 
 	// Add recommended secrets
 	"secrets": {

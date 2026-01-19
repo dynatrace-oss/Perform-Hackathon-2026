@@ -35,7 +35,7 @@ export DYNATRACE_AUTOMATION_CLIENT_SECRET=$DYNATRACE_OAUTH_CLIENT_SECRET
 
 export DYNATRACE_DEBUG=true
 export DYNATRACE_LOG_HTTP=terraform-provider-dynatrace.http.log
-export DYYNATRACE_HTTP_RESPONSE=true
+export DYNATRACE_HTTP_RESPONSE=true
 
 terraform init
 
@@ -84,7 +84,7 @@ helm install dynatrace-operator oci://public.ecr.aws/dynatrace/dynatrace-operato
   --atomic
 
 kubectl -n dynatrace wait pod --for=condition=ready --selector=app.kubernetes.io/name=dynatrace-operator,app.kubernetes.io/component=webhook --timeout=300s
-kubectl -n dynatrace create secret generic dynakube --from-literal="apiToken=$DDYNATRACE_KUBERNETES_OPERATOR_TOKEN" --from-literal="dataIngestToken=$DYNATRACE_KUBERNETES_DATA_INGEST_TOKEN"
+kubectl -n dynatrace create secret generic dynakube --from-literal="apiToken=$DYNATRACE_KUBERNETES_OPERATOR_TOKEN" --from-literal="dataIngestToken=$DYNATRACE_KUBERNETES_DATA_INGEST_TOKEN"
 
 ### Update the ip of the ip adress for the ingres
 #TODO to update this part to create the various Gateway rules
@@ -96,8 +96,8 @@ kubectl create secret generic dynatrace \
    --from-literal=dt_api_token="$DYNATRACE_KUBERNETES_DATA_INGEST_TOKEN" \
    --from-literal=clustername="$CLUSTER_NAME"
 
-sed -i '' "s|DYNATRACE_LIVE_URL|$DYNATRACE_LIVE_URL|g" kubernetes/dynakube.yaml
-sed -i '' "s|CLUSTER_NAME|$CLUSTER_NAME|g" kubernetes/dynakube.yaml
+sed -i "s|DYNATRACE_LIVE_URL|$DYNATRACE_LIVE_URL|g" kubernetes/dynakube.yaml
+sed -i "s|CLUSTER_NAME|$CLUSTER_NAME|g" kubernetes/dynakube.yaml
 
 kubectl apply --filename kubernetes/dynakube.yaml
 
@@ -110,11 +110,11 @@ kubectl --namespace dynatrace \
   --from-literal=oauth-client-id="$DYNATRACE_OAUTH_CLIENT_ID" \
   --from-literal=oauth-client-secret="$DYNATRACE_OAUTH_CLIENT_SECRET"
 
-sed -i '' "s|CODESPACE_NAME|${CODESPACE_NAME:0:40}|g" kubernetes/edge-connect.yaml
-sed -i '' "s|DYNATRACE_ENVIRONMENT_ID|$DYNATRACE_ENVIRONMENT_ID|g" kubernetes/edge-connect.yaml
-sed -i '' "s|DYNATRACE_APPS_URL|$DYNATRACE_APPS_URL|g" kubernetes/edge-connect.yaml
-sed -i '' "s|DYNATRACE_SSO_URL|$DYNATRACE_SSO_URL|g" kubernetes/edge-connect.yaml
-sed -i '' "s|DYNATRACE_ACCOUNT_ID|$DYNATRACE_ACCOUNT_ID|g" kubernetes/edge-connect.yaml
+sed -i "s|CODESPACE_NAME|${CODESPACE_NAME:0:40}|g" kubernetes/edge-connect.yaml
+sed -i "s|DYNATRACE_ENVIRONMENT_ID|$DYNATRACE_ENVIRONMENT_ID|g" kubernetes/edge-connect.yaml
+sed -i "s|DYNATRACE_APPS_URL|$DYNATRACE_APPS_URL|g" kubernetes/edge-connect.yaml
+sed -i "s|DYNATRACE_SSO_URL|$DYNATRACE_SSO_URL|g" kubernetes/edge-connect.yaml
+sed -i "s|DYNATRACE_ACCOUNT_ID|$DYNATRACE_ACCOUNT_ID|g" kubernetes/edge-connect.yaml
 
 
 kubectl apply --filename kubernetes/edge-connect.yaml
