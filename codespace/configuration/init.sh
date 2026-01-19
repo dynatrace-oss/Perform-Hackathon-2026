@@ -2,7 +2,8 @@
 
 set -e
 
-cd configuration || exit
+# Change to the directory where this script is located
+cd "$(dirname "$0")" || exit
 
 ######################
 ### Infrastructure ###
