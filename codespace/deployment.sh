@@ -50,8 +50,34 @@ helm install open-feature-operator openfeature/open-feature-operator \
 kubectl create namespace vegas-casino
 kubectl label namespace vegas-casino oneagent=false
 
+######################
+### Team Identifier ###
+######################
+# Construct team identifier matching Terraform team.tf logic
+# Format: <demo_name_kebab>-<sanitized_codespace_name>
+# This ensures consistency between Terraform-created teams and Helm-deployed resources
+# The team identifier is used in dt.owner annotations for Dynatrace ownership tracking
+
+# Default demo name (matches variables.tf default)
+DEMO_NAME_KEBAB="${DEMO_NAME_KEBAB:-vegas-casino-app}"
+
+# Sanitize codespace name to match Terraform init.sh logic
+# Convert to lowercase, replace invalid chars with hyphens, remove leading/trailing hyphens
+SANITIZED_CODESPACE=$(echo "${CODESPACE_NAME:-codespace}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/^-\+//' | sed 's/-\+$//' | sed 's/--\+/-/g')
+# Ensure it doesn't start with a number (add prefix if needed)
+if echo "$SANITIZED_CODESPACE" | grep -qE '^[0-9]'; then
+    SANITIZED_CODESPACE="codespace-${SANITIZED_CODESPACE}"
+fi
+
+# Construct team identifier (matches team.tf: local.team_identifier)
+TEAM_IDENTIFIER="${DEMO_NAME_KEBAB}-${SANITIZED_CODESPACE}"
+
+echo "📋 Using team identifier: $TEAM_IDENTIFIER"
+echo "   This will be used for dt.owner annotations in all deployed pods"
+
 helm install vegas-casino $WORKDIR/helm/vegas-casino \
    --set global.codespace=true \
+   --set global.teamIdentifier="$TEAM_IDENTIFIER" \
    --namespace vegas-casino
 
 HTTP_IDX=$(kubectl get svc vegas-casino-gateway  -n vegas-casino -o json |  jq -r '.spec.ports | to_entries | .[] | select(.value.name == "listener-80") | .key')

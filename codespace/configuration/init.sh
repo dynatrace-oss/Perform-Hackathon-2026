@@ -45,7 +45,15 @@ export TF_VAR_github_token=$GITHUB_TOKEN
 export TF_VAR_dynatrace_platform_token=$DYNATRACE_PLATFORM_TOKEN
 export TF_VAR_dynatrace_live_url="https://$DYNATRACE_LIVE_URL"
 export TF_VAR_dynatrace_environment_id=$DYNATRACE_ENVIRONMENT_ID
-export TF_VAR_codespace_name=$CODESPACE_NAME
+
+# Sanitize codespace name for use in team identifier
+# Convert to lowercase, replace invalid chars with hyphens, remove leading/trailing hyphens
+SANITIZED_CODESPACE=$(echo "${CODESPACE_NAME:-codespace}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/^-\+//' | sed 's/-\+$//' | sed 's/--\+/-/g')
+# Ensure it doesn't start with a number (add prefix if needed)
+if echo "$SANITIZED_CODESPACE" | grep -qE '^[0-9]'; then
+    SANITIZED_CODESPACE="codespace-${SANITIZED_CODESPACE}"
+fi
+export TF_VAR_codespace_name="$SANITIZED_CODESPACE"
 
 
 
@@ -172,8 +180,11 @@ sleep 60
 
 # Try to import existing team if it exists (prevents recreation errors)
 # This allows Terraform to manage existing teams without trying to recreate them
+# Note: Team identifier now includes codespace name for uniqueness
 echo "Checking if team already exists and importing if needed..."
-TEAM_IDENTIFIER="${TF_VAR_demo_name_kebab:-vegas-casino-app}"
+
+# Use the sanitized codespace name that was already set for Terraform
+TEAM_IDENTIFIER="${TF_VAR_demo_name_kebab:-vegas-casino-app}-${TF_VAR_codespace_name}"
 
 # Check if team is already in Terraform state
 if terraform state show dynatrace_ownership_teams.demo >/dev/null 2>&1; then
