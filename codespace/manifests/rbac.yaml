@@ -13,15 +13,6 @@ metadata:
     app: otelcontribcol
 rules:
   - apiGroups:
-    - "ore.openfeature.dev"
-    resource:
-    - featureflag
-    verbs:
-      - get
-      - list
-      - watch
-      - patch
-  - apiGroups:
       - ""
     resources:
       - events
