@@ -7,7 +7,7 @@
 ### dttoken: Dynatrace api token with ingest metrics and otlp ingest scope
 ### dturl : url of your DT tenant wihtout any / at the end for example: https://dedede.live.dynatrace.com
 ################################################################################
-WORKDIR="/workspaces/Vegas-App"
+WORKDIR="/workspaces/Perform-Hackathon-2026"
 
 ### Pre-flight checks for dependencies
 if ! command -v jq >/dev/null 2>&1; then
