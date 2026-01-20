@@ -94,7 +94,8 @@ export DYNATRACE_KUBERNETES_OPERATOR_TOKEN
 
 DYNATRACE_KUBERNETES_DATA_INGEST_TOKEN="$(terraform output kubernetes_data_ingest_token | tr -d '"')"
 export DYNATRACE_KUBERNETES_DATA_INGEST_TOKEN
-export CLUSTER_NAME="Perform-Vegas-$CODESPACE_NAME" 
+export CLUSTER_NAME="Perform-Vegas-$CODESPACE_NAME"
+export TEAM_NAME="vegas-casino-app [$CODESPACE_NAME]"
 
 kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
 
@@ -146,6 +147,9 @@ kubectl create secret generic dynatrace \
 
 sed -i "s|DYNATRACE_LIVE_URL|$DYNATRACE_LIVE_URL|g" "$K8S_DIR/dynakube.yaml"
 sed -i "s|CLUSTER_NAME|$CLUSTER_NAME|g" "$K8S_DIR/dynakube.yaml"
+
+# replace team name in the values.yaml
+sed -i "s|TEAM_NAME|$TEAM_NAME|g" "$WORKDIR/helm/values.yaml"
 
 kubectl apply --filename "$K8S_DIR/dynakube.yaml"
 
