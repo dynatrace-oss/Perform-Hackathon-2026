@@ -149,7 +149,7 @@ sed -i "s|DYNATRACE_LIVE_URL|$DYNATRACE_LIVE_URL|g" "$K8S_DIR/dynakube.yaml"
 sed -i "s|CLUSTER_NAME|$CLUSTER_NAME|g" "$K8S_DIR/dynakube.yaml"
 
 # replace team name in the values.yaml
-sed -i "s|TEAM_NAME|$TEAM_NAME|g" "$WORKDIR/helm/values.yaml"
+sed -i "s|TEAM_NAME|$TEAM_NAME|g" "$WORKDIR/helm/vegas-casino/values.yaml"
 
 kubectl apply --filename "$K8S_DIR/dynakube.yaml"
 
