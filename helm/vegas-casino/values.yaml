@@ -3,8 +3,8 @@
 
 # Global configuration
 global:
-  imageRegistry: hrexed/vegasapp
-  imageTag: "0.39"
+  imageRegistry: ghcr.io/grabnerandi/vegasapp
+  imageTag: "latest"
   imagePullPolicy: IfNotPresent
   namespace: vegas-casino
   # Set to false if you want to use an existing namespace

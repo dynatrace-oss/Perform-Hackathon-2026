@@ -3,7 +3,7 @@
 set -e
 
 # Set workspace root directory
-WORKDIR="/workspaces/Vegas-App"
+WORKDIR="/workspaces/Perform-Hackathon-2026"
 ### Pre-flight checks for dependencies
 if ! command -v terraform >/dev/null 2>&1; then
     echo "Please install terraform before continuing"
