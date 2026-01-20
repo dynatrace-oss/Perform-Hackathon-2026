@@ -1,10 +1,10 @@
 name: Generate SBOM
 
 on:
-  push:
-    branches: [ main ]
-    tags:
-      - 'v*'
+  workflow_run:
+    workflows: ["Docker Build and Push"]
+    types:
+      - completed
   workflow_dispatch:
 
 env:
@@ -16,6 +16,7 @@ jobs:
   generate-sbom:
     name: Generate SBOM for ${{ matrix.service }}
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     strategy:
       matrix:
         service:
@@ -30,38 +31,95 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch || github.ref }}
+          sha: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build image for SBOM generation
-        uses: docker/build-push-action@v5
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          context: .
-          file: services/${{ matrix.service }}/Dockerfile
-          push: false
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:sbom-temp
-          load: true
-          platforms: ${{ env.PLATFORM }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (matching docker-build workflow)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull image from registry
+        id: pull
+        run: |
+          # Try tags in order of preference
+          TAGS="${{ steps.meta.outputs.tags }}"
+          IMAGE_BASE="${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}"
+          
+          # Extract first tag (most specific)
+          FIRST_TAG=$(echo "$TAGS" | head -n1 | tr -d ' ')
+          echo "Attempting to pull: ${IMAGE_BASE}:${FIRST_TAG}"
+          
+          # Try pulling with retries (images might still be uploading)
+          MAX_RETRIES=5
+          RETRY_COUNT=0
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if docker pull "${IMAGE_BASE}:${FIRST_TAG}"; then
+              echo "tag=${FIRST_TAG}" >> $GITHUB_OUTPUT
+              echo "Successfully pulled image with tag: ${FIRST_TAG}"
+              exit 0
+            fi
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              echo "Pull failed, retrying in 10 seconds... (attempt $RETRY_COUNT/$MAX_RETRIES)"
+              sleep 10
+            fi
+          done
+          
+          # Fallback to 'latest' for main branch
+          CURRENT_REF="${{ github.event.workflow_run.head_branch || github.ref_name }}"
+          if [[ "$CURRENT_REF" == "main" ]]; then
+            echo "Trying 'latest' tag as fallback..."
+            if docker pull "${IMAGE_BASE}:latest"; then
+              echo "tag=latest" >> $GITHUB_OUTPUT
+              echo "Successfully pulled image with tag: latest"
+            else
+              echo "Failed to pull image with any tag."
+              exit 1
+            fi
+          else
+            echo "Failed to pull image with tag: ${FIRST_TAG}"
+            exit 1
+          fi
 
       - name: Generate SBOM with Syft
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:sbom-temp
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ steps.pull.outputs.tag }}
           format: spdx-json
           output-file: sbom-${{ matrix.service }}.json
 
       - name: Generate SBOM (SPDX format)
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:sbom-temp
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ steps.pull.outputs.tag }}
           format: spdx
           output-file: sbom-${{ matrix.service }}.spdx
 
       - name: Generate SBOM (CycloneDX format)
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:sbom-temp
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ steps.pull.outputs.tag }}
           format: cyclonedx-json
           output-file: sbom-${{ matrix.service }}.cdx.json
 
