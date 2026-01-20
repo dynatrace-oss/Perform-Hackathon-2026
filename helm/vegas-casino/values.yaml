@@ -14,7 +14,7 @@ global:
   # Dynatrace team identifier for dt.owner annotation (includes codespace name for uniqueness)
   # Format: <demo_name_kebab>-<codespace_name>
   # Example: vegas-casino-app-henrik-codespace-123
-  teamIdentifier: "vegas-casino-app"
+  teamIdentifier: "TEAM_NAME"
   
 # OpenTelemetry configuration
 opentelemetry:
