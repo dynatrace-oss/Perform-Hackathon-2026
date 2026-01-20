@@ -4,7 +4,7 @@
 # Global configuration
 global:
   imageRegistry: GITHUB_USER/vegasapp
-  imageTag: "0.39"
+  imageTag: "latest"
   imagePullPolicy: IfNotPresent
   namespace: vegas-casino
   # Set to false if you want to use an existing namespace
