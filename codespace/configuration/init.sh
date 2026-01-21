@@ -194,8 +194,8 @@ else
         # Continue - Terraform will create it
     fi
 fi
-sed -i "s|TEAM_IDENTIFIER|$TEAM_IDENTIFIER|g" "$WORKDIR/codespace/helm/vegas-casino/values.yaml"
-sed -i "s|GITHUB_USER|$GITHUB_USER|g" "$WORKDIR/codespace/helm/vegas-casino/values.yaml"
+sed -i "s|TEAM_IDENTIFIER|$TEAM_IDENTIFIER|g" "$WORKDIR/helm/vegas-casino/values.yaml"
+sed -i "s|GITHUB_USER|$GITHUB_USER|g" "$WORKDIR/helm/vegas-casino/values.yaml"
 
 
 # Finally deploy all infrastructure
