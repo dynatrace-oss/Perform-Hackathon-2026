@@ -3,7 +3,7 @@
 
 # Global configuration
 global:
-  imageRegistry: GITHUB_USER/vegasapp
+  imageRegistry:  ghcr.io/GITHUB_USER/vegasapp
   imageTag: "latest"
   imagePullPolicy: IfNotPresent
   namespace: vegas-casino
