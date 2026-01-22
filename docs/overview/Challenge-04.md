@@ -1,6 +1,6 @@
 # Customizing GitHub Copilot in Your IDE
 
-[< Previous Challenge](./Challenge-03.md) - **[Home](../index.md)** - [Next Bonus Challenge >](./DTChallenge-04.md)
+[< Previous Challenge](./Challenge-03.md) - **[Home](../index.md)** - [Next Bonus Challenge >](./Challenge-05.md) | [Other Bonus >](./DTChallenge-04.md)
 
 ## Introduction
 GitHub Copilot becomes significantly more useful when it understands the context, standards, and expectations of your project. In this challenge, you will customize Copilot within your IDE by creating custom instructions and installing a custom agent to interact with Copilot in specialized ways.

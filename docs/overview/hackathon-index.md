@@ -30,7 +30,8 @@ Improve instrumentation and observability using Dynatrace and Copilot. These cha
 These challenges are optional and provide additional learning opportunities:
 
 1. [Customizing GitHub Copilot in Your IDE](Challenge-04.md) - Advanced Copilot customization
-2. [Build a Custom Dynatrace App](DTChallenge-04.md) - Create a custom Dynatrace application
+2. [Convert B-MAD Agent to GitHub Copilot Agent](Challenge-05.md) - Transform a B-MAD agent into a Copilot agent
+3. [Build a Custom Dynatrace App](DTChallenge-04.md) - Create a custom Dynatrace application
 
 ## Getting Started
 
@@ -64,6 +65,7 @@ These challenges are optional and provide additional learning opportunities:
 | Challenge | Description | Duration |
 |-----------|-------------|----------|
 | [Customizing GitHub Copilot in Your IDE](Challenge-04.md) | Create custom instructions and agents | ~1 hour |
+| [Convert B-MAD Agent to GitHub Copilot Agent](Challenge-05.md) | Transform a B-MAD agent into a Copilot agent | ~1-2 hours |
 | [Build a Custom Dynatrace App](DTChallenge-04.md) | Create a custom Dynatrace app | ~2 hours |
 
 ## Learning Path
@@ -79,12 +81,14 @@ graph LR
     H --> I[Challenge 03]
     I --> J[Bonus Challenges]
     J --> K[Challenge 04<br/>Copilot]
+    J --> M[Challenge 05<br/>B-MAD Agent]
     J --> L[Challenge 04<br/>Dynatrace]
     
     style A fill:#9333ea
     style F fill:#06b6d4
     style J fill:#f59e0b
     style K fill:#10b981
+    style M fill:#10b981
     style L fill:#10b981
 ```
 

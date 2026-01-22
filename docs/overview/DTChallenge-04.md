@@ -1,6 +1,6 @@
 # Build a Custom Dynatrace App (Bonus)
 
-[< Previous Bonus Challenge](./Challenge-04.md) - **[Home](../index.md)** 
+[< Previous Bonus Challenge](./Challenge-05.md) - **[Home](../index.md)** 
 
 ## Introduction
 

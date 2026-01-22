@@ -79,6 +79,7 @@ nav:
       - Improve your Dynatrace Setup: overview/DTChallenge-03.md
     - Bonus:
       - Customizing GitHub Copilot in Your IDE: overview/Challenge-04.md
+      - Convert B-MAD Agent to GitHub Copilot Agent: overview/Challenge-05.md
       - Build a Custom Dynatrace App: overview/DTChallenge-04.md
   - Environment Setup:
     - DevContainer Overview: deployment/devcontainer.md
