@@ -1,113 +1,155 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://vegas-casino.example.com/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/contributing/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/contributing/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/getting-started/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/getting-started/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/architecture/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/architecture/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/architecture/components/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/architecture/components/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/architecture/technology/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/architecture/technology/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/deployment/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/deployment/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/deployment/ci-cd/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/deployment/ci-cd/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/deployment/helm/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/deployment/devcontainer/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/deployment/k8s-vs-helm/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/deployment/helm/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/deployment/manifests/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/deployment/k8s-vs-helm/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/deployment/openfeature/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/deployment/manifests/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/development/building/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/deployment/openfeature/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/development/docker/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/development/building/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/overview/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/development/docker/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/overview/hackathon/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/development/feature-flags/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/snippets/api-token/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/development/github-actions/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/snippets/info-required/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/development/helm-updates/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/snippets/tenant-id/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/development/source-code/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/testing/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/overview/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/testing/k6/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/overview/Challenge-01/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
     <url>
-         <loc>https://vegas-casino.example.com/testing/playwright/</loc>
-         <lastmod>2026-01-09</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/overview/Challenge-02/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/overview/Challenge-03/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/overview/Challenge-04/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/overview/DTChallenge-00/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/overview/DTChallenge-01/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/overview/DTChallenge-02/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/overview/DTChallenge-03/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/overview/DTChallenge-04/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/overview/hackathon-index/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/overview/hackathon/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/snippets/api-token/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/snippets/codespace-details-warning-box/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/snippets/info-required/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/snippets/tenant-id/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/testing/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/testing/k6/</loc>
+         <lastmod>2026-01-22</lastmod>
+    </url>
+    <url>
+         <loc>https://dynatrace-oss.github.io/Perform-Hackathon-2026/testing/playwright/</loc>
+         <lastmod>2026-01-22</lastmod>
     </url>
 </urlset>

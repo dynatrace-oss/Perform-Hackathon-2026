@@ -1,0 +1,142 @@
+/* Dynatrace Brand Colors - Core Palette */
+:root {
+  --dt-pink: #BB0FD2;
+  --dt-purple: #5E29E5;
+  --dt-blue: #1966FF;
+  --dt-turquoise: #5DF2E0;
+}
+
+/* Override Material for MkDocs primary color with Dynatrace Purple */
+[data-md-color-primary="purple"] {
+  --md-primary-fg-color: #5E29E5;
+  --md-primary-fg-color--light: #1966FF;
+  --md-primary-fg-color--dark: #5E29E5;
+}
+
+/* Override Material for MkDocs accent color with Dynatrace Turquoise */
+[data-md-color-accent="cyan"] {
+  --md-accent-fg-color: #5DF2E0;
+  --md-accent-fg-color--transparent: rgba(93, 242, 224, 0.1);
+}
+
+/* Apply Dynatrace colors globally */
+:root {
+  --md-primary-fg-color: #5E29E5;
+  --md-primary-fg-color--light: #1966FF;
+  --md-primary-fg-color--dark: #5E29E5;
+  --md-accent-fg-color: #5DF2E0;
+  --md-accent-fg-color--transparent: rgba(93, 242, 224, 0.1);
+}
+
+/* Dark mode (slate) adjustments */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #5E29E5;
+  --md-primary-fg-color--light: #1966FF;
+  --md-primary-fg-color--dark: #5E29E5;
+  --md-accent-fg-color: #5DF2E0;
+  --md-accent-fg-color--transparent: rgba(93, 242, 224, 0.2);
+}
+
+/* Links use Dynatrace Blue */
+.md-typeset a {
+  color: #1966FF;
+}
+
+.md-typeset a:hover {
+  color: #5E29E5;
+}
+
+.md-typeset a:focus {
+  color: #5E29E5;
+}
+
+/* Admonitions with Dynatrace colors */
+.md-typeset .admonition.tip {
+  border-color: #5DF2E0;
+}
+
+.md-typeset .admonition.tip .admonition-title {
+  background-color: rgba(93, 242, 224, 0.1);
+  border-color: #5DF2E0;
+}
+
+.md-typeset .admonition.warning {
+  border-color: #BB0FD2;
+}
+
+.md-typeset .admonition.warning .admonition-title {
+  background-color: rgba(187, 15, 210, 0.1);
+  border-color: #BB0FD2;
+}
+
+.md-typeset .admonition.info {
+  border-color: #1966FF;
+}
+
+.md-typeset .admonition.info .admonition-title {
+  background-color: rgba(25, 102, 255, 0.1);
+  border-color: #1966FF;
+}
+
+/* Navigation active and hover states */
+.md-nav__link--active {
+  color: #5E29E5;
+}
+
+.md-nav__link:hover {
+  color: #1966FF;
+}
+
+/* Buttons with Dynatrace colors */
+.md-typeset .md-button {
+  background-color: #5E29E5;
+  border-color: #5E29E5;
+  color: #FFFFFF;
+}
+
+.md-typeset .md-button:hover {
+  background-color: #1966FF;
+  border-color: #1966FF;
+  color: #FFFFFF;
+}
+
+.md-typeset .md-button--primary {
+  background-color: #5E29E5;
+  border-color: #5E29E5;
+}
+
+.md-typeset .md-button--primary:hover {
+  background-color: #1966FF;
+  border-color: #1966FF;
+}
+
+/* Header with Dynatrace Purple */
+.md-header {
+  background-color: #5E29E5;
+}
+
+.md-header__button:hover {
+  color: #5DF2E0;
+}
+
+/* Search with Dynatrace colors */
+.md-search__form {
+  background-color: rgba(94, 41, 229, 0.1);
+}
+
+.md-search__input:hover {
+  background-color: rgba(94, 41, 229, 0.15);
+}
+
+/* Tabs with Dynatrace colors */
+.md-tabs {
+  background-color: #5E29E5;
+}
+
+.md-tabs__link--active {
+  color: #5DF2E0;
+}
+
+.md-tabs__link:hover {
+  color: #5DF2E0;
+}
