@@ -118,6 +118,15 @@ func (s *diceServer) Roll(ctx context.Context, req *pb.RollRequest) (*pb.RollRes
 	d2 := rand.Intn(6) + 1
 	sum := d1 + d2
 
+	// Add span event for dice roll
+	span.AddEvent("dice_rolled", trace.WithAttributes(
+		attribute.Int("dice.1", d1),
+		attribute.Int("dice.2", d2),
+		attribute.Int("dice.sum", sum),
+		attribute.String("bet.type", betType),
+		attribute.Float64("bet.amount", betAmount),
+	))
+
 	// Determine win condition
 	var win bool
 	var payoutMultiplier float64
@@ -146,6 +155,14 @@ func (s *diceServer) Roll(ctx context.Context, req *pb.RollRequest) (*pb.RollRes
 		payoutMultiplier = 2
 	}
 
+	// Add span event for win determination
+	span.AddEvent("win_determined", trace.WithAttributes(
+		attribute.Bool("win", win),
+		attribute.Float64("payout.multiplier", payoutMultiplier),
+		attribute.String("bet.type", betType),
+		attribute.Int("dice.sum", sum),
+	))
+
 	payout := 0.0
 	if win {
 		payout = betAmount * payoutMultiplier
@@ -155,6 +172,12 @@ func (s *diceServer) Roll(ctx context.Context, req *pb.RollRequest) (*pb.RollRes
 		if houseAdvantageEnabled {
 			// 25% chance to convert a win into a loss (house advantage)
 			if rand.Float64() < 0.25 {
+				// Add span event for house advantage
+				span.AddEvent("house_advantage_applied", trace.WithAttributes(
+					attribute.Float64("original.payout", payout),
+					attribute.Bool("converted_to_loss", true),
+				))
+				
 				win = false
 				payout = 0.0
 				log.Printf("[Dice] 🏠 House advantage applied: win converted to loss")

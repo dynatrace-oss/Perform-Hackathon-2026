@@ -279,6 +279,13 @@ class SlotsServiceImpl {
     // Generate random result using Dynatrace symbols
     let result = Array.from({ length: 3 }, () => icons[Math.floor(Math.random() * icons.length)]);
     
+    // Add span event for initial reel result
+    span.addEvent('reels_spun', {
+      'reel.1': result[0],
+      'reel.2': result[1],
+      'reel.3': result[2],
+    });
+    
     let cheatBoosted = false;
     
     // Apply cheat logic
@@ -317,15 +324,41 @@ class SlotsServiceImpl {
         // Leave third as random for double
         cheatBoosted = true;
       }
+      
+      // Add span event if cheat modified the result
+      if (cheatBoosted) {
+        span.addEvent('cheat_boosted_result', {
+          'cheat.type': cheatType,
+          'reel.1': result[0],
+          'reel.2': result[1],
+          'reel.3': result[2],
+        });
+      }
     }
 
     let { win, winAmount, multiplier, winType, description } = calculateWin(result, betAmount);
+    
+    // Add span event for win calculation
+    span.addEvent('win_calculated', {
+      'win': win,
+      'win.amount': winAmount,
+      'win.multiplier': multiplier,
+      'win.type': winType,
+      'result': result.join(','),
+    });
     
     // Apply house advantage if enabled and player would win
     // This reduces win probability by 25% when the casino is losing too much money
     if (win && winAmount > 0 && houseAdvantageEnabled) {
       // 25% chance to convert a win into a loss
       if (Math.random() < 0.25) {
+        // Add span event for house advantage override
+        span.addEvent('house_advantage_applied', {
+          'original.win_amount': winAmount,
+          'original.multiplier': multiplier,
+          'converted_to_loss': true,
+        });
+        
         win = false;
         winAmount = 0;
         multiplier = 0;
@@ -343,6 +376,15 @@ class SlotsServiceImpl {
       multiplier: multiplier,
       bet_amount: betAmount,
       cheat_boosted: cheatBoosted
+    });
+
+    // Add span event for final game result
+    span.addEvent('game_completed', {
+      'final.result': result.join(','),
+      'final.win': win,
+      'final.payout': winAmount,
+      'final.multiplier': multiplier,
+      'cheat.boosted': cheatBoosted,
     });
 
     // Store game state in Redis

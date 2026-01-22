@@ -210,6 +210,18 @@ class BlackjackServiceImpl {
     const playerHand = [drawCard(), drawCard()];
     const dealerHand = [drawCard(), drawCard()];
     
+    // Add span event for initial deal
+    span.addEvent('cards_dealt', {
+      'player.card1.rank': playerHand[0].rank,
+      'player.card1.suit': playerHand[0].suit,
+      'player.card2.rank': playerHand[1].rank,
+      'player.card2.suit': playerHand[1].suit,
+      'dealer.card1.rank': dealerHand[0].rank,
+      'dealer.card1.suit': dealerHand[0].suit,
+      'dealer.card2.rank': dealerHand[1].rank,
+      'dealer.card2.suit': dealerHand[1].suit,
+    });
+    
     // Store game state in Redis (primary source of truth)
     const gameState = {
       playerHand,
@@ -232,6 +244,13 @@ class BlackjackServiceImpl {
       gameState.gameStatus = 'finished';
       const dealerActualScore = scoreHand(dealerHand);
       const dealerNaturalBlackjack = dealerActualScore === 21 && dealerHand.length === 2;
+      
+      // Add span event for natural blackjack
+      span.addEvent('natural_blackjack_detected', {
+        'player.score': playerScore,
+        'dealer.score': dealerActualScore,
+        'dealer.has_blackjack': dealerNaturalBlackjack,
+      });
       
       if (dealerNaturalBlackjack) {
         gameState.result = 'push';
@@ -356,8 +375,23 @@ class BlackjackServiceImpl {
     const playerScore = scoreHand(gameState.playerHand);
     const dealerScore = scoreHand([gameState.dealerHand[0]]);
 
+    // Add span event for player drawing card
+    span.addEvent('player_drew_card', {
+      'card.rank': newCard.rank,
+      'card.suit': newCard.suit,
+      'hand.score': playerScore,
+      'hand.card_count': gameState.playerHand.length,
+      'hand.busted': playerScore > 21,
+    });
+
     // Check if player busts
     if (playerScore > 21) {
+      // Add span event for bust
+      span.addEvent('player_busted', {
+        'player.final_score': playerScore,
+        'dealer.score': scoreHand(gameState.dealerHand),
+      });
+      
       gameState.gameStatus = 'finished';
       gameState.result = 'bust';
       gameState.payout = 0;
@@ -499,12 +533,37 @@ class BlackjackServiceImpl {
 
     // Dealer's turn - draw until 17 or higher
     gameState.gameStatus = 'dealer_turn';
+    
+    // Add span event for dealer turn starting
+    span.addEvent('dealer_turn_started', {
+      'dealer.initial_score': scoreHand(gameState.dealerHand),
+      'player.score': scoreHand(gameState.playerHand),
+    });
+    
+    let dealerDrawCount = 0;
     while (scoreHand(gameState.dealerHand) < 17) {
-      gameState.dealerHand.push(drawCard());
+      const dealerCard = drawCard();
+      gameState.dealerHand.push(dealerCard);
+      dealerDrawCount++;
+      
+      // Add span event for each dealer card drawn
+      span.addEvent('dealer_drew_card', {
+        'card.rank': dealerCard.rank,
+        'card.suit': dealerCard.suit,
+        'dealer.score': scoreHand(gameState.dealerHand),
+        'draw.number': dealerDrawCount,
+      });
     }
 
     const playerScore = scoreHand(gameState.playerHand);
     const dealerScore = scoreHand(gameState.dealerHand);
+    
+    // Add span event for dealer turn completed
+    span.addEvent('dealer_turn_completed', {
+      'dealer.final_score': dealerScore,
+      'dealer.busted': dealerScore > 21,
+      'dealer.cards_drawn': dealerDrawCount,
+    });
     
     // Check house advantage feature flag
     const houseAdvantageEnabled = await getFeatureFlag('casino.house-advantage', false);
@@ -514,6 +573,15 @@ class BlackjackServiceImpl {
     
     // Determine result (with house advantage check if enabled)
     const { result, payout } = await determineGameResult(playerScore, dealerScore, gameState.betAmount);
+    
+    // Add span event for final result
+    span.addEvent('game_result_determined', {
+      'result': result,
+      'payout': payout,
+      'player.score': playerScore,
+      'dealer.score': dealerScore,
+      'bet.amount': gameState.betAmount,
+    });
     
     gameState.gameStatus = 'finished';
     gameState.result = result;
