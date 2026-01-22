@@ -47,6 +47,8 @@ If there are any errors please let us know!
 
 You can validate that the codespace is started successfuly by doing a `kubectl get pods -A` to validate that all pods launched successfully. Also open the Kubernets App in Dynatrace and validate that you see a Kubernetes Server that matches the name of your codespace. You can also use the "Kubernetes Cluster" Segment to easily filter for your cluster!
 
+Note: After starting your codespaces you may see a popup that requests you to sign in again to GitHub. Aftering signing in you may see a poping stating that 'SAML access was not provided. Some GitHub repositories will not be available'. If you see this message you can safely ignore it.
+
 ### 5: Launch the Vegas App
 
 Once all is running you should be able to open up the web interface of our deployed app. For that you can simply open the Ports tab in Visual Studio Code and open the Gateway service. 
