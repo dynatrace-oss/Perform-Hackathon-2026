@@ -100,7 +100,7 @@ Your Codespace has now deployed the following resources:
 Before moving on, Davis AI needs around 20 minutes to analyze your Kubernetes workloads and establish a baseline for
 predictive analysis. You can check its progress by navigating to the newly deployed "Predictive Kubernetes Scaling"
 notebook and running the DQL query in the "2. Predict Resource Usage" step. If the results indicate that Davis AI is
-ready, you can proceed to [step 5](#5-generate-some-load).
+ready, you can proceed to the next steps in the hackathon challenges.
 
 Just make sure that your Codespace does not expire within that time by e.g. clicking into the window from time to time.
 Check out the [GitHub Codespace documentation](https://docs.github.com/en/codespaces/setting-your-user-preferences/setting-your-timeout-period-for-github-codespaces){target="_blank"}
@@ -155,5 +155,5 @@ to read more about timeout periods for Codespaces and how to configure them.
     In the new Visual Studio code window, open a new terminal and continue with the tutorial.
 
 <div class="grid cards" markdown>
-- [Click Here to Run the Demo :octicons-arrow-right-24:](workshop.md)
+- [Start the Hackathon :octicons-arrow-right-24:](overview/hackathon-index.md)
 </div>

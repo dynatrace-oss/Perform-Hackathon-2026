@@ -209,8 +209,6 @@ See [Updating with Helm](../development/helm-updates.md) for details.
 For detailed information about each component:
 
 - **[DevContainer Environment](devcontainer.md)**: Complete environment overview
-- **[OpenFeature Operator](openfeature.md)**: Feature flag management
-- **[Helm Charts](helm.md)**: Deployment configuration
 
 ## Troubleshooting
 

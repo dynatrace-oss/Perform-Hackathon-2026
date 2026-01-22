@@ -99,3 +99,20 @@ plugins:
   - git-revision-date-localized:
       enable_creation_date: true
 
+# Exclude files that are not meant to be standalone pages
+# (snippets are included via --8<-- syntax, old content, etc.)
+exclude_docs: |
+  snippets/**
+  overview/hackathon.md
+  overview/index.md
+  getting-started.md
+  architecture/technology.md
+  deployment/ci-cd.md
+  deployment/helm.md
+  deployment/k8s-vs-helm.md
+  deployment/manifests.md
+  deployment/openfeature.md
+  development/building.md
+  development/docker.md
+  testing/**
+

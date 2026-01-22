@@ -247,5 +247,5 @@ graph TB
 
 ---
 
-**Next**: Learn about [Components](components.md) or the [Technology Stack](technology.md).
+**Next**: Learn about [Components](components.md).
 
