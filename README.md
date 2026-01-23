@@ -194,9 +194,36 @@ The hackathon is organized into tracks:
 
 ### Bonus Challenges (Optional)
 - Customizing GitHub Copilot in Your IDE
+- Convert B-MAD Agent to GitHub Copilot Agent
 - Build a Custom Dynatrace App
 
 **👉 [View All Challenges on the Documentation Website](https://dynatrace-oss.github.io/Perform-Hackathon-2026/overview/hackathon-index/)**
+
+## 📊 Learning Path
+
+The recommended learning path follows this sequence:
+
+```mermaid
+graph LR
+    A[Fork Repository] --> B[GitHub Copilot<br/>Challenge 01]
+    B --> C[Challenge 02]
+    C --> D[Challenge 03]
+    D --> F[Dynatrace<br/>Challenge 00]
+    F --> G[Challenge 01]
+    G --> H[Challenge 02]
+    H --> I[Challenge 03]
+    I --> J[Bonus Challenges]
+    J --> K[Challenge 04<br/>Copilot]
+    J --> M[Challenge 05<br/>B-MAD Agent]
+    J --> L[Challenge 04<br/>Dynatrace]
+    
+    style A fill:#9333ea
+    style F fill:#06b6d4
+    style J fill:#f59e0b
+    style K fill:#10b981
+    style M fill:#10b981
+    style L fill:#10b981
+```
 
 ## 🛠️ Technology Stack
 
