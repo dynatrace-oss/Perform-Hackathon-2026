@@ -77,19 +77,24 @@ See the [Development Guide](development/source-code.md) for details on:
 
 ```mermaid
 graph LR
-    A[Fork Repository] --> B[Challenge 01<br/>GitHub Copilot Intro]
-    B --> C[Challenge 02<br/>Best Practices]
-    C --> D[Challenge 03<br/>MCP Integration]
-    D --> E[Challenge 04<br/>Customize Copilot]
-    E --> F[DTChallenge 00<br/>Launch Environment]
-    F --> G[DTChallenge 01<br/>Query Data]
-    G --> H[DTChallenge 02<br/>Improve Instrumentation]
-    H --> I[DTChallenge 03<br/>Dynatrace Setup]
-    I --> J[DTChallenge 04<br/>Custom App]
+    A[Fork Repository] --> B[GitHub Copilot<br/>Challenge 01]
+    B --> C[Challenge 02]
+    C --> D[Challenge 03]
+    D --> F[Dynatrace<br/>Challenge 00]
+    F --> G[Challenge 01]
+    G --> H[Challenge 02]
+    H --> I[Challenge 03]
+    I --> J[Bonus Challenges]
+    J --> K[Challenge 04<br/>Copilot]
+    J --> M[Challenge 05<br/>B-MAD Agent]
+    J --> L[Challenge 04<br/>Dynatrace]
     
     style A fill:#9333ea
     style F fill:#06b6d4
-    style J fill:#10b981
+    style J fill:#f59e0b
+    style K fill:#10b981
+    style M fill:#10b981
+    style L fill:#10b981
 ```
 
 ## 📚 Additional Resources
