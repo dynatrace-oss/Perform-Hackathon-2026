@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package whackamolegame;
+
+service WhackAMoleService {
+  rpc StartGame(StartGameRequest) returns (GameState) {}
+  rpc Hit(ActionRequest) returns (GameState) {}
+  rpc Miss(ActionRequest) returns (GameState) {}
+  rpc EndGame(EndGameRequest) returns (GameResult) {}
+  rpc GetStatus(StatusRequest) returns (GameState) {}
+}
+
+message StartGameRequest {
+  string username = 1;
+  int32 difficulty = 2;
+}
+
+message ActionRequest {
+  string username = 1;
+  int32 mole_id = 2;
+}
+
+message EndGameRequest {
+  string username = 1;
+}
+
+message StatusRequest {
+  string username = 1;
+}
+
+message GameState {
+  string status = 1;
+  string username = 2;
+  int32 score = 3;
+  int32 hits = 4;
+  int32 misses = 5;
+  int32 combo = 6;
+  int32 moles = 7;
+  int64 time_remaining = 8;
+  string game_id = 9;
+}
+
+message GameResult {
+  string status = 1;
+  int32 final_score = 2;
+  int32 hits = 3;
+  int32 misses = 4;
+  int32 max_combo = 5;
+  double accuracy = 6;
+}
