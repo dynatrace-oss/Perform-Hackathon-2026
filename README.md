@@ -1,3 +1,5 @@
+This project is no longer actively maintained. The repository remains available for reference, but no additional features, fixes, or support should be expected.
+
 # 🎰 Vegas Casino - Observability Hackathon
 
 > ## 📖 **[👉 Open Hackathon Documentation Website](https://dynatrace-oss.github.io/Perform-Hackathon-2026) 👈**
